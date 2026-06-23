@@ -44,6 +44,11 @@ curl -sS 'http://127.0.0.1:3000/search?q=customer&limit=3'
 curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHistory=true'
 ```
 
+## Import 경로
+
+- HTTP author import는 Markdown(`.md`)과 JSONL(`.jsonl`)을 받습니다.
+- `malmungchi ingest <input-dir> --out <workspace>`는 로컬 Markdown(`.md`)과 JSON(`.json`) 파일을 persona와 provenance workflow에 맞게 normalize합니다.
+
 ## MCP 도구
 
 - `search_documents`
@@ -73,6 +78,7 @@ curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHis
 CLI는 `malmungchi`로 실행합니다:
 
 ```bash
+malmungchi ingest ./notes --out ./workspace
 malmungchi persona --help
 malmungchi panel --help
 malmungchi room --help
@@ -81,6 +87,7 @@ malmungchi room --help
 소스 checkout에서는 Bun script로도 같은 명령을 쓸 수 있습니다:
 
 ```bash
+bun run malmungchi ingest ./notes --out ./workspace
 bun run malmungchi persona --help
 bun run malmungchi panel --help
 bun run malmungchi room --help

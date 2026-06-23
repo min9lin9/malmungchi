@@ -44,6 +44,12 @@ curl -sS 'http://127.0.0.1:3000/search?q=customer&limit=3'
 curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHistory=true'
 ```
 
+## Import Paths
+
+- HTTP author import accepts Markdown (`.md`) and JSONL (`.jsonl`).
+- `malmungchi ingest <input-dir> --out <workspace>` normalizes local Markdown
+  (`.md`) and JSON (`.json`) files for persona and provenance workflows.
+
 ## MCP Tools
 
 - `search_documents`
@@ -73,6 +79,7 @@ curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHis
 The bundled CLI is exposed as `malmungchi`:
 
 ```bash
+malmungchi ingest ./notes --out ./workspace
 malmungchi persona --help
 malmungchi panel --help
 malmungchi room --help
@@ -81,6 +88,7 @@ malmungchi room --help
 From a source checkout, the same commands are available through Bun:
 
 ```bash
+bun run malmungchi ingest ./notes --out ./workspace
 bun run malmungchi persona --help
 bun run malmungchi panel --help
 bun run malmungchi room --help
