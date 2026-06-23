@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+coverage/
+tmp/
+__pycache__/
+*.pyc
+*.tsbuildinfo
+*.map
+*.tgz
+
+# logs
+*.log
+npm-debug.log*
+
+# env
+.env
+.env.local
+.env.*
+.npmrc
+*.pem
+*.key
+
+# OS
+.DS_Store
+
+# editor
+.vscode/
+.idea/
+
+# runtime data
+data/episodes/
+data/topics/
+data/episodes.jsonl
+data/topics.jsonl
+data/manifest.json
+
+# search index cache
+data/.cache/
+
+evidence/
+.omo/
+.venv/

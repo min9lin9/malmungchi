@@ -1,0 +1,30 @@
+{
+  "description": "Static synthetic Phase 1 benchmark: natural-language queries and relevance judgments over existing corpus chunks.",
+  "groups": [
+    {"sourceOffset":0,"relevantPositions":[2,3],"queries":["product retention lessons from this interview","quality signals for product teams","recall of onboarding strategy examples","ranking product insights for operators"]},
+    {"sourceOffset":4,"relevantPositions":[2,3],"queries":["growth model lessons from the discussion","product strategy quality signals","onboarding recall for marketplace teams","ranking durable retention examples"]},
+    {"sourceOffset":8,"relevantPositions":[2,3],"queries":["customer discovery product lessons","quality signals in founder decisions","recall practical activation examples","ranking product leadership advice"]},
+    {"sourceOffset":12,"relevantPositions":[2,3],"queries":["marketplace product strategy lessons","quality signals for growth loops","recall retention operating examples","ranking activation insights"]},
+    {"sourceOffset":16,"relevantPositions":[2,3],"queries":["product management operating lessons","quality signals for roadmap choices","recall customer onboarding examples","ranking product-market fit advice"]},
+    {"sourceOffset":20,"relevantPositions":[2,3],"queries":["growth team product lessons","quality signals for experimentation","recall retention loop examples","ranking startup product advice"]},
+    {"sourceOffset":24,"relevantPositions":[2,3],"queries":["founder product strategy lessons","quality signals for customer value","recall onboarding friction examples","ranking product growth insights"]},
+    {"sourceOffset":28,"relevantPositions":[2,3],"queries":["consumer product retention lessons","quality signals in activation metrics","recall marketplace quality examples","ranking product leadership patterns"]},
+    {"sourceOffset":32,"relevantPositions":[2,3],"queries":["enterprise product growth lessons","quality signals for sales-led product","recall onboarding strategy examples","ranking durable product decisions"]},
+    {"sourceOffset":36,"relevantPositions":[2,3],"queries":["product-led growth lessons","quality signals for self-serve funnels","recall retention metric examples","ranking activation strategy advice"]},
+    {"sourceOffset":40,"relevantPositions":[2,3],"queries":["platform product strategy lessons","quality signals for ecosystem teams","recall developer onboarding examples","ranking product execution insights"]},
+    {"sourceOffset":44,"relevantPositions":[2,3],"queries":["AI product management lessons","quality signals for user workflows","recall activation examples in AI tools","ranking product strategy takeaways"]},
+    {"sourceOffset":48,"relevantPositions":[2,3],"queries":["B2B product strategy lessons","quality signals for buyer workflows","recall onboarding examples for teams","ranking retention strategy insights"]},
+    {"sourceOffset":52,"relevantPositions":[2,3],"queries":["mobile product growth lessons","quality signals for user engagement","recall activation loop examples","ranking product experimentation advice"]},
+    {"sourceOffset":56,"relevantPositions":[2,3],"queries":["community product lessons","quality signals for network effects","recall retention examples from communities","ranking marketplace strategy advice"]},
+    {"sourceOffset":60,"relevantPositions":[2,3],"queries":["pricing product strategy lessons","quality signals for packaging decisions","recall onboarding value examples","ranking monetization product insights"]},
+    {"sourceOffset":64,"relevantPositions":[2,3],"queries":["design product leadership lessons","quality signals for user experience","recall activation examples in design","ranking product craft advice"]},
+    {"sourceOffset":68,"relevantPositions":[2,3],"queries":["data product strategy lessons","quality signals for analytics teams","recall retention metric examples","ranking product measurement advice"]},
+    {"sourceOffset":72,"relevantPositions":[2,3],"queries":["international product growth lessons","quality signals for local markets","recall onboarding localization examples","ranking global product insights"]},
+    {"sourceOffset":76,"relevantPositions":[2,3],"queries":["early-stage product lessons","quality signals for startup focus","recall activation examples for founders","ranking product discovery advice"]},
+    {"sourceOffset":80,"relevantPositions":[2,3],"queries":["scaling product organization lessons","quality signals for team rituals","recall roadmap alignment examples","ranking product leadership insights"]},
+    {"sourceOffset":84,"relevantPositions":[2,3],"queries":["creator product strategy lessons","quality signals for engagement loops","recall retention examples for creators","ranking platform product advice"]},
+    {"sourceOffset":88,"relevantPositions":[2,3],"queries":["security product strategy lessons","quality signals for trust workflows","recall onboarding examples for admins","ranking product trust insights"]},
+    {"sourceOffset":92,"relevantPositions":[2,3],"queries":["AI workflow product lessons","quality signals for assistant products","recall activation examples for AI","ranking product adoption advice"]},
+    {"sourceOffset":96,"relevantPositions":[2,3],"queries":["market expansion product lessons","quality signals for customer segments","recall retention examples by segment","ranking product growth strategy"]}
+  ]
+}

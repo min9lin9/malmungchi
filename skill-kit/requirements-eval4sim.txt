@@ -1,0 +1,6 @@
+sentence-transformers==3.4.1
+transformers==4.48.3
+torch==2.5.1
+scikit-learn==1.6.1
+numpy==2.2.2
+colbert-ai==0.2.21

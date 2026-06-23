@@ -1,0 +1,3 @@
+display_name: Panel Debate
+short_description: Run cited, bounded debates between generated personas.
+default_prompt: Run a bounded cited panel debate between these personas.

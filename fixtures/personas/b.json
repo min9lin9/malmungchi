@@ -1,0 +1,25 @@
+{
+  "personaId": "b-persona",
+  "authorId": "b",
+  "provider": "fake",
+  "not_real_person": true,
+  "claims": [
+    {
+      "id": "claim-1",
+      "text": "Keep decisions bounded and reversible.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "quote": "한국어 보존",
+          "chunkId": "doc:e2:c1",
+          "elementId": "doc:e2",
+          "docId": "doc",
+          "sourceFile": "note.md",
+          "lineStart": 2,
+          "lineEnd": 2
+        }
+      ]
+    }
+  ],
+  "caveats": []
+}

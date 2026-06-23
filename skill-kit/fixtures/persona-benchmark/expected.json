@@ -1,0 +1,18 @@
+{
+  "reference": "persona feature benchmark fixture",
+  "categories": ["vc", "tech", "founder", "expert", "influencer", "politician", "celebrity"],
+  "providers": ["openai-compatible", "codex", "claude-code", "ollama", "fake"],
+  "commands": ["chat", "room", "panel", "list", "status", "history"],
+  "dimensions": [
+    "personaSchema",
+    "personaQuality",
+    "personaChatReadiness",
+    "categoryPanelReadiness",
+    "groupRoomReadiness",
+    "standaloneCliReadiness",
+    "providerParity",
+    "migrationReadiness",
+    "securityReadiness",
+    "overall"
+  ]
+}

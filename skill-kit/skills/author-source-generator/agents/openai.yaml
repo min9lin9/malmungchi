@@ -1,0 +1,3 @@
+display_name: Author Source Generator
+short_description: Build Corpus author imports from normalized source elements.
+default_prompt: Generate and import a Corpus author source from normalized documents.

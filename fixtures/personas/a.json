@@ -1,0 +1,25 @@
+{
+  "personaId": "a-persona",
+  "authorId": "a",
+  "provider": "fake",
+  "not_real_person": true,
+  "claims": [
+    {
+      "id": "claim-1",
+      "text": "Prioritize evidence before scaling.",
+      "confidence": "medium",
+      "evidence": [
+        {
+          "quote": "Evidence-backed product strategy note.",
+          "chunkId": "doc:e1:c1",
+          "elementId": "doc:e1",
+          "docId": "doc",
+          "sourceFile": "note.md",
+          "lineStart": 1,
+          "lineEnd": 1
+        }
+      ]
+    }
+  ],
+  "caveats": []
+}

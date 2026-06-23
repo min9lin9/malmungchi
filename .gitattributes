@@ -1,0 +1,2 @@
+# Treat generated cache files as binary to avoid diff noise
+data/.cache/* binary

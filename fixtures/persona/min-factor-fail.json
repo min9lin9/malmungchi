@@ -1,0 +1,8 @@
+{
+  "personaId": "fail-persona",
+  "authorId": "fail",
+  "provider": "fake",
+  "not_real_person": true,
+  "claims": [],
+  "caveats": ["No source evidence was available; no claims were fabricated."]
+}
