@@ -5,8 +5,16 @@
   "type": "module",
   "main": "src/main.ts",
   "bin": {
-    "malmungchi": "./skill-kit/src/index.ts"
+    "malmungchi": "bin/malmungchi"
   },
+  "files": [
+    "bin",
+    "src",
+    "skill-kit/src",
+    "skill-kit/skills",
+    "fixtures",
+    "requirements-eval4sim.txt"
+  ],
   "exports": {
     ".": "./src/main.ts",
     "./bootstrap": "./src/bootstrap.ts",

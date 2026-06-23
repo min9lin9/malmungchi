@@ -1,0 +1,2 @@
+#!/usr/bin/env bun
+import "../skill-kit/src/index.ts";

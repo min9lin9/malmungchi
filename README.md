@@ -10,7 +10,20 @@ generated caches, or provider credentials.
 
 ## Quickstart
 
+Prerequisite: Bun 1.3 or newer.
+
+Install from npm:
+
 ```bash
+npm install -g malmungchi
+malmungchi --help
+```
+
+Or run from source:
+
+```bash
+git clone https://github.com/min9lin9/malmungchi.git
+cd malmungchi
 bun install
 bun run typecheck
 bun test
@@ -61,10 +74,27 @@ curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHis
 The bundled CLI is exposed as `malmungchi`:
 
 ```bash
+malmungchi persona --help
+malmungchi panel --help
+malmungchi room --help
+```
+
+From a source checkout, the same commands are available through Bun:
+
+```bash
 bun run malmungchi persona --help
 bun run malmungchi panel --help
 bun run malmungchi room --help
 ```
+
+To test the Codex skill locally, link it into your Codex skills directory:
+
+```bash
+mkdir -p ~/.codex/skills
+ln -sfn "$(pwd)/skill-kit/skills/malmungchi" ~/.codex/skills/malmungchi
+```
+
+Then start a new Codex session and call `/malmungchi`.
 
 Available local checks:
 
