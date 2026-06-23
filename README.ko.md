@@ -7,8 +7,6 @@ Malmungchi는 Codex와 함께 쓰는 로컬 문서 기억 서버이자 페르소
 
 Markdown이나 JSONL로 만든 author source를 가져오고, MCP 또는 HTTP로 검색하고, 근거가 붙은 export bundle을 만들고, 그 근거를 바탕으로 선을 넘지 않는 simulated persona를 생성합니다. 기억력은 빌려주되, 허언증은 빌려주지 않는 것이 목표입니다.
 
-이 저장소에는 비공개 문서 컬렉션, 비공개 evidence, 생성된 cache, provider credential이 들어 있지 않습니다.
-
 ## 빠른 시작
 
 필요한 것: Bun 1.3 이상.
@@ -118,10 +116,6 @@ bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/malmun
 - `EMBED_MODEL`: embedding model 이름
 
 Provider key는 환경 변수에서만 읽습니다. 테스트는 deterministic fake provider를 쓰므로 실제 model credential이 없어도 됩니다.
-
-## 데이터 정책
-
-커밋되는 데이터는 작은 synthetic fixture뿐입니다. Runtime source data는 설정한 data directory에 두고, 의도적으로 만든 작은 public fixture가 아니라면 커밋하지 마세요. 기억 창고는 좋지만, 이삿짐 전체를 Git에 넣을 필요는 없습니다.
 
 ## 라이선스
 

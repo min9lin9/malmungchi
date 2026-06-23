@@ -7,9 +7,6 @@ It imports user-provided Markdown or JSONL author sources, searches them through
 MCP or HTTP, exports evidence bundles with provenance, and uses those exports to
 generate bounded simulated personas.
 
-This repository does not include private document collections, private evidence,
-generated caches, or provider credentials.
-
 ## Quickstart
 
 Prerequisite: Bun 1.3 or newer.
@@ -120,12 +117,6 @@ bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/malmun
 
 Provider keys are read only from environment variables. Tests use deterministic
 fake providers and do not require live model credentials.
-
-## Data Policy
-
-Only synthetic fixtures are committed. Runtime source data belongs under the
-configured data directory and should not be committed unless it is intentionally
-created as a small public fixture.
 
 ## License
 
