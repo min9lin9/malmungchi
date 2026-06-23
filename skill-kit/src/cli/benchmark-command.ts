@@ -1,22 +1,22 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { type BenchmarkDimension, evaluatePersonaBenchmark } from "../persona-benchmark.ts";
-import { evaluateMalmunchiPersonaQuality } from "../persona-quality-benchmark.ts";
+import { evaluateMalmungchiPersonaQuality } from "../persona-quality-benchmark.ts";
 import { arg, has } from "./args.ts";
 
 export async function handleBenchmarkCommand(command: string): Promise<boolean> {
   if (command !== "benchmark:persona") return false;
   const fixture = arg("--fixture", "fixtures/persona-benchmark") ?? "fixtures/persona-benchmark";
-  const malmunchiUrl = arg("--malmunchi-url");
+  const malmungchiUrl = arg("--malmungchi-url");
   const authorId = arg("--author-id");
   const out = arg("--out");
   const markdown = arg("--markdown");
   if (!out) throw new Error("Usage: skill-kit benchmark:persona --fixture <dir> --out <json>");
-  const report = malmunchiUrl
-    ? await evaluateMalmunchiPersonaQuality({
-        malmunchiUrl,
+  const report = malmungchiUrl
+    ? await evaluateMalmungchiPersonaQuality({
+        malmungchiUrl,
         authorId: authorId ?? missingAuthorId(),
-        allowRemote: has("--allow-remote-malmunchi"),
+        allowRemote: has("--allow-remote-malmungchi"),
       })
     : await evaluatePersonaBenchmark(fixture);
   await mkdir(dirname(out), { recursive: true });
@@ -33,7 +33,7 @@ export async function handleBenchmarkCommand(command: string): Promise<boolean> 
 function renderBenchmarkMarkdown(
   report:
     | Awaited<ReturnType<typeof evaluatePersonaBenchmark>>
-    | Awaited<ReturnType<typeof evaluateMalmunchiPersonaQuality>>
+    | Awaited<ReturnType<typeof evaluateMalmungchiPersonaQuality>>
 ): string {
   const rows = Object.entries(report.dimensions).map(([name, dimension]) =>
     renderDimension(name, dimension)
@@ -47,6 +47,6 @@ function renderDimension(name: string, dimension: BenchmarkDimension): string {
 
 function missingAuthorId(): never {
   throw new Error(
-    "Usage: skill-kit benchmark:persona --malmunchi-url <url> --author-id <id> --out <json>"
+    "Usage: skill-kit benchmark:persona --malmungchi-url <url> --author-id <id> --out <json>"
   );
 }

@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { Document } from "flexsearch";
 import { z } from "zod";
-import type { MalmunchiManifest } from "../domain/document";
+import type { MalmungchiManifest } from "../domain/document";
 
 const CACHE_SCHEMA_VERSION = 1;
 
@@ -27,7 +27,7 @@ export function getCachePaths(dataDir: string): CachePaths {
   return { cacheDir, cacheFile };
 }
 
-export function computeMalmunchiHash(manifest: MalmunchiManifest): string {
+export function computeMalmungchiHash(manifest: MalmungchiManifest): string {
   const payload = JSON.stringify({
     schemaVersion: manifest.schemaVersion,
     documentCount: manifest.documentCount,

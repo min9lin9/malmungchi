@@ -1,6 +1,6 @@
-# Malmunchi
+# Malmungchi
 
-Malmunchi is a local document memory server and persona workflow kit for Codex.
+Malmungchi is a local document memory server and persona workflow kit for Codex.
 It imports user-provided Markdown or JSONL author sources, searches them through
 MCP or HTTP, exports evidence bundles with provenance, and uses those exports to
 generate bounded simulated personas.
@@ -20,7 +20,7 @@ bun run start:http
 Import a source:
 
 ```bash
-curl -sS -X POST http://127.0.0.1:3000/malmunchi/import-author \
+curl -sS -X POST http://127.0.0.1:3000/malmungchi/import-author \
   -H 'content-type: application/json' \
   -d '{"authorId":"demo","fileName":"note.md","fileContent":"# Product Note\n\nCustomer interviews guide planning."}'
 ```
@@ -29,7 +29,7 @@ Search and export:
 
 ```bash
 curl -sS 'http://127.0.0.1:3000/search?q=customer&limit=3'
-curl -sS 'http://127.0.0.1:3000/malmunchi/sources/author:demo/export?includeHistory=true'
+curl -sS 'http://127.0.0.1:3000/malmungchi/sources/author:demo/export?includeHistory=true'
 ```
 
 ## MCP Tools
@@ -46,7 +46,7 @@ curl -sS 'http://127.0.0.1:3000/malmunchi/sources/author:demo/export?includeHist
 - `export_source`
 - `get_source_history`
 - `delete_source`
-- `get_malmunchi_stats`
+- `get_malmungchi_stats`
 - `get_llm_status`
 
 ## Internal Shape
@@ -58,12 +58,12 @@ curl -sS 'http://127.0.0.1:3000/malmunchi/sources/author:demo/export?includeHist
 
 ## CLI And Skills
 
-The bundled CLI is exposed as `malmunchi`:
+The bundled CLI is exposed as `malmungchi`:
 
 ```bash
-bun run malmunchi persona --help
-bun run malmunchi panel --help
-bun run malmunchi room --help
+bun run malmungchi persona --help
+bun run malmungchi panel --help
+bun run malmungchi room --help
 ```
 
 Available local checks:
@@ -73,16 +73,16 @@ bun run qa:e2e
 bun run security:check
 bun run validate:skills
 bun run eval4sim:doctor
-bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/malmunchi-persona.json
+bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/malmungchi-persona.json
 ```
 
 ## Environment
 
-- `MALMUNCHI_TRANSPORT`: `stdio` or `http`
-- `MALMUNCHI_DATA_DIR`: local storage directory, default `./data`
-- `MALMUNCHI_IMPORT_DIR`: allowed local import root
-- `MALMUNCHI_API_KEY`: optional bearer token for HTTP routes except health
-- `MALMUNCHI_SEARCH_ENGINE`: `flexsearch` or `meilisearch`
+- `MALMUNGCHI_TRANSPORT`: `stdio` or `http`
+- `MALMUNGCHI_DATA_DIR`: local storage directory, default `./data`
+- `MALMUNGCHI_IMPORT_DIR`: allowed local import root
+- `MALMUNGCHI_API_KEY`: optional bearer token for HTTP routes except health
+- `MALMUNGCHI_SEARCH_ENGINE`: `flexsearch` or `meilisearch`
 - `EMBED_PROVIDER`: `openai` or `kimi`
 - `EMBED_MODEL`: embedding model name
 

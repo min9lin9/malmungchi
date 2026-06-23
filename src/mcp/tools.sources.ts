@@ -33,8 +33,8 @@ export function registerSourceTools(
   server.registerTool(
     "list_sources",
     {
-      title: "List malmunchi sources",
-      description: "List imported document sources currently loaded in Malmunchi.",
+      title: "List malmungchi sources",
+      description: "List imported document sources currently loaded in Malmungchi.",
       inputSchema: ListSourcesSchema,
       annotations: {
         readOnlyHint: true,
@@ -56,7 +56,7 @@ export function registerSourceTools(
   server.registerTool(
     "get_source",
     {
-      title: "Inspect a malmunchi source",
+      title: "Inspect a malmungchi source",
       description: "Inspect one source and list the documents it contributes.",
       inputSchema: GetSourceSchema,
       annotations: {
@@ -133,7 +133,7 @@ export function registerSourceTools(
   server.registerTool(
     "refresh_source",
     {
-      title: "Refresh a mutable malmunchi source",
+      title: "Refresh a mutable malmungchi source",
       description: "Re-import a stored author source and update search/manifest state.",
       inputSchema: RefreshSourceSchema,
       annotations: {
@@ -185,7 +185,7 @@ export function registerSourceTools(
     "get_source_status",
     {
       title: "Read source status",
-      description: "Read active document count and source-memory health for a malmunchi source.",
+      description: "Read active document count and source-memory health for a malmungchi source.",
       inputSchema: GetSourceStatusSchema,
       annotations: {
         readOnlyHint: true,
@@ -208,8 +208,8 @@ export function registerSourceTools(
   server.registerTool(
     "export_source",
     {
-      title: "Export a malmunchi source",
-      description: "Export source metadata and document content from the loaded malmunchi.",
+      title: "Export a malmungchi source",
+      description: "Export source metadata and document content from the loaded malmungchi.",
       inputSchema: ExportSourceSchema,
       annotations: {
         readOnlyHint: true,
@@ -235,7 +235,7 @@ export function registerSourceTools(
     "get_source_history",
     {
       title: "Read source history",
-      description: "Read import, refresh, and delete events recorded for a malmunchi source.",
+      description: "Read import, refresh, and delete events recorded for a malmungchi source.",
       inputSchema: GetSourceHistorySchema,
       annotations: {
         readOnlyHint: true,
@@ -258,7 +258,7 @@ export function registerSourceTools(
   server.registerTool(
     "delete_source",
     {
-      title: "Delete a mutable malmunchi source",
+      title: "Delete a mutable malmungchi source",
       description: "Delete an imported author source from storage, manifest, and search.",
       inputSchema: DeleteSourceSchema,
       annotations: {

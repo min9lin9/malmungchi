@@ -10,23 +10,23 @@ import { DocumentStore } from "../../src/service/document-store";
 const DATA_DIR = path.join(import.meta.dir, "..", "..", "data");
 
 export async function buildDocumentService() {
-  const malmunchi = await loadDocuments(DATA_DIR);
-  const manifest = await buildManifest(malmunchi, {
-    name: "test-malmunchi",
+  const malmungchi = await loadDocuments(DATA_DIR);
+  const manifest = await buildManifest(malmungchi, {
+    name: "test-malmungchi",
     dataDir: DATA_DIR,
   });
-  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
-  const categoryIndex = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
+  const baseIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
+  const categoryIndex = enrichCategoryIndex(malmungchi.documents, malmungchi.categories, baseIndex);
 
   const store = new DocumentStore(
-    new Map(malmunchi.documents.map((e) => [e.slug, e])),
-    new Map(malmunchi.categories.map((t) => [t.slug, t])),
+    new Map(malmungchi.documents.map((e) => [e.slug, e])),
+    new Map(malmungchi.categories.map((t) => [t.slug, t])),
     categoryIndex,
     manifest
   );
 
   const engine = new FlexSearchEngine();
-  await engine.build(malmunchi.documents, categoryIndex.documentToCategories, {
+  await engine.build(malmungchi.documents, categoryIndex.documentToCategories, {
     dataDir: DATA_DIR,
   });
 

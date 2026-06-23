@@ -22,7 +22,7 @@ function textOf(result: unknown): string {
 }
 
 describe("mcp tools", () => {
-  it("lists public Malmunchi tools", async () => {
+  it("lists public Malmungchi tools", async () => {
     const client = await createTestClient(await buildFixtureDocumentService());
     const tools = await client.listTools();
     const names = tools.tools.map((t) => t.name).sort();
@@ -33,7 +33,7 @@ describe("mcp tools", () => {
       "export_source",
       "get_document",
       "get_llm_status",
-      "get_malmunchi_stats",
+      "get_malmungchi_stats",
       "get_source",
       "get_source_history",
       "get_source_status",
@@ -58,7 +58,7 @@ describe("mcp tools", () => {
   it("imports an author source and exposes lifecycle tools", async () => {
     const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), "mcp-author-import-"));
     try {
-      const client = await createTestClient(await buildService(dataDir, "test-malmunchi"));
+      const client = await createTestClient(await buildService(dataDir, "test-malmungchi"));
       const imported = await client.callTool({
         name: "import_author_source",
         arguments: {

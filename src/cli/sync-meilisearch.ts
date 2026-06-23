@@ -8,9 +8,9 @@ import { logger } from "../util/logger";
 async function main() {
   logger.info(`Syncing Meilisearch index ${env.meiliIndexName}...`);
 
-  const { malmunchi } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
-  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
-  const categoryIndex = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
+  const { malmungchi } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
+  const baseIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
+  const categoryIndex = enrichCategoryIndex(malmungchi.documents, malmungchi.categories, baseIndex);
 
   const engine = new MeilisearchEngine({
     host: env.meiliHost,
@@ -18,7 +18,7 @@ async function main() {
     indexName: env.meiliIndexName,
   });
 
-  await engine.build(malmunchi.documents, categoryIndex.documentToCategories);
+  await engine.build(malmungchi.documents, categoryIndex.documentToCategories);
 
   const stats = engine.getStats();
   logger.info("Meilisearch sync complete", { indexedCount: stats.indexedCount });

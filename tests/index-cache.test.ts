@@ -6,7 +6,7 @@ import { buildManifest } from "../src/ingest/build-manifest";
 import { loadDocuments } from "../src/ingest/load-documents";
 import {
   computeEngineConfigHash,
-  computeMalmunchiHash,
+  computeMalmungchiHash,
   getCachePaths,
   importIndexCache,
   loadIndexCache,
@@ -17,20 +17,20 @@ import { buildFixtureEngine } from "./helpers/build-fixture-engine";
 const DATA_DIR = path.join(import.meta.dir, "..", "data");
 
 describe("index cache", () => {
-  it("computeMalmunchiHash is stable across manifest rebuilds with same content", async () => {
-    const malmunchi = await loadDocuments(DATA_DIR);
-    const manifest1 = await buildManifest(malmunchi, {
-      name: "test-malmunchi",
+  it("computeMalmungchiHash is stable across manifest rebuilds with same content", async () => {
+    const malmungchi = await loadDocuments(DATA_DIR);
+    const manifest1 = await buildManifest(malmungchi, {
+      name: "test-malmungchi",
       dataDir: DATA_DIR,
     });
     await new Promise((resolve) => setTimeout(resolve, 10));
-    const manifest2 = await buildManifest(malmunchi, {
-      name: "test-malmunchi",
+    const manifest2 = await buildManifest(malmungchi, {
+      name: "test-malmungchi",
       dataDir: DATA_DIR,
     });
 
     expect(manifest1.generatedAt).not.toBe(manifest2.generatedAt);
-    expect(computeMalmunchiHash(manifest1)).toBe(computeMalmunchiHash(manifest2));
+    expect(computeMalmungchiHash(manifest1)).toBe(computeMalmungchiHash(manifest2));
   });
 
   it("returns null for invalid cache JSON", async () => {
@@ -71,7 +71,7 @@ describe("index cache", () => {
     };
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
     const paths = getCachePaths(tmpDir);
-    const libraryHash = "roundtrip-malmunchi";
+    const libraryHash = "roundtrip-malmungchi";
     const engineConfigHash = computeEngineConfigHash({
       tokenize: "forward",
       weights: { title: 3, guest: 2, keywords: 2, transcript: 1 },

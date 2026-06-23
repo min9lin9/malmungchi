@@ -10,9 +10,9 @@ import type {
 } from "../service/source-operations";
 
 export function formatSources(sources: readonly Source[]): string {
-  if (sources.length === 0) return "# Malmunchi Sources\n\nNo sources are loaded.";
+  if (sources.length === 0) return "# Malmungchi Sources\n\nNo sources are loaded.";
   return [
-    `# Malmunchi Sources (${sources.length})`,
+    `# Malmungchi Sources (${sources.length})`,
     "",
     ...sources.map((source) =>
       [
@@ -45,7 +45,7 @@ export function formatDeleteSourceResult(result: DeleteSourceResult): string {
     "",
     `- Documents removed: ${result.deletedDocuments}`,
     "",
-    "The source has been removed from Malmunchi and the search index.",
+    "The source has been removed from Malmungchi and the search index.",
   ].join("\n");
 }
 

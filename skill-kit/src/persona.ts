@@ -8,7 +8,7 @@ import {
   loadElements,
   validatePersonaProvenance,
 } from "./provenance.ts";
-import { assertLocalMalmunchiUrl, redactSecrets } from "./security.ts";
+import { assertLocalMalmungchiUrl, redactSecrets } from "./security.ts";
 import type { Persona } from "./types.ts";
 
 export async function generatePersona(options: {
@@ -17,15 +17,15 @@ export async function generatePersona(options: {
   provider: ProviderName;
   out: string;
   markdown?: string;
-  malmunchiUrl?: string;
-  allowRemoteMalmunchi?: boolean;
+  malmungchiUrl?: string;
+  allowRemoteMalmungchi?: boolean;
 }): Promise<Persona> {
   const provider = createProvider(options.provider);
-  const chunks = options.malmunchiUrl
+  const chunks = options.malmungchiUrl
     ? await loadDocumentsChunks({
-        malmunchiUrl: options.malmunchiUrl,
+        malmungchiUrl: options.malmungchiUrl,
         authorId: options.authorId,
-        allowRemote: options.allowRemoteMalmunchi ?? false,
+        allowRemote: options.allowRemoteMalmungchi ?? false,
       })
     : chunkElements(options.source ? await loadElements(options.source).catch(() => []) : []).slice(
         0,
@@ -70,25 +70,25 @@ export async function generatePersona(options: {
 }
 
 async function loadDocumentsChunks(options: {
-  malmunchiUrl: string;
+  malmungchiUrl: string;
   authorId: string;
   allowRemote: boolean;
 }) {
-  const url = assertLocalMalmunchiUrl(options.malmunchiUrl, options.allowRemote);
+  const url = assertLocalMalmungchiUrl(options.malmungchiUrl, options.allowRemote);
   const sourceId = `author:${options.authorId}`;
-  const exportUrl = new URL(`/malmunchi/sources/${encodeURIComponent(sourceId)}/export`, url);
+  const exportUrl = new URL(`/malmungchi/sources/${encodeURIComponent(sourceId)}/export`, url);
   exportUrl.searchParams.set("format", "json");
   exportUrl.searchParams.set("includeHistory", "true");
   const response = await fetch(exportUrl);
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Malmunchi source export failed ${response.status}: ${redactSecrets(text)}`);
+    throw new Error(`Malmungchi source export failed ${response.status}: ${redactSecrets(text)}`);
   }
-  return malmunchiDocuments(JSON.parse(text), sourceId)
+  return malmungchiDocuments(JSON.parse(text), sourceId)
     .slice(0, 5)
     .map((document, index) => ({
       docId: document.slug,
-      elementId: `malmunchi-export-${index + 1}`,
+      elementId: `malmungchi-export-${index + 1}`,
       chunkId: `${document.slug}#${index + 1}`,
       text: document.content,
       sourceFile: document.sourceId,
@@ -97,7 +97,7 @@ async function loadDocumentsChunks(options: {
     }));
 }
 
-function malmunchiDocuments(
+function malmungchiDocuments(
   value: unknown,
   sourceId: string
 ): Array<{ slug: string; content: string; sourceId: string }> {
@@ -105,7 +105,7 @@ function malmunchiDocuments(
   return value.documents
     .filter(isRecord)
     .map((document) => ({
-      slug: stringField(document.slug) ?? "malmunchi-document",
+      slug: stringField(document.slug) ?? "malmungchi-document",
       content: stringField(document.content) ?? "",
       sourceId: stringField(document.sourceId) ?? sourceId,
     }))

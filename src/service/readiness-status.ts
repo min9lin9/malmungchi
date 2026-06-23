@@ -1,4 +1,4 @@
-import type { MalmunchiStats } from "../domain/document";
+import type { MalmungchiStats } from "../domain/document";
 
 export interface ReadinessStatus {
   ready: boolean;
@@ -6,5 +6,5 @@ export interface ReadinessStatus {
     documentsLoaded: boolean;
     searchIndexLoaded: boolean;
   };
-  stats: Pick<MalmunchiStats, "documentCount" | "categoryCount" | "indexedDocumentCount">;
+  stats: Pick<MalmungchiStats, "documentCount" | "categoryCount" | "indexedDocumentCount">;
 }

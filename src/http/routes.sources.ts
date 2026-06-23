@@ -2,7 +2,7 @@ import { Elysia, t } from "elysia";
 import type { DocumentService } from "../service/document-service";
 
 export function sourceRoutes(service: DocumentService) {
-  return new Elysia({ prefix: "/malmunchi" })
+  return new Elysia({ prefix: "/malmungchi" })
     .get("/sources", async () => ({ sources: await service.listSources() }))
     .get(
       "/sources/:sourceId/status",

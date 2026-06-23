@@ -12,17 +12,17 @@ interface ValidationIssue {
 async function validateData(): Promise<ValidationIssue[]> {
   const issues: ValidationIssue[] = [];
 
-  const malmunchi = await loadDocuments(env.dataDir);
+  const malmungchi = await loadDocuments(env.dataDir);
 
   // 1. All documents must have a slug
-  for (const document of malmunchi.documents) {
+  for (const document of malmungchi.documents) {
     if (!document.slug) {
       issues.push({ type: "error", message: "DocumentRecord missing slug" });
     }
   }
 
   // 2. Every document must have title or guest
-  for (const document of malmunchi.documents) {
+  for (const document of malmungchi.documents) {
     if (!document.metadata.title && !document.metadata.guest) {
       issues.push({
         type: "error",
@@ -32,7 +32,7 @@ async function validateData(): Promise<ValidationIssue[]> {
   }
 
   // 3. Transcript files are loaded as UTF-8 by loadDocuments; empty content is suspicious
-  for (const document of malmunchi.documents) {
+  for (const document of malmungchi.documents) {
     if (document.content.trim().length === 0) {
       issues.push({
         type: "warning",
@@ -42,8 +42,8 @@ async function validateData(): Promise<ValidationIssue[]> {
   }
 
   // 4. Every category entry references real document slugs
-  const documentSlugs = new Set(malmunchi.documents.map((e) => e.slug));
-  for (const category of malmunchi.categories) {
+  const documentSlugs = new Set(malmungchi.documents.map((e) => e.slug));
+  for (const category of malmungchi.categories) {
     for (const slug of category.documentSlugs) {
       if (!documentSlugs.has(slug)) {
         issues.push({
@@ -55,31 +55,31 @@ async function validateData(): Promise<ValidationIssue[]> {
   }
 
   // 5. Manifest counts match
-  const manifest = await buildManifest(malmunchi, {
+  const manifest = await buildManifest(malmungchi, {
     name: env.instanceName,
     dataDir: env.dataDir,
   });
 
-  if (manifest.documentCount !== malmunchi.documents.length) {
+  if (manifest.documentCount !== malmungchi.documents.length) {
     issues.push({
       type: "error",
-      message: `Manifest documentCount (${manifest.documentCount}) does not match loaded documents (${malmunchi.documents.length})`,
+      message: `Manifest documentCount (${manifest.documentCount}) does not match loaded documents (${malmungchi.documents.length})`,
     });
   }
-  if (manifest.categoryCount !== malmunchi.categories.length) {
+  if (manifest.categoryCount !== malmungchi.categories.length) {
     issues.push({
       type: "error",
-      message: `Manifest categoryCount (${manifest.categoryCount}) does not match loaded categories (${malmunchi.categories.length})`,
+      message: `Manifest categoryCount (${manifest.categoryCount}) does not match loaded categories (${malmungchi.categories.length})`,
     });
   }
 
   // 6. Search index covers all documents
-  const categoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const categoryIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
   const indexedCount = categoryIndex.documentToCategories.size;
-  if (indexedCount !== malmunchi.documents.length) {
+  if (indexedCount !== malmungchi.documents.length) {
     issues.push({
       type: "error",
-      message: `Category index covers ${indexedCount} documents, expected ${malmunchi.documents.length}`,
+      message: `Category index covers ${indexedCount} documents, expected ${malmungchi.documents.length}`,
     });
   }
 
@@ -87,7 +87,7 @@ async function validateData(): Promise<ValidationIssue[]> {
 }
 
 async function main() {
-  console.error(`Validating malmunchi in ${env.dataDir}...`);
+  console.error(`Validating malmungchi in ${env.dataDir}...`);
   const issues = await validateData();
 
   const errors = issues.filter((i) => i.type === "error");

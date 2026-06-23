@@ -16,14 +16,14 @@ async function main() {
       maxResponseChars: env.maxResponseChars,
     });
     await startStdioTransport(server);
-    logger.info("Malmunchi MCP server running via stdio");
+    logger.info("Malmungchi MCP server running via stdio");
   }
 
   if (env.transport === "http") {
     const app = createHttpApp(service);
     const stopHttp = await startHttpTransport(app, env.httpPort, env.httpHost);
     shutdownHandlers.push(stopHttp);
-    logger.info(`Malmunchi HTTP server running at http://${env.httpHost}:${env.httpPort}`);
+    logger.info(`Malmungchi HTTP server running at http://${env.httpHost}:${env.httpPort}`);
   }
 
   const shutdown = async (signal: string) => {

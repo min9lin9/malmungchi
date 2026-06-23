@@ -1,7 +1,7 @@
 import { z } from "zod";
-import type { MalmunchiManifest } from "./document";
+import type { MalmungchiManifest } from "./document";
 
-export const MalmunchiManifestSchema = z.object({
+export const MalmungchiManifestSchema = z.object({
   name: z.string(),
   generatedAt: z.string(),
   documentCount: z.number().int().nonnegative(),
@@ -14,10 +14,10 @@ export const MalmunchiManifestSchema = z.object({
   categorySlugs: z.array(z.string()),
   documentHashes: z.record(z.string()),
   categoryHashes: z.record(z.string()),
-}) satisfies z.ZodType<MalmunchiManifest>;
+}) satisfies z.ZodType<MalmungchiManifest>;
 
-export function parseManifest(raw: unknown): MalmunchiManifest | null {
-  const result = MalmunchiManifestSchema.safeParse(raw);
+export function parseManifest(raw: unknown): MalmungchiManifest | null {
+  const result = MalmungchiManifestSchema.safeParse(raw);
   if (!result.success) {
     return null;
   }

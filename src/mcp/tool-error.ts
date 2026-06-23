@@ -1,10 +1,10 @@
-import { MalmunchiError } from "../domain/errors";
+import { MalmungchiError } from "../domain/errors";
 
 export function handleToolError(error: unknown): {
   content: { type: "text"; text: string }[];
   isError: true;
 } {
-  if (error instanceof MalmunchiError) {
+  if (error instanceof MalmungchiError) {
     return {
       content: [{ type: "text", text: error.message }],
       isError: true,

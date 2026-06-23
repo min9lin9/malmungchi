@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "malmunchi-skill-kit",
+      "name": "malmungchi-skill-kit",
       "devDependencies": {
         "@biomejs/biome": "^2.5.0",
         "@types/bun": "latest",

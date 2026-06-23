@@ -10,8 +10,8 @@ async function buildApp() {
 
 describe("http security", () => {
   afterEach(() => {
-    delete process.env.MALMUNCHI_CORS_ORIGIN;
-    delete process.env.MALMUNCHI_API_KEY;
+    delete process.env.MALMUNGCHI_CORS_ORIGIN;
+    delete process.env.MALMUNGCHI_API_KEY;
     delete process.env[legacyEnvName("CORS_ORIGIN")];
     delete process.env[legacyEnvName("API_KEY")];
   });
@@ -32,7 +32,7 @@ describe("http security", () => {
   });
 
   it("respects custom CORS origin", async () => {
-    process.env.MALMUNCHI_CORS_ORIGIN = "https://example.com";
+    process.env.MALMUNGCHI_CORS_ORIGIN = "https://example.com";
     const app = await buildApp();
     const res = await app.handle(new Request("http://localhost/health"));
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("https://example.com");

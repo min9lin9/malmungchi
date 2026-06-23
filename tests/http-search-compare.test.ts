@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { MalmunchiManifest, SearchInput, SearchResult } from "../src/domain/document";
+import type { MalmungchiManifest, SearchInput, SearchResult } from "../src/domain/document";
 import { createHttpApp } from "../src/http/app";
 import type {
   SearchEngine,
@@ -60,7 +60,7 @@ describe("http search compare", () => {
   });
 
   it("search compare reports Meilisearch unsupported fallback", async () => {
-    const manifest: MalmunchiManifest = {
+    const manifest: MalmungchiManifest = {
       name: "fake",
       generatedAt: new Date(0).toISOString(),
       documentCount: 0,

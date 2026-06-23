@@ -3,7 +3,7 @@ import { mkdir, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  assertLocalMalmunchiUrl,
+  assertLocalMalmungchiUrl,
   assertRootBoundPath,
   getRequiredEnv,
   redactSecrets,
@@ -26,9 +26,9 @@ test("rejects symlink escape", async () => {
   }
 });
 
-test("rejects remote malmunchi url without opt-in", () => {
-  expect(() => assertLocalMalmunchiUrl("https://example.com", false)).toThrow("allow-remote");
-  expect(assertLocalMalmunchiUrl("http://127.0.0.1:3000", false).hostname).toBe("127.0.0.1");
+test("rejects remote malmungchi url without opt-in", () => {
+  expect(() => assertLocalMalmungchiUrl("https://example.com", false)).toThrow("allow-remote");
+  expect(assertLocalMalmungchiUrl("http://127.0.0.1:3000", false).hostname).toBe("127.0.0.1");
 });
 
 test("credentials are env-only and redacted", () => {

@@ -1,13 +1,13 @@
 import type {
   DocumentRecord,
-  MalmunchiManifest,
+  MalmungchiManifest,
   SearchInput,
   SearchResult,
 } from "../domain/document";
 
 export interface SearchEngineBuildOptions {
   dataDir?: string;
-  manifest?: MalmunchiManifest;
+  manifest?: MalmungchiManifest;
 }
 
 export interface SearchEngineStats {

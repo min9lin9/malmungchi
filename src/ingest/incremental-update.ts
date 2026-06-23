@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { DocumentRecord, MalmunchiManifest } from "../domain/document";
+import type { DocumentRecord, MalmungchiManifest } from "../domain/document";
 import type { SearchEngine } from "../search/search-engine";
 import type { DocumentStore } from "../service/document-store";
 import { buildDocumentCategoryIndex } from "./build-index";
@@ -12,7 +12,7 @@ import { type DocumentCollection, loadDocuments } from "./load-documents";
 export interface IncrementalUpdateResult {
   diff: DocumentCollectionDiff;
   reindexedAll: boolean;
-  manifest: MalmunchiManifest;
+  manifest: MalmungchiManifest;
 }
 
 function unique<T>(items: T[]): T[] {
@@ -51,8 +51,8 @@ export async function applyIncrementalUpdate(
     return { diff, reindexedAll: false, manifest: store.manifest };
   }
 
-  const malmunchi = await loadDocuments(dataDir);
-  const manifest = await buildManifest(malmunchi, { name: instanceName, dataDir });
+  const malmungchi = await loadDocuments(dataDir);
+  const manifest = await buildManifest(malmungchi, { name: instanceName, dataDir });
 
   const categoryIndexChanged =
     diff.addedCategories.length > 0 ||
@@ -60,19 +60,22 @@ export async function applyIncrementalUpdate(
     diff.removedCategories.length > 0;
 
   if (categoryIndexChanged) {
-    const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+    const baseCategoryIndex = buildDocumentCategoryIndex(
+      malmungchi.documents,
+      malmungchi.categories
+    );
     const categoryIndex = enrichCategoryIndex(
-      malmunchi.documents,
-      malmunchi.categories,
+      malmungchi.documents,
+      malmungchi.categories,
       baseCategoryIndex
     );
 
     const oldSlugs = Array.from(store.documents.keys());
     await engine.removeDocuments(oldSlugs);
-    await engine.addDocuments(malmunchi.documents);
+    await engine.addDocuments(malmungchi.documents);
 
-    store.documents = new Map(malmunchi.documents.map((e) => [e.slug, e]));
-    store.categories = new Map(malmunchi.categories.map((t) => [t.slug, t]));
+    store.documents = new Map(malmungchi.documents.map((e) => [e.slug, e]));
+    store.categories = new Map(malmungchi.categories.map((t) => [t.slug, t]));
     store.categoryIndex = categoryIndex;
     store.manifest = manifest;
 
@@ -85,7 +88,7 @@ export async function applyIncrementalUpdate(
   const slugsToRemove = unique([...diff.removedDocuments, ...diff.changedDocuments]);
   const slugsToAdd = unique([...diff.addedDocuments, ...diff.changedDocuments]);
   const documentsToAdd = slugsToAdd
-    .map((slug) => malmunchi.documents.find((e) => e.slug === slug))
+    .map((slug) => malmungchi.documents.find((e) => e.slug === slug))
     .filter((e): e is DocumentRecord => e !== undefined);
 
   if (slugsToRemove.length > 0) {
@@ -110,7 +113,7 @@ export async function applyIncrementalUpdate(
 }
 
 export async function canIncrementalUpdate(
-  manifest: MalmunchiManifest,
+  manifest: MalmungchiManifest,
   dataDir: string
 ): Promise<boolean> {
   const diff = await diffDocuments(manifest, dataDir);

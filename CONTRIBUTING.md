@@ -1,6 +1,6 @@
 # Contributing
 
-Malmunchi is kept public-safe by default. Contributions should use synthetic
+Malmungchi is kept public-safe by default. Contributions should use synthetic
 fixtures and must not include private document collections, generated caches,
 provider keys, or local evidence.
 

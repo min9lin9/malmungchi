@@ -52,13 +52,13 @@ type HttpApp = ReturnType<typeof createHttpApp>;
 
 async function main(): Promise<void> {
   const dataDir = await resolveDataDir();
-  await ensureMalmunchiDirs(dataDir);
+  await ensureMalmungchiDirs(dataDir);
 
   const service = await buildService(dataDir, "prototype-smoke");
   const app = createHttpApp(service);
   const sourceId = "author:prototype-smoke";
 
-  const imported = await requestJson(app, "POST", "/malmunchi/import-author", ImportAuthorResponse, {
+  const imported = await requestJson(app, "POST", "/malmungchi/import-author", ImportAuthorResponse, {
     authorId: "prototype-smoke",
     fileName: "smoke.md",
     fileContent: "# Prototype Smoke\n\noriginal smoke token",
@@ -82,7 +82,7 @@ async function main(): Promise<void> {
   const dryRun = await requestJson(
     app,
     "POST",
-    `/malmunchi/sources/${sourceId}/refresh?dryRun=true`,
+    `/malmungchi/sources/${sourceId}/refresh?dryRun=true`,
     RefreshResponse
   );
   requireCondition("dry-run", dryRun.dryRun === true, "expected dryRun true");
@@ -92,7 +92,7 @@ async function main(): Promise<void> {
   const drySearch = await requestJson(app, "GET", "/search?q=updated%20smoke&limit=1", SearchResponse);
   requireCondition("dry-run-search", drySearch.returned === 0, "dry-run mutated search index");
 
-  const refresh = await requestJson(app, "POST", `/malmunchi/sources/${sourceId}/refresh`, RefreshResponse);
+  const refresh = await requestJson(app, "POST", `/malmungchi/sources/${sourceId}/refresh`, RefreshResponse);
   requireCondition("refresh", refresh.status === "changed", "expected changed refresh");
 
   const liveSearch = await requestJson(app, "GET", "/search?q=updated%20smoke&limit=1", SearchResponse);
@@ -102,7 +102,7 @@ async function main(): Promise<void> {
   const compact = await requestJson(
     app,
     "POST",
-    `/malmunchi/sources/${sourceId}/memory/compact`,
+    `/malmungchi/sources/${sourceId}/memory/compact`,
     CompactResponse
   );
   requireCondition("compact", compact.skippedMalformedEvents === 1, "expected one malformed event");
@@ -111,7 +111,7 @@ async function main(): Promise<void> {
   const exported = await requestJson(
     app,
     "GET",
-    `/malmunchi/sources/${sourceId}/export?format=json&includeHistory=true`,
+    `/malmungchi/sources/${sourceId}/export?format=json&includeHistory=true`,
     ExportResponse
   );
   const compare = await requestJson(app, "GET", "/search/compare?q=updated%20smoke&limit=3", CompareResponse);
@@ -161,10 +161,10 @@ async function resolveDataDir(): Promise<string> {
   });
   const dataDir = parsed.values["data-dir"];
   if (typeof dataDir === "string") return dataDir;
-  return fs.mkdtemp(path.join(os.tmpdir(), "malmunchi-prototype-smoke-"));
+  return fs.mkdtemp(path.join(os.tmpdir(), "malmungchi-prototype-smoke-"));
 }
 
-async function ensureMalmunchiDirs(dataDir: string): Promise<void> {
+async function ensureMalmungchiDirs(dataDir: string): Promise<void> {
   await fs.mkdir(path.join(dataDir, "documents"), { recursive: true });
   await fs.mkdir(path.join(dataDir, "categories"), { recursive: true });
   await fs.mkdir(path.join(dataDir, "imports"), { recursive: true });

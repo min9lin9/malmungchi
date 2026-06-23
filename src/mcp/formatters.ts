@@ -1,4 +1,4 @@
-import type { MalmunchiStats, SearchResult } from "../domain/document";
+import type { MalmungchiStats, SearchResult } from "../domain/document";
 import type { LlmStatus } from "../llm/llm-status";
 import type { ImportAuthorResult } from "../service/document-service";
 
@@ -91,9 +91,9 @@ export function formatDocument(
   return output;
 }
 
-export function formatMalmunchiStats(stats: MalmunchiStats): string {
+export function formatMalmungchiStats(stats: MalmungchiStats): string {
   const lines = [
-    `# Malmunchi Stats: ${stats.name}`,
+    `# Malmungchi Stats: ${stats.name}`,
     "",
     `- Documents: ${stats.documentCount}`,
     `- Categories: ${stats.categoryCount}`,

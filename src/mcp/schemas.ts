@@ -46,7 +46,7 @@ export const GetDocumentSchema = z.object({
     .describe("Which section to return"),
 });
 
-export const GetMalmunchiStatsSchema = z.object({});
+export const GetMalmungchiStatsSchema = z.object({});
 export const ListSourcesSchema = z.object({});
 
 export const GetSourceSchema = z.object({
@@ -134,7 +134,7 @@ export const CompareSearchExplainSchema = z.object({
 
 export type SearchDocumentsInput = z.infer<typeof SearchDocumentsSchema>;
 export type GetDocumentInput = z.infer<typeof GetDocumentSchema>;
-export type GetMalmunchiStatsInput = z.infer<typeof GetMalmunchiStatsSchema>;
+export type GetMalmungchiStatsInput = z.infer<typeof GetMalmungchiStatsSchema>;
 export type ExportSourceInput = z.infer<typeof ExportSourceSchema>;
 export type CompactSourceMemoryInput = z.infer<typeof CompactSourceMemorySchema>;
 export type GetSourceHistoryInput = z.infer<typeof GetSourceHistorySchema>;

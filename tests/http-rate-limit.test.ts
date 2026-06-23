@@ -9,7 +9,7 @@ async function buildApp(rateLimitRpm: number) {
 
 describe("http rate limit", () => {
   afterEach(() => {
-    delete process.env.MALMUNCHI_API_KEY;
+    delete process.env.MALMUNGCHI_API_KEY;
   });
 
   it("allows requests under the limit", async () => {

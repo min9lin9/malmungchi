@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "malmunchi",
+      "name": "malmungchi",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.6.1",
         "elysia": "^1.2.0",

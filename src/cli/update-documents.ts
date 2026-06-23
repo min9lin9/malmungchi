@@ -8,24 +8,24 @@ import { DocumentStore } from "../service/document-store";
 import { logger } from "../util/logger";
 
 async function main() {
-  const { malmunchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
+  const { malmungchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
   const categoryIndex = enrichCategoryIndex(
-    malmunchi.documents,
-    malmunchi.categories,
+    malmungchi.documents,
+    malmungchi.categories,
     baseCategoryIndex
   );
 
   const store = new DocumentStore(
-    new Map(malmunchi.documents.map((e) => [e.slug, e])),
-    new Map(malmunchi.categories.map((t) => [t.slug, t])),
+    new Map(malmungchi.documents.map((e) => [e.slug, e])),
+    new Map(malmungchi.categories.map((t) => [t.slug, t])),
     categoryIndex,
     manifest
   );
 
   const engine = new FlexSearchEngine();
-  await engine.build(malmunchi.documents, categoryIndex.documentToCategories, {
+  await engine.build(malmungchi.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
     manifest,
   });
@@ -42,11 +42,11 @@ async function main() {
     diff.removedCategories.length;
 
   if (totalChanges === 0) {
-    logger.info("No malmunchi changes detected");
+    logger.info("No malmungchi changes detected");
     return;
   }
 
-  logger.info("Malmunchi updated incrementally", {
+  logger.info("Malmungchi updated incrementally", {
     ...diff,
     reindexedAll: result.reindexedAll,
   });

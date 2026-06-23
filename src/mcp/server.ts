@@ -7,7 +7,7 @@ export function createMcpServer(
   options: { maxResponseChars: number }
 ): McpServer {
   const server = new McpServer({
-    name: "malmunchi",
+    name: "malmungchi",
     version: "1.0.0",
   });
 

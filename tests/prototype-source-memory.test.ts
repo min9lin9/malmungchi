@@ -10,12 +10,12 @@ describe("prototype source memory polish", () => {
   it("compacts source memory over HTTP", async () => {
     const dataDir = await makePrototypeDataDir("prototype-compact-");
     try {
-      const app = createHttpApp(await buildService(dataDir, "test-malmunchi"));
+      const app = createHttpApp(await buildService(dataDir, "test-malmungchi"));
       await importPrototypeAuthor(app, "compact-author");
 
       for (let index = 0; index < 3; index++) {
         const refresh = await app.handle(
-          new Request("http://localhost/malmunchi/sources/author:compact-author/refresh", {
+          new Request("http://localhost/malmungchi/sources/author:compact-author/refresh", {
             method: "POST",
           })
         );
@@ -24,7 +24,7 @@ describe("prototype source memory polish", () => {
       await fs.appendFile(path.join(dataDir, ".cache", "source-memory.jsonl"), "{bad-json\n");
 
       const compact = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author/memory/compact", {
+        new Request("http://localhost/malmungchi/sources/author:compact-author/memory/compact", {
           method: "POST",
         })
       );
@@ -49,7 +49,7 @@ describe("prototype source memory polish", () => {
       );
 
       const status = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author/status")
+        new Request("http://localhost/malmungchi/sources/author:compact-author/status")
       );
       expect(status.status).toBe(200);
       const statusBody = (await status.json()) as {
@@ -66,7 +66,7 @@ describe("prototype source memory polish", () => {
       expect(statusBody.memory.backupRetained).toBe(true);
 
       const history = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author/history")
+        new Request("http://localhost/malmungchi/sources/author:compact-author/history")
       );
       const historyBody = (await history.json()) as {
         events: { readonly action: string }[];
@@ -89,7 +89,7 @@ describe("prototype source memory polish", () => {
       expect(firstBackups).toHaveLength(1);
 
       const secondCompact = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author/memory/compact", {
+        new Request("http://localhost/malmungchi/sources/author:compact-author/memory/compact", {
           method: "POST",
         })
       );
@@ -98,13 +98,13 @@ describe("prototype source memory polish", () => {
       expect(secondBackups).toHaveLength(1);
 
       const deleteRes = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author", {
+        new Request("http://localhost/malmungchi/sources/author:compact-author", {
           method: "DELETE",
         })
       );
       expect(deleteRes.status).toBe(200);
       const deletedCompact = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:compact-author/memory/compact", {
+        new Request("http://localhost/malmungchi/sources/author:compact-author/memory/compact", {
           method: "POST",
         })
       );
@@ -112,7 +112,7 @@ describe("prototype source memory polish", () => {
 
       const beforeUnknown = await fs.readFile(path.join(dataDir, ".cache", "source-memory.jsonl"));
       const unknownCompact = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:not-real/memory/compact", {
+        new Request("http://localhost/malmungchi/sources/author:not-real/memory/compact", {
           method: "POST",
         })
       );
@@ -127,14 +127,14 @@ describe("prototype source memory polish", () => {
   it("does not overwrite a corrupt compaction sidecar", async () => {
     const dataDir = await makePrototypeDataDir("prototype-compact-sidecar-");
     try {
-      const app = createHttpApp(await buildService(dataDir, "test-malmunchi"));
+      const app = createHttpApp(await buildService(dataDir, "test-malmungchi"));
       await importPrototypeAuthor(app, "sidecar-author");
       await fs.mkdir(path.join(dataDir, ".cache"), { recursive: true });
       const sidecarPath = path.join(dataDir, ".cache", "source-memory.compaction.json");
       await fs.writeFile(sidecarPath, "{bad-json", "utf-8");
 
       const compact = await app.handle(
-        new Request("http://localhost/malmunchi/sources/author:sidecar-author/memory/compact", {
+        new Request("http://localhost/malmungchi/sources/author:sidecar-author/memory/compact", {
           method: "POST",
         })
       );

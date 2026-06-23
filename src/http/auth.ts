@@ -3,7 +3,7 @@ import { legacyEnvName } from "../config/env-names";
 const PUBLIC_PATHS = new Set(["/health", "/health/ready"]);
 
 function getApiKey(): string | undefined {
-  return process.env.MALMUNCHI_API_KEY ?? process.env[legacyEnvName("API_KEY")];
+  return process.env.MALMUNGCHI_API_KEY ?? process.env[legacyEnvName("API_KEY")];
 }
 
 export function checkApiKey(
@@ -20,7 +20,7 @@ export function checkApiKey(
 
   if (token !== apiKey) {
     set.status = 401;
-    set.headers["WWW-Authenticate"] = 'Bearer realm="malmunchi"';
+    set.headers["WWW-Authenticate"] = 'Bearer realm="malmungchi"';
     return { error: "Unauthorized" };
   }
 }

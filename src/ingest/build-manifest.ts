@@ -1,8 +1,8 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { MALMUNCHI_SCHEMA_VERSION } from "../config/constants";
-import type { MalmunchiManifest } from "../domain/document";
+import { MALMUNGCHI_SCHEMA_VERSION } from "../config/constants";
+import type { MalmungchiManifest } from "../domain/document";
 import { parseManifest } from "../domain/manifest";
 import type { DocumentCollection } from "./load-documents";
 
@@ -20,10 +20,10 @@ async function hashFile(filePath: string): Promise<string> {
 }
 
 export async function buildManifest(
-  malmunchi: DocumentCollection,
+  malmungchi: DocumentCollection,
   options: { name: string; dataDir: string }
-): Promise<MalmunchiManifest> {
-  const { documents, categories } = malmunchi;
+): Promise<MalmungchiManifest> {
+  const { documents, categories } = malmungchi;
 
   let contentBytes = 0;
   let contentWordCount = 0;
@@ -53,7 +53,7 @@ export async function buildManifest(
     }
   }
 
-  const manifest: MalmunchiManifest = {
+  const manifest: MalmungchiManifest = {
     name: options.name,
     generatedAt: new Date().toISOString(),
     documentCount: documents.length,
@@ -61,7 +61,7 @@ export async function buildManifest(
     indexedDocumentCount: documents.length,
     contentBytes,
     contentWordCount,
-    schemaVersion: MALMUNCHI_SCHEMA_VERSION,
+    schemaVersion: MALMUNGCHI_SCHEMA_VERSION,
     documentSlugs: documents.map((e) => e.slug).sort(),
     categorySlugs: categories.map((t) => t.slug).sort(),
     documentHashes,
@@ -72,14 +72,14 @@ export async function buildManifest(
 }
 
 export async function writeManifest(
-  manifest: MalmunchiManifest,
+  manifest: MalmungchiManifest,
   manifestPath: string
 ): Promise<void> {
   await fs.mkdir(path.dirname(manifestPath), { recursive: true });
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
 }
 
-export async function readManifest(manifestPath: string): Promise<MalmunchiManifest | null> {
+export async function readManifest(manifestPath: string): Promise<MalmungchiManifest | null> {
   try {
     const raw = await fs.readFile(manifestPath, "utf-8");
     return parseManifest(JSON.parse(raw));

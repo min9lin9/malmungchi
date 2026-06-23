@@ -1,8 +1,8 @@
 import type { BenchmarkDimension } from "./persona-benchmark.ts";
-import { assertLocalMalmunchiUrl, redactSecrets } from "./security.ts";
+import { assertLocalMalmungchiUrl, redactSecrets } from "./security.ts";
 
-export interface MalmunchiPersonaQualityReport {
-  readonly malmunchiBacked: true;
+export interface MalmungchiPersonaQualityReport {
+  readonly malmungchiBacked: true;
   readonly authorId: string;
   readonly sourceId: string;
   readonly documentCount: number;
@@ -16,20 +16,20 @@ export interface MalmunchiPersonaQualityReport {
   };
 }
 
-export async function evaluateMalmunchiPersonaQuality(options: {
-  readonly malmunchiUrl: string;
+export async function evaluateMalmungchiPersonaQuality(options: {
+  readonly malmungchiUrl: string;
   readonly authorId: string;
   readonly allowRemote: boolean;
-}): Promise<MalmunchiPersonaQualityReport> {
+}): Promise<MalmungchiPersonaQualityReport> {
   const sourceId = `author:${options.authorId}`;
-  const value = await fetchSourceExport(options.malmunchiUrl, sourceId, {
+  const value = await fetchSourceExport(options.malmungchiUrl, sourceId, {
     allowRemote: options.allowRemote,
   });
   const documents = exportDocuments(value);
   const maybePass = (ok: boolean): BenchmarkDimension =>
     ok ? { pass: true, score: 1 } : { pass: false, score: 0 };
   const hasDocuments = documents.length > 0;
-  const allMalmunchiCitations = documents.every(
+  const allMalmungchiCitations = documents.every(
     (document) => document.sourceId === sourceId && document.provenanceSourceId === sourceId
   );
   const hasKorean = documents.some((document) => /[가-힣]/u.test(document.content));
@@ -43,15 +43,15 @@ export async function evaluateMalmunchiPersonaQuality(options: {
       .split(/\s+/u)
       .filter(Boolean).length >= 8;
   const overall =
-    hasDocuments && allMalmunchiCitations && hasKorean && noForbiddenClaims && enoughForTurns;
+    hasDocuments && allMalmungchiCitations && hasKorean && noForbiddenClaims && enoughForTurns;
   return {
-    malmunchiBacked: true,
+    malmungchiBacked: true,
     authorId: options.authorId,
     sourceId,
     documentCount: documents.length,
     dimensions: {
       retrievalGrounding: maybePass(hasDocuments),
-      citationCoverage: maybePass(allMalmunchiCitations),
+      citationCoverage: maybePass(allMalmungchiCitations),
       koreanVoiceFidelity: maybePass(hasKorean),
       hallucinationGuard: maybePass(noForbiddenClaims),
       multiTurnReadiness: maybePass(enoughForTurns),
@@ -61,18 +61,18 @@ export async function evaluateMalmunchiPersonaQuality(options: {
 }
 
 async function fetchSourceExport(
-  malmunchiUrl: string,
+  malmungchiUrl: string,
   sourceId: string,
   options: { readonly allowRemote: boolean }
 ): Promise<unknown> {
-  const url = assertLocalMalmunchiUrl(malmunchiUrl, options.allowRemote);
-  const exportUrl = new URL(`/malmunchi/sources/${encodeURIComponent(sourceId)}/export`, url);
+  const url = assertLocalMalmungchiUrl(malmungchiUrl, options.allowRemote);
+  const exportUrl = new URL(`/malmungchi/sources/${encodeURIComponent(sourceId)}/export`, url);
   exportUrl.searchParams.set("format", "json");
   exportUrl.searchParams.set("includeHistory", "true");
   const response = await fetch(exportUrl);
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Malmunchi source export failed ${response.status}: ${redactSecrets(text)}`);
+    throw new Error(`Malmungchi source export failed ${response.status}: ${redactSecrets(text)}`);
   }
   return JSON.parse(text);
 }

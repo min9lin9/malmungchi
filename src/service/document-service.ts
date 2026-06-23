@@ -2,7 +2,7 @@ import type { Env } from "../config/env";
 import type {
   DocumentRecord,
   DocumentSectionRequest,
-  MalmunchiStats,
+  MalmungchiStats,
   SearchInput,
 } from "../domain/document";
 import { DocumentNotFoundError, InvalidInputError } from "../domain/errors";
@@ -59,7 +59,7 @@ export class DocumentService {
 
   stopSubscriptions(): void {}
 
-  getStats(): MalmunchiStats {
+  getStats(): MalmungchiStats {
     return { ...this.store.manifest };
   }
 

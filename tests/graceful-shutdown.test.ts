@@ -7,7 +7,7 @@ import { startHttpTransport } from "../src/transports/http";
 import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
 async function testLockPath(): Promise<string> {
-  return join(await mkdtemp(join(tmpdir(), "malmunchi-http-lock-")), "server.lock");
+  return join(await mkdtemp(join(tmpdir(), "malmungchi-http-lock-")), "server.lock");
 }
 
 describe("graceful shutdown", () => {

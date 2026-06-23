@@ -2,7 +2,7 @@
 
 ## Project
 
-- Name: `malmunchi`
+- Name: `malmungchi`
 - Runtime: Bun 1.3+
 - Stack: TypeScript strict, Elysia, FlexSearch, MCP SDK, Zod
 - Test runner: `bun test`

@@ -5,7 +5,7 @@ node_modules/
 bun.lockb
 evidence/*
 !evidence/.gitkeep
-.malmunchi/
+.malmungchi/
 normalized/
 raw/
 chunks/

@@ -27,7 +27,7 @@ async function ensureFixture(dir: string): Promise<void> {
 }
 
 export async function qaE2e(): Promise<void> {
-  const temp = await mkdtemp(join(tmpdir(), "malmunchi-"));
+  const temp = await mkdtemp(join(tmpdir(), "malmungchi-"));
   const evidence = join(temp, "evidence");
   await mkdir(evidence, { recursive: true });
   try {
@@ -75,7 +75,7 @@ export async function qaE2e(): Promise<void> {
       join(evidence, "task-13-cleanup.json"),
       JSON.stringify({ temp, cleaned: true }, null, 2)
     );
-    console.log("malmunchi e2e ok");
+    console.log("malmungchi e2e ok");
   } finally {
     await rm(temp, { recursive: true, force: true });
   }

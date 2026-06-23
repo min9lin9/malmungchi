@@ -24,12 +24,12 @@ function formatScore(n: number): string {
 }
 
 async function main() {
-  const { malmunchi } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
-  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
-  const categoryIndex = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
+  const { malmungchi } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
+  const baseIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
+  const categoryIndex = enrichCategoryIndex(malmungchi.documents, malmungchi.categories, baseIndex);
 
   const flex = new FlexSearchEngine({ maxResults: env.maxResults });
-  await flex.build(malmunchi.documents, categoryIndex.documentToCategories, {
+  await flex.build(malmungchi.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
   });
 
@@ -38,7 +38,7 @@ async function main() {
     apiKey: env.meiliApiKey,
     indexName: `${env.meiliIndexName}-compare`,
   });
-  await meili.build(malmunchi.documents, categoryIndex.documentToCategories);
+  await meili.build(malmungchi.documents, categoryIndex.documentToCategories);
 
   const input: SearchInput = { query: "", limit: 5 };
 

@@ -1,6 +1,6 @@
 import path from "node:path";
 import { env } from "./config/env";
-import type { MalmunchiManifest } from "./domain/document";
+import type { MalmungchiManifest } from "./domain/document";
 import { buildDocumentCategoryIndex } from "./ingest/build-index";
 import { buildManifest, readManifest, writeManifest } from "./ingest/build-manifest";
 import { enrichCategoryIndex } from "./ingest/enrich-categories";
@@ -11,8 +11,8 @@ import { DocumentStore } from "./service/document-store";
 import { logger } from "./util/logger";
 
 export interface BootstrapResult {
-  malmunchi: DocumentCollection;
-  manifest: MalmunchiManifest;
+  malmungchi: DocumentCollection;
+  manifest: MalmungchiManifest;
 }
 
 export async function loadDocumentsAndManifest(
@@ -20,23 +20,23 @@ export async function loadDocumentsAndManifest(
   instanceName: string
 ): Promise<BootstrapResult> {
   const manifestPath = path.join(dataDir, "manifest.json");
-  const malmunchi = await loadDocuments(dataDir);
+  const malmungchi = await loadDocuments(dataDir);
 
   let manifest = await readManifest(manifestPath);
   if (!manifest) {
-    manifest = await buildManifest(malmunchi, { name: instanceName, dataDir });
+    manifest = await buildManifest(malmungchi, { name: instanceName, dataDir });
     await writeManifest(manifest, manifestPath);
     logger.info("manifest rebuilt", { manifestPath });
   }
 
-  return { malmunchi, manifest };
+  return { malmungchi, manifest };
 }
 
 export async function buildService(
   dataDir: string,
   instanceName: string
 ): Promise<DocumentService> {
-  const { malmunchi, manifest } = await loadDocumentsAndManifest(dataDir, instanceName);
+  const { malmungchi, manifest } = await loadDocumentsAndManifest(dataDir, instanceName);
   const defaultImportDir = path.join(env.dataDir, "imports");
   const authorImportDir =
     env.authorImportDir === defaultImportDir ? path.join(dataDir, "imports") : env.authorImportDir;
@@ -52,22 +52,22 @@ export async function buildService(
     embeddingCacheDir: path.join(dataDir, ".cache", "embeddings"),
   };
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
   const categoryIndex = enrichCategoryIndex(
-    malmunchi.documents,
-    malmunchi.categories,
+    malmungchi.documents,
+    malmungchi.categories,
     baseCategoryIndex
   );
 
   const store = new DocumentStore(
-    new Map(malmunchi.documents.map((document) => [document.slug, document])),
-    new Map(malmunchi.categories.map((category) => [category.slug, category])),
+    new Map(malmungchi.documents.map((document) => [document.slug, document])),
+    new Map(malmungchi.categories.map((category) => [category.slug, category])),
     categoryIndex,
     manifest
   );
 
   const engine = await createSearchEngine(serviceEnv);
-  await engine.build(malmunchi.documents, categoryIndex.documentToCategories, {
+  await engine.build(malmungchi.documents, categoryIndex.documentToCategories, {
     dataDir,
     manifest,
   });
@@ -78,9 +78,9 @@ export async function buildService(
 export async function rebuildManifest(
   dataDir: string,
   instanceName: string
-): Promise<MalmunchiManifest> {
-  const malmunchi = await loadDocuments(dataDir);
-  const manifest = await buildManifest(malmunchi, { name: instanceName, dataDir });
+): Promise<MalmungchiManifest> {
+  const malmungchi = await loadDocuments(dataDir);
+  const manifest = await buildManifest(malmungchi, { name: instanceName, dataDir });
   await writeManifest(manifest, path.join(dataDir, "manifest.json"));
   return manifest;
 }

@@ -56,11 +56,11 @@ export async function assertRootBoundPath(root: string, candidate: string): Prom
   return fullReal;
 }
 
-export function assertLocalMalmunchiUrl(urlText: string, allowRemote: boolean): URL {
+export function assertLocalMalmungchiUrl(urlText: string, allowRemote: boolean): URL {
   const url = new URL(urlText);
   const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
   if (!allowRemote && !localHosts.has(url.hostname)) {
-    throw new Error(`Remote Malmunchi URL requires --allow-remote-malmunchi: ${url.origin}`);
+    throw new Error(`Remote Malmungchi URL requires --allow-remote-malmungchi: ${url.origin}`);
   }
   return url;
 }
@@ -73,7 +73,7 @@ export function getRequiredEnv(name: "OPENAI_API_KEY" | "KIMI_API_KEY"): string 
 
 export function defaultModelCache(): string {
   const base = process.env.XDG_CACHE_HOME ?? `${process.env.HOME ?? "."}/.cache`;
-  return `${base}/malmunchi/models`;
+  return `${base}/malmungchi/models`;
 }
 
 export async function scanFileForSecrets(file: string): Promise<string[]> {

@@ -1,12 +1,12 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DEFAULT_SEARCH_LIMIT } from "../config/constants";
 import type { DocumentService } from "../service/document-service";
-import { formatDocument, formatMalmunchiStats, formatSearchResults } from "./formatters";
+import { formatDocument, formatMalmungchiStats, formatSearchResults } from "./formatters";
 import { formatSearchCompareResult } from "./formatters.search";
 import {
   CompareSearchExplainSchema,
   GetDocumentSchema,
-  GetMalmunchiStatsSchema,
+  GetMalmungchiStatsSchema,
   SearchDocumentsSchema,
 } from "./schemas";
 import { handleToolError } from "./tool-error";
@@ -131,11 +131,11 @@ export function registerCoreTools(
   );
 
   server.registerTool(
-    "get_malmunchi_stats",
+    "get_malmungchi_stats",
     {
-      title: "Get malmunchi statistics",
+      title: "Get malmungchi statistics",
       description: "Return document count, category count, index status, and generated timestamp.",
-      inputSchema: GetMalmunchiStatsSchema,
+      inputSchema: GetMalmungchiStatsSchema,
       annotations: {
         readOnlyHint: true,
         destructiveHint: false,
@@ -145,7 +145,7 @@ export function registerCoreTools(
     },
     async () => {
       try {
-        return { content: [{ type: "text", text: formatMalmunchiStats(service.getStats()) }] };
+        return { content: [{ type: "text", text: formatMalmungchiStats(service.getStats()) }] };
       } catch (error) {
         return handleToolError(error);
       }

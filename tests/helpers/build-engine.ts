@@ -7,11 +7,11 @@ import { FlexSearchEngine } from "../../src/search/flexsearch-engine";
 const DATA_DIR = path.join(import.meta.dir, "..", "..", "data");
 
 export async function buildEngine() {
-  const malmunchi = await loadDocuments(DATA_DIR);
-  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
-  const index = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
+  const malmungchi = await loadDocuments(DATA_DIR);
+  const baseIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
+  const index = enrichCategoryIndex(malmungchi.documents, malmungchi.categories, baseIndex);
   const engine = new FlexSearchEngine();
-  await engine.build(malmunchi.documents, index.documentToCategories, {
+  await engine.build(malmungchi.documents, index.documentToCategories, {
     dataDir: DATA_DIR,
   });
   return engine;

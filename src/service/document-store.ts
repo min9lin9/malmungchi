@@ -1,4 +1,4 @@
-import type { Category, DocumentRecord, MalmunchiManifest } from "../domain/document";
+import type { Category, DocumentRecord, MalmungchiManifest } from "../domain/document";
 import type { DocumentCategoryIndex } from "../ingest/build-index";
 
 export class DocumentStore {
@@ -6,7 +6,7 @@ export class DocumentStore {
     public documents: Map<string, DocumentRecord>,
     public categories: Map<string, Category>,
     public categoryIndex: DocumentCategoryIndex,
-    public manifest: MalmunchiManifest
+    public manifest: MalmungchiManifest
   ) {}
 
   getDocument(slug: string): DocumentRecord | undefined {

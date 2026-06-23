@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { loadAllAuthorPosts } from "../author/storage/author-storage";
-import type { MalmunchiManifest } from "../domain/document";
+import type { MalmungchiManifest } from "../domain/document";
 
 function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
@@ -107,7 +107,7 @@ async function scanJsonlCategoryHashes(jsonlPath: string): Promise<Record<string
 }
 
 export async function diffDocuments(
-  manifest: MalmunchiManifest,
+  manifest: MalmungchiManifest,
   dataDir: string
 ): Promise<DocumentCollectionDiff> {
   const documentsDir = path.join(dataDir, "documents");

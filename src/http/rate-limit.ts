@@ -11,7 +11,7 @@ function getClientId(request: Request): string {
 function getLimit(limitRpm?: number): number {
   if (limitRpm !== undefined) return Math.max(1, Math.floor(limitRpm));
 
-  const raw = process.env.MALMUNCHI_RATE_LIMIT_RPM ?? process.env[legacyEnvName("RATE_LIMIT_RPM")];
+  const raw = process.env.MALMUNGCHI_RATE_LIMIT_RPM ?? process.env[legacyEnvName("RATE_LIMIT_RPM")];
   if (!raw) return 60;
   const value = Number.parseInt(raw, 10);
   return Number.isNaN(value) || value < 1 ? 60 : value;

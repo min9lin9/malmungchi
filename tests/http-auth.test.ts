@@ -10,19 +10,19 @@ async function buildApp() {
 
 describe("http auth", () => {
   afterEach(() => {
-    delete process.env.MALMUNCHI_API_KEY;
+    delete process.env.MALMUNGCHI_API_KEY;
     delete process.env[legacyEnvName("API_KEY")];
   });
 
   it("allows public health endpoint without key", async () => {
-    process.env.MALMUNCHI_API_KEY = "secret";
+    process.env.MALMUNGCHI_API_KEY = "secret";
     const app = await buildApp();
     const res = await app.handle(new Request("http://localhost/health"));
     expect(res.status).toBe(200);
   });
 
   it("rejects missing api key", async () => {
-    process.env.MALMUNCHI_API_KEY = "secret";
+    process.env.MALMUNGCHI_API_KEY = "secret";
     const app = await buildApp();
     const res = await app.handle(new Request("http://localhost/search?q=test"));
     expect(res.status).toBe(401);
@@ -30,7 +30,7 @@ describe("http auth", () => {
   });
 
   it("accepts valid bearer token", async () => {
-    process.env.MALMUNCHI_API_KEY = "secret";
+    process.env.MALMUNGCHI_API_KEY = "secret";
     const app = await buildApp();
     const res = await app.handle(
       new Request("http://localhost/search?q=test", {
@@ -41,7 +41,7 @@ describe("http auth", () => {
   });
 
   it("rejects invalid bearer token", async () => {
-    process.env.MALMUNCHI_API_KEY = "secret";
+    process.env.MALMUNGCHI_API_KEY = "secret";
     const app = await buildApp();
     const res = await app.handle(
       new Request("http://localhost/search?q=test", {
@@ -52,7 +52,7 @@ describe("http auth", () => {
   });
 
   it("does not require auth when api key is unset", async () => {
-    delete process.env.MALMUNCHI_API_KEY;
+    delete process.env.MALMUNGCHI_API_KEY;
     delete process.env[legacyEnvName("API_KEY")];
     const app = await buildApp();
     const res = await app.handle(new Request("http://localhost/search?q=test"));

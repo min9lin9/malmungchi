@@ -78,7 +78,7 @@ export interface SearchResult {
   rankingSignals?: RankingSignals;
 }
 
-export interface MalmunchiStats {
+export interface MalmungchiStats {
   name: string;
   generatedAt: string;
   documentCount: number;
@@ -93,7 +93,7 @@ export interface MalmunchiStats {
   categoryHashes: Record<string, string>;
 }
 
-export interface MalmunchiManifest extends MalmunchiStats {}
+export interface MalmungchiManifest extends MalmungchiStats {}
 
 export interface DocumentSectionRequest {
   slug?: string;

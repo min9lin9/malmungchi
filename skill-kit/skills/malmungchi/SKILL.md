@@ -1,20 +1,20 @@
 ---
-name: malmunchi
-description: Use Malmunchi for local source storage, search, lifecycle export, author-source generation, personas, persona benchmarks, panels, and rooms.
+name: malmungchi
+description: Use Malmungchi for local source storage, search, lifecycle export, author-source generation, personas, persona benchmarks, panels, and rooms.
 ---
 
-# Malmunchi Skill
+# Malmungchi Skill
 
-Use this skill when the user mentions Malmunchi, `/malmunchi`, source import/export,
+Use this skill when the user mentions Malmungchi, `/malmungchi`, source import/export,
 source-backed personas, persona benchmarks, panel debate, or room debate.
 
 Local install:
 - MCP server: `<repo>/src/main.ts`
-- CLI: `bun run malmunchi`
+- CLI: `bun run malmungchi`
 - Skills: `<repo>/skill-kit/skills/*`
 
 Routing:
-- Use Malmunchi core for source storage, search, source lifecycle, refresh,
+- Use Malmungchi core for source storage, search, source lifecycle, refresh,
   history, export, and provenance.
 - Use the bundled CLI for local normalization, author source generation,
   persona generation, offline fixture workflows, persona benchmark, panel
@@ -22,7 +22,7 @@ Routing:
 
 Quick commands:
 ```bash
-bun run malmunchi --help
+bun run malmungchi --help
 bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/persona-benchmark.json
 ```
 

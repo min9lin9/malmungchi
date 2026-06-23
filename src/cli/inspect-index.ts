@@ -8,18 +8,18 @@ import { logger } from "../util/logger";
 async function main() {
   logger.info(`Inspecting index in ${env.dataDir}...`);
 
-  const { malmunchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
+  const { malmungchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmungchi.documents, malmungchi.categories);
   const categoryIndex = enrichCategoryIndex(
-    malmunchi.documents,
-    malmunchi.categories,
+    malmungchi.documents,
+    malmungchi.categories,
     baseCategoryIndex
   );
   const engine = new FlexSearchEngine();
-  await engine.build(malmunchi.documents, categoryIndex.documentToCategories);
+  await engine.build(malmungchi.documents, categoryIndex.documentToCategories);
 
-  const documentsWithoutCategories = malmunchi.documents.filter(
+  const documentsWithoutCategories = malmungchi.documents.filter(
     (e: { slug: string }) => (categoryIndex.documentToCategories.get(e.slug)?.length ?? 0) === 0
   );
 
@@ -31,8 +31,8 @@ async function main() {
     JSON.stringify(
       {
         manifest,
-        documents: malmunchi.documents.length,
-        categories: malmunchi.categories.length,
+        documents: malmungchi.documents.length,
+        categories: malmungchi.categories.length,
         documentsWithoutCategories: documentsWithoutCategories.length,
         topCategories: categoryDocumentCounts.slice(0, 10),
         bottomCategories: categoryDocumentCounts.slice(-10),
