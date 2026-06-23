@@ -13,7 +13,7 @@ npm publish rights for the `malmungchi` package.
 Check auth first:
 
 ```bash
-npm whoami
+npm whoami --registry=https://registry.npmjs.org/
 ```
 
 ## Option A: publish the release tarball
@@ -25,8 +25,11 @@ gh release download v1.0.0 \
   --repo min9lin9/malmungchi \
   --pattern 'malmungchi-1.0.0.tgz'
 
-npm publish ./malmungchi-1.0.0.tgz --access public
-npm view malmungchi version
+npm publish ./malmungchi-1.0.0.tgz \
+  --access public \
+  --registry=https://registry.npmjs.org/
+
+npm view malmungchi version --registry=https://registry.npmjs.org/
 ```
 
 Expected version:
@@ -46,8 +49,11 @@ git checkout v1.0.0
 bun install --frozen-lockfile
 bun run ci
 npm pack
-npm publish ./malmungchi-1.0.0.tgz --access public
-npm view malmungchi version
+npm publish ./malmungchi-1.0.0.tgz \
+  --access public \
+  --registry=https://registry.npmjs.org/
+
+npm view malmungchi version --registry=https://registry.npmjs.org/
 ```
 
 ## CI token pattern
@@ -57,7 +63,30 @@ secret and write it to a temporary user npm config during the publish job:
 
 ```bash
 printf '//registry.npmjs.org/:_authToken=%s\n' "$NPM_TOKEN" > ~/.npmrc
-npm publish ./malmungchi-1.0.0.tgz --access public
+npm publish ./malmungchi-1.0.0.tgz \
+  --access public \
+  --registry=https://registry.npmjs.org/
 ```
 
 Do not commit `.npmrc`, npm tokens, one-time passwords, or account credentials.
+
+## E404 during first publish
+
+If `npm publish` fails with `E404 Not Found - PUT https://registry.npmjs.org/malmungchi`,
+the package name is usually still unpublished but the current npm auth cannot
+create or publish it.
+
+Check these in the publishing environment:
+
+```bash
+npm whoami --registry=https://registry.npmjs.org/
+npm config get registry
+npm publish ./malmungchi-1.0.0.tgz \
+  --access public \
+  --registry=https://registry.npmjs.org/ \
+  --loglevel verbose
+```
+
+For the first publish, use either an interactive npm login session or a token
+that can publish new public packages. A granular token limited to an existing
+package will not work because `malmungchi` does not exist yet.
