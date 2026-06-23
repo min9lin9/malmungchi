@@ -1,5 +1,5 @@
 import type { Document } from "flexsearch";
-import type { Episode, RankingSignals, SearchInput, SearchResult } from "../domain/episode";
+import type { DocumentRecord, RankingSignals, SearchInput, SearchResult } from "../domain/document";
 import { buildRankingSignals, withRerankSignal } from "./explain";
 import { normalizeQuery } from "./normalize";
 import { type ParsedQuery, parseQuery } from "./query";
@@ -13,15 +13,15 @@ export const FIELD_WEIGHTS: Record<string, number> = {
 };
 
 export interface SemanticReranker {
-  prepare?(episodes: readonly Episode[]): Promise<void>;
+  prepare?(documents: readonly DocumentRecord[]): Promise<void>;
   rerank(query: string, results: readonly SearchResult[]): Promise<SearchResult[]>;
 }
 
 export interface FlexSearchRankerContext {
-  episodes: Map<string, Episode>;
-  episodeSearchableText: Map<string, string>;
-  episodeWordSet: Map<string, Set<string>>;
-  episodeToTopics: Map<string, string[]>;
+  documents: Map<string, DocumentRecord>;
+  documentSearchableText: Map<string, string>;
+  documentWordSet: Map<string, Set<string>>;
+  documentToCategories: Map<string, string[]>;
   maxResults: number;
   reranker?: SemanticReranker;
   rerankTimeoutMs: number;
@@ -100,7 +100,7 @@ export class FlexSearchRanker {
         score,
         rankingMode,
         buildRankingSignals({
-          episode: this.context.episodes.get(slug),
+          document: this.context.documents.get(slug),
           query,
           rankingMode,
           fieldScores: fieldScores.get(slug),
@@ -115,16 +115,16 @@ export class FlexSearchRanker {
     rankingMode: "weighted" | "rrf",
     rankingSignals?: RankingSignals
   ): SearchResult {
-    const episode = this.context.episodes.get(slug);
-    const source = this.resolveSource(episode, slug);
+    const document = this.context.documents.get(slug);
+    const source = this.resolveSource(document, slug);
     return {
       slug,
-      title: episode?.metadata.title ?? slug,
-      guest: episode?.metadata.guest ?? "",
-      publishDate: episode?.metadata.publish_date ?? "",
+      title: document?.metadata.title ?? slug,
+      guest: document?.metadata.guest ?? "",
+      publishDate: document?.metadata.publish_date ?? "",
       score,
       snippet: "",
-      topicSlugs: this.context.episodeToTopics.get(slug) ?? [],
+      categorySlugs: this.context.documentToCategories.get(slug) ?? [],
       sourceType: source.type,
       sourceId: source.id,
       rankingMode,
@@ -133,18 +133,14 @@ export class FlexSearchRanker {
   }
 
   private resolveSource(
-    episode: Episode | undefined,
+    document: DocumentRecord | undefined,
     slug: string
-  ): { type: "podcast" | "blog" | "author"; id: string } {
-    if (episode?.metadata.source === "author") {
-      const authorId = episode.metadata.authorId ?? slug.split(":")[1] ?? "unknown";
+  ): { type: "author"; id: string } {
+    if (document?.metadata.source === "author") {
+      const authorId = document.metadata.authorId ?? slug.split(":")[1] ?? "unknown";
       return { type: "author", id: `author:${authorId}` };
     }
-    if (episode?.metadata.source === "blog" || slug.startsWith("blog:")) {
-      const blogId = slug.split(":")[1] ?? episode?.metadata.guest ?? "unknown";
-      return { type: "blog", id: `blog:${blogId}` };
-    }
-    return { type: "podcast", id: "podcast" };
+    return { type: "author", id: "author:unknown" };
   }
 
   private applyPostFilters(
@@ -153,11 +149,11 @@ export class FlexSearchRanker {
     input: SearchInput
   ): SearchResult[] {
     return Array.from(candidates.values()).filter((result) => {
-      const episode = this.context.episodes.get(result.slug);
-      if (!episode) return false;
-      if (parsed.phrases.some((phrase) => !this.containsPhrase(episode, phrase))) return false;
+      const document = this.context.documents.get(result.slug);
+      if (!document) return false;
+      if (parsed.phrases.some((phrase) => !this.containsPhrase(document, phrase))) return false;
       if (parsed.terms.length > 0) {
-        const matched = parsed.terms.filter((term) => this.containsTerm(episode, term));
+        const matched = parsed.terms.filter((term) => this.containsTerm(document, term));
         const required = parsed.operator === "and" ? parsed.terms.length : 1;
         if (matched.length < required) return false;
       }
@@ -170,9 +166,9 @@ export class FlexSearchRanker {
       return false;
     }
     if (
-      input.topic &&
-      !result.topicSlugs.some((topic) =>
-        topic.toLowerCase().includes(input.topic?.toLowerCase() ?? "")
+      input.category &&
+      !result.categorySlugs.some((category) =>
+        category.toLowerCase().includes(input.category?.toLowerCase() ?? "")
       )
     ) {
       return false;
@@ -182,25 +178,25 @@ export class FlexSearchRanker {
     return true;
   }
 
-  private containsPhrase(episode: Episode, phrase: string): boolean {
-    return this.getSearchableText(episode).includes(phrase.toLowerCase());
+  private containsPhrase(document: DocumentRecord, phrase: string): boolean {
+    return this.getSearchableText(document).includes(phrase.toLowerCase());
   }
 
-  private containsTerm(episode: Episode, term: string): boolean {
-    return this.context.episodeWordSet.get(episode.slug)?.has(term.toLowerCase()) ?? false;
+  private containsTerm(document: DocumentRecord, term: string): boolean {
+    return this.context.documentWordSet.get(document.slug)?.has(term.toLowerCase()) ?? false;
   }
 
-  private getSearchableText(episode: Episode): string {
+  private getSearchableText(document: DocumentRecord): string {
     return (
-      this.context.episodeSearchableText.get(episode.slug) ??
-      FlexSearchRanker.searchableText(episode).toLowerCase()
+      this.context.documentSearchableText.get(document.slug) ??
+      FlexSearchRanker.searchableText(document).toLowerCase()
     );
   }
 
   private attachSnippets(results: SearchResult[], query: string): SearchResult[] {
     return results.map((result) => {
-      const episode = this.context.episodes.get(result.slug);
-      return { ...result, snippet: episode ? buildSnippet(episode.transcript, query) : "" };
+      const document = this.context.documents.get(result.slug);
+      return { ...result, snippet: document ? buildSnippet(document.transcript, query) : "" };
     });
   }
 
@@ -253,12 +249,12 @@ export class FlexSearchRanker {
     return { offset: Math.max(0, requestedOffset), limit };
   }
 
-  static searchableText(episode: Episode): string {
+  static searchableText(document: DocumentRecord): string {
     return [
-      episode.metadata.title ?? "",
-      episode.metadata.guest ?? "",
-      (episode.metadata.keywords ?? []).join(" "),
-      episode.transcript,
+      document.metadata.title ?? "",
+      document.metadata.guest ?? "",
+      (document.metadata.keywords ?? []).join(" "),
+      document.transcript,
     ].join("\n");
   }
 }

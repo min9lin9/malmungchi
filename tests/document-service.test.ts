@@ -1,17 +1,17 @@
 import { describe, expect, it } from "bun:test";
-import { EpisodeNotFoundError } from "../src/domain/errors";
-import { buildFixturePodcastService } from "./helpers/build-fixture-service";
+import { DocumentNotFoundError } from "../src/domain/errors";
+import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
-describe("podcast service", () => {
+describe("document service", () => {
   it("returns stats", async () => {
-    const service = await buildFixturePodcastService();
+    const service = await buildFixtureDocumentService();
     const stats = service.getStats();
-    expect(stats.episodeCount).toBe(2);
-    expect(stats.topicCount).toBe(0);
+    expect(stats.documentCount).toBe(2);
+    expect(stats.categoryCount).toBe(0);
   });
 
   it("searches documents", async () => {
-    const service = await buildFixturePodcastService();
+    const service = await buildFixtureDocumentService();
     const result = await service.searchDocuments({
       query: "product",
       limit: 5,
@@ -22,8 +22,8 @@ describe("podcast service", () => {
   });
 
   it("gets document metadata by slug", async () => {
-    const service = await buildFixturePodcastService();
-    const result = service.getEpisode({
+    const service = await buildFixtureDocumentService();
+    const result = service.getDocument({
       slug: "author:demo-author:product-note",
       section: "metadata",
     });
@@ -33,15 +33,15 @@ describe("podcast service", () => {
   });
 
   it("gets document by legacy author name", async () => {
-    const service = await buildFixturePodcastService();
-    const result = service.getEpisode({ guestName: "demo-author", section: "metadata" });
+    const service = await buildFixtureDocumentService();
+    const result = service.getDocument({ guestName: "demo-author", section: "metadata" });
     expect(result.slug.startsWith("author:demo-author:")).toBe(true);
   });
 
   it("throws for missing document", async () => {
-    const service = await buildFixturePodcastService();
-    expect(() => service.getEpisode({ slug: "not-real-guest", section: "metadata" })).toThrow(
-      EpisodeNotFoundError
+    const service = await buildFixtureDocumentService();
+    expect(() => service.getDocument({ slug: "not-real-guest", section: "metadata" })).toThrow(
+      DocumentNotFoundError
     );
   });
 });

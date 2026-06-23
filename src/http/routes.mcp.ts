@@ -2,9 +2,9 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { Elysia } from "elysia";
 import { env } from "../config/env";
 import { createMcpServer } from "../mcp/server";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 
-export function mcpRoutes(service: PodcastService) {
+export function mcpRoutes(service: DocumentService) {
   // Reuse the same MCP server instance across stateless HTTP requests.
   // Each request still gets a fresh transport, which is required by the SDK.
   const server = createMcpServer(service, {

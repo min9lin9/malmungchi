@@ -1,4 +1,4 @@
-import type { Episode } from "../domain/episode";
+import type { DocumentRecord } from "../domain/document";
 import { formatSourceMarkdown } from "./source-export";
 import { buildExportDocuments, buildExportManifest } from "./source-export-checksums";
 import type {
@@ -10,7 +10,7 @@ import type {
 
 export function buildSourceExportResult(input: {
   readonly detail: SourceDetail;
-  readonly episodes: readonly Episode[];
+  readonly documents: readonly DocumentRecord[];
   readonly sourceId: string;
   readonly manifestGeneratedAt?: string;
   readonly history?: SourceHistoryResult;
@@ -18,11 +18,11 @@ export function buildSourceExportResult(input: {
 }): ExportSourceResult {
   const documents = buildExportDocuments({
     source: input.detail.source,
-    documents: input.episodes.map((episode) => ({
-      slug: episode.slug,
-      title: episode.metadata.title ?? episode.slug,
-      content: episode.content,
-      originalUrl: episode.metadata.originalUrl,
+    documents: input.documents.map((document) => ({
+      slug: document.slug,
+      title: document.metadata.title ?? document.slug,
+      content: document.content,
+      originalUrl: document.metadata.originalUrl,
     })),
   });
   const manifest = buildExportManifest({

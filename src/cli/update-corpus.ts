@@ -1,7 +1,7 @@
 import { loadCorpusAndManifest } from "../bootstrap";
 import { env } from "../config/env";
-import { buildEpisodeTopicIndex } from "../ingest/build-index";
-import { enrichTopicIndex } from "../ingest/enrich-topics";
+import { buildDocumentCategoryIndex } from "../ingest/build-index";
+import { enrichCategoryIndex } from "../ingest/enrich-categories";
 import { applyIncrementalUpdate } from "../ingest/incremental-update";
 import { FlexSearchEngine } from "../search/flexsearch-engine";
 import { CorpusStore } from "../service/corpus-store";
@@ -10,18 +10,18 @@ import { logger } from "../util/logger";
 async function main() {
   const { corpus, manifest } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
 
-  const baseTopicIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseTopicIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
 
   const store = new CorpusStore(
-    new Map(corpus.episodes.map((e) => [e.slug, e])),
-    new Map(corpus.topics.map((t) => [t.slug, t])),
-    topicIndex,
+    new Map(corpus.documents.map((e) => [e.slug, e])),
+    new Map(corpus.categories.map((t) => [t.slug, t])),
+    categoryIndex,
     manifest
   );
 
   const engine = new FlexSearchEngine();
-  await engine.build(corpus.episodes, topicIndex.episodeToTopics, {
+  await engine.build(corpus.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
     manifest,
   });
@@ -30,12 +30,12 @@ async function main() {
 
   const diff = result.diff;
   const totalChanges =
-    diff.addedEpisodes.length +
-    diff.changedEpisodes.length +
-    diff.removedEpisodes.length +
-    diff.addedTopics.length +
-    diff.changedTopics.length +
-    diff.removedTopics.length;
+    diff.addedDocuments.length +
+    diff.changedDocuments.length +
+    diff.removedDocuments.length +
+    diff.addedCategories.length +
+    diff.changedCategories.length +
+    diff.removedCategories.length;
 
   if (totalChanges === 0) {
     logger.info("No corpus changes detected");

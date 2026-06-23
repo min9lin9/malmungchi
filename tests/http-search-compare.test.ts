@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { CorpusManifest, SearchInput, SearchResult } from "../src/domain/episode";
+import type { CorpusManifest, SearchInput, SearchResult } from "../src/domain/document";
 import { createHttpApp } from "../src/http/app";
 import type {
   SearchEngine,
@@ -7,11 +7,11 @@ import type {
   SearchEngineStats,
 } from "../src/search/search-engine";
 import { CorpusStore } from "../src/service/corpus-store";
-import { PodcastService } from "../src/service/podcast-service";
-import { buildFixturePodcastService } from "./helpers/build-fixture-service";
+import { DocumentService } from "../src/service/document-service";
+import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
 async function buildApp() {
-  return createHttpApp(await buildFixturePodcastService());
+  return createHttpApp(await buildFixtureDocumentService());
 }
 
 describe("http search compare", () => {
@@ -63,23 +63,23 @@ describe("http search compare", () => {
     const manifest: CorpusManifest = {
       name: "fake",
       generatedAt: new Date(0).toISOString(),
-      episodeCount: 0,
-      topicCount: 0,
-      indexedEpisodeCount: 0,
-      transcriptBytes: 0,
-      transcriptWordCount: 0,
+      documentCount: 0,
+      categoryCount: 0,
+      indexedDocumentCount: 0,
+      contentBytes: 0,
+      contentWordCount: 0,
       schemaVersion: 1,
-      episodeSlugs: [],
-      topicSlugs: [],
-      episodeHashes: {},
-      topicHashes: {},
+      documentSlugs: [],
+      categorySlugs: [],
+      documentHashes: {},
+      categoryHashes: {},
     };
     const engine = new FakeMeilisearchEngine();
-    const service = new PodcastService(
+    const service = new DocumentService(
       new CorpusStore(
         new Map(),
         new Map(),
-        { episodeToTopics: new Map(), topicToEpisodes: new Map() },
+        { documentToCategories: new Map(), categoryToDocuments: new Map() },
         manifest
       ),
       engine
@@ -117,7 +117,7 @@ class FakeMeilisearchEngine implements SearchEngine {
 
   async build(
     _episodes: unknown[],
-    _episodeToTopics: Map<string, string[]>,
+    _documentToCategories: Map<string, string[]>,
     _options?: SearchEngineBuildOptions
   ) {}
 

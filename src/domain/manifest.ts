@@ -1,19 +1,19 @@
 import { z } from "zod";
-import type { CorpusManifest } from "./episode";
+import type { CorpusManifest } from "./document";
 
 export const CorpusManifestSchema = z.object({
   name: z.string(),
   generatedAt: z.string(),
-  episodeCount: z.number().int().nonnegative(),
-  topicCount: z.number().int().nonnegative(),
-  indexedEpisodeCount: z.number().int().nonnegative(),
-  transcriptBytes: z.number().int().nonnegative(),
-  transcriptWordCount: z.number().int().nonnegative(),
+  documentCount: z.number().int().nonnegative(),
+  categoryCount: z.number().int().nonnegative(),
+  indexedDocumentCount: z.number().int().nonnegative(),
+  contentBytes: z.number().int().nonnegative(),
+  contentWordCount: z.number().int().nonnegative(),
   schemaVersion: z.number().int().nonnegative(),
-  episodeSlugs: z.array(z.string()),
-  topicSlugs: z.array(z.string()),
-  episodeHashes: z.record(z.string()),
-  topicHashes: z.record(z.string()),
+  documentSlugs: z.array(z.string()),
+  categorySlugs: z.array(z.string()),
+  documentHashes: z.record(z.string()),
+  categoryHashes: z.record(z.string()),
 }) satisfies z.ZodType<CorpusManifest>;
 
 export function parseManifest(raw: unknown): CorpusManifest | null {

@@ -8,8 +8,8 @@ import { getLlmStatus } from "../src/llm/llm-status";
 function env(overrides: Partial<Env>): Env {
   return {
     dataDir: "/tmp/data",
-    episodesDir: "/tmp/data/documents",
-    topicsDir: "/tmp/data/categories",
+    documentsDir: "/tmp/data/documents",
+    categoriesDir: "/tmp/data/categories",
     blogsDir: "/tmp/data/blogs",
     authorsDir: "/tmp/data/authors",
     authorImportDir: "/tmp/data/imports",

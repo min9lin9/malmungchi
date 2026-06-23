@@ -1,14 +1,14 @@
 import { describe, expect, it } from "bun:test";
 import type { Env } from "../src/config/env";
-import type { Episode } from "../src/domain/episode";
+import type { DocumentRecord } from "../src/domain/document";
 import { createSearchEngine } from "../src/search/engine-factory";
 import { FlexSearchEngine } from "../src/search/flexsearch-engine";
 import { MeilisearchEngine } from "../src/search/meilisearch-engine";
 
 const baseEnv: Env = {
   dataDir: "/tmp/data",
-  episodesDir: "/tmp/data/documents",
-  topicsDir: "/tmp/data/categories",
+  documentsDir: "/tmp/data/documents",
+  categoriesDir: "/tmp/data/categories",
   blogsDir: "/tmp/data/blogs",
   authorsDir: "/tmp/data/authors",
   authorImportDir: "/tmp/data/imports",
@@ -46,7 +46,7 @@ describe("createSearchEngine", () => {
   });
 });
 
-function episode(slug: string, transcript: string): Episode {
+function document(slug: string, transcript: string): DocumentRecord {
   return {
     slug,
     metadata: { title: slug },
@@ -76,7 +76,7 @@ it("wires semantic rerank for flexsearch when embedding auth is configured", asy
       codexAuthPath: "/tmp/missing-auth.json",
     });
     await engine.build(
-      [episode("keyword", "alpha keyword"), episode("semantic", "alpha semantic")],
+      [document("keyword", "alpha keyword"), document("semantic", "alpha semantic")],
       new Map()
     );
 

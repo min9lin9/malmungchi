@@ -6,9 +6,9 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { buildService } from "../src/bootstrap";
 import { createMcpServer } from "../src/mcp/server";
-import { buildFixturePodcastService } from "./helpers/build-fixture-service";
+import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
-async function createTestClient(service: Awaited<ReturnType<typeof buildFixturePodcastService>>) {
+async function createTestClient(service: Awaited<ReturnType<typeof buildFixtureDocumentService>>) {
   const server = createMcpServer(service, { maxResponseChars: 50000 });
   const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
   const client = new Client({ name: "test-client", version: "1.0.0" });
@@ -23,7 +23,7 @@ function textOf(result: unknown): string {
 
 describe("mcp tools", () => {
   it("lists public Malmunchi tools", async () => {
-    const client = await createTestClient(await buildFixturePodcastService());
+    const client = await createTestClient(await buildFixtureDocumentService());
     const tools = await client.listTools();
     const names = tools.tools.map((t) => t.name).sort();
     expect(names).toEqual([
@@ -45,7 +45,7 @@ describe("mcp tools", () => {
   });
 
   it("searches fixture documents", async () => {
-    const client = await createTestClient(await buildFixturePodcastService());
+    const client = await createTestClient(await buildFixtureDocumentService());
     const result = await client.callTool({
       name: "search_documents",
       arguments: { query: "product", limit: 1, offset: 0 },
@@ -86,7 +86,7 @@ describe("mcp tools", () => {
   });
 
   it("returns structured error for missing document", async () => {
-    const client = await createTestClient(await buildFixturePodcastService());
+    const client = await createTestClient(await buildFixtureDocumentService());
     const result = await client.callTool({
       name: "get_document",
       arguments: { slug: "not-real-document", section: "metadata" },

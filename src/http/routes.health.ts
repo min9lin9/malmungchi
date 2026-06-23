@@ -1,10 +1,10 @@
 import { Elysia } from "elysia";
 import pkg from "../../package.json" with { type: "json" };
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 
 const startTime = Date.now();
 
-export function healthRoutes(service: PodcastService) {
+export function healthRoutes(service: DocumentService) {
   return new Elysia({ prefix: "/health" })
     .get("/", () => {
       const mem = process.memoryUsage();

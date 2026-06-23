@@ -1,4 +1,4 @@
-import type { Episode, SearchResult } from "../../domain/episode";
+import type { DocumentRecord, SearchResult } from "../../domain/document";
 import type { SemanticReranker } from "../flexsearch-ranker";
 import { cosineSimilarity } from "./cosine";
 import type { EmbeddingCache } from "./embedding-cache";
@@ -27,19 +27,19 @@ export class EmbeddingReranker implements SemanticReranker {
 
   constructor(private readonly options: EmbeddingRerankerOptions) {}
 
-  async prepare(episodes: readonly Episode[]): Promise<void> {
-    for (const episode of episodes) {
-      this.documents.set(episode.slug, {
+  async prepare(documents: readonly DocumentRecord[]): Promise<void> {
+    for (const document of documents) {
+      this.documents.set(document.slug, {
         text: [
-          episode.metadata.title ?? "",
-          episode.metadata.guest ?? "",
-          (episode.metadata.keywords ?? []).join(" "),
-          episode.transcript,
+          document.metadata.title ?? "",
+          document.metadata.guest ?? "",
+          (document.metadata.keywords ?? []).join(" "),
+          document.transcript,
         ].join("\n"),
-        contentHash: episode.contentHash ?? episode.slug,
+        contentHash: document.contentHash ?? document.slug,
       });
     }
-    await Promise.all(episodes.map((episode) => this.loadCachedDocument(episode.slug)));
+    await Promise.all(documents.map((document) => this.loadCachedDocument(document.slug)));
   }
 
   async rerank(query: string, results: readonly SearchResult[]): Promise<SearchResult[]> {

@@ -9,7 +9,7 @@ import { addKnowledge } from "../src/knowledge.ts";
 import { runPanelByCategory, runRoomAsk } from "../src/panel-debate.ts";
 import { evaluatePersonaBenchmark } from "../src/persona-benchmark.ts";
 import { providerStatus } from "../src/providers.ts";
-import { redactSecrets, safeTopicSlug } from "../src/security.ts";
+import { redactSecrets, safeCategorySlug } from "../src/security.ts";
 import { cloneStatus } from "../src/standalone.ts";
 import type { Persona } from "../src/types.ts";
 
@@ -60,7 +60,7 @@ test("supports provider parity and category parsing", () => {
   const header = "Authorization" + ": " + "Bearer" + " sk-test";
   const token = "access_" + "token=abc";
   expect(redactSecrets(`${header} ${token}`)).toContain("<redacted>");
-  expect(() => safeTopicSlug("../bad")).toThrow("Unsafe topic");
+  expect(() => safeCategorySlug("../bad")).toThrow("Unsafe category");
 });
 
 test("roundtrips clone markdown and stores chat history", async () => {
@@ -104,7 +104,7 @@ test("reports benchmark dimensions and persona workflow metadata", async () => {
       workspace,
       source: note,
       sourceLabel: "note",
-      topic: "투자철학",
+      category: "투자철학",
       sourceType: "file",
       publishedAt: "2026-06-20",
     });

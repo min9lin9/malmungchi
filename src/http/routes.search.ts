@@ -1,8 +1,8 @@
 import { Elysia, t } from "elysia";
 import { DATE_REGEX, DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT } from "../config/constants";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 
-export function searchRoutes(service: PodcastService) {
+export function searchRoutes(service: DocumentService) {
   return new Elysia({ prefix: "/search" })
     .get(
       "/",
@@ -12,7 +12,7 @@ export function searchRoutes(service: PodcastService) {
           limit: query.limit,
           offset: query.offset,
           page: query.page,
-          topic: query.topic,
+          category: query.category,
           guest: query.guest,
           fromDate: query.fromDate,
           toDate: query.toDate,
@@ -30,7 +30,7 @@ export function searchRoutes(service: PodcastService) {
           ),
           offset: t.Optional(t.Number({ default: 0, minimum: 0 })),
           page: t.Optional(t.Number({ minimum: 1 })),
-          topic: t.Optional(t.String()),
+          category: t.Optional(t.String()),
           guest: t.Optional(t.String()),
           fromDate: t.Optional(t.String({ pattern: DATE_REGEX.source })),
           toDate: t.Optional(t.String({ pattern: DATE_REGEX.source })),
@@ -46,7 +46,7 @@ export function searchRoutes(service: PodcastService) {
         service.compareSearchExplanations({
           query: query.q,
           limit: query.limit,
-          topic: query.topic,
+          category: query.category,
           guest: query.guest,
           fromDate: query.fromDate,
           toDate: query.toDate,
@@ -57,7 +57,7 @@ export function searchRoutes(service: PodcastService) {
           limit: t.Optional(
             t.Number({ default: DEFAULT_SEARCH_LIMIT, minimum: 1, maximum: MAX_SEARCH_LIMIT })
           ),
-          topic: t.Optional(t.String()),
+          category: t.Optional(t.String()),
           guest: t.Optional(t.String()),
           fromDate: t.Optional(t.String({ pattern: DATE_REGEX.source })),
           toDate: t.Optional(t.String({ pattern: DATE_REGEX.source })),

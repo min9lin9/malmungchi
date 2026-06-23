@@ -1,7 +1,7 @@
 ---
 {
   "author_id": "demo-author",
-  "episode_slug": "product-note",
+  "document_slug": "product-note",
   "slug": "author:demo-author:product-note",
   "title": "Product Note",
   "source_url": "fixture:product-note.md",

@@ -1,13 +1,13 @@
 import path from "node:path";
 import { env } from "./config/env";
-import type { CorpusManifest } from "./domain/episode";
-import { buildEpisodeTopicIndex } from "./ingest/build-index";
+import type { CorpusManifest } from "./domain/document";
+import { buildDocumentCategoryIndex } from "./ingest/build-index";
 import { buildManifest, readManifest, writeManifest } from "./ingest/build-manifest";
-import { enrichTopicIndex } from "./ingest/enrich-topics";
+import { enrichCategoryIndex } from "./ingest/enrich-categories";
 import { type Corpus, loadCorpus } from "./ingest/load-corpus";
 import { createSearchEngine } from "./search/engine-factory";
 import { CorpusStore } from "./service/corpus-store";
-import { PodcastService } from "./service/podcast-service";
+import { DocumentService } from "./service/document-service";
 import { logger } from "./util/logger";
 
 export interface BootstrapResult {
@@ -32,7 +32,7 @@ export async function loadCorpusAndManifest(
   return { corpus, manifest };
 }
 
-export async function buildService(dataDir: string, corpusName: string): Promise<PodcastService> {
+export async function buildService(dataDir: string, corpusName: string): Promise<DocumentService> {
   const { corpus, manifest } = await loadCorpusAndManifest(dataDir, corpusName);
   const defaultImportDir = path.join(env.dataDir, "imports");
   const authorImportDir =
@@ -40,8 +40,8 @@ export async function buildService(dataDir: string, corpusName: string): Promise
   const serviceEnv = {
     ...env,
     dataDir,
-    episodesDir: path.join(dataDir, "documents"),
-    topicsDir: path.join(dataDir, "categories"),
+    documentsDir: path.join(dataDir, "documents"),
+    categoriesDir: path.join(dataDir, "categories"),
     blogsDir: path.join(dataDir, "sources"),
     authorsDir: path.join(dataDir, "authors"),
     authorImportDir,
@@ -49,23 +49,23 @@ export async function buildService(dataDir: string, corpusName: string): Promise
     embeddingCacheDir: path.join(dataDir, ".cache", "embeddings"),
   };
 
-  const baseTopicIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseTopicIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
 
   const store = new CorpusStore(
-    new Map(corpus.episodes.map((e: Corpus["episodes"][number]) => [e.slug, e])),
-    new Map(corpus.topics.map((t: Corpus["topics"][number]) => [t.slug, t])),
-    topicIndex,
+    new Map(corpus.documents.map((e: Corpus["documents"][number]) => [e.slug, e])),
+    new Map(corpus.categories.map((t: Corpus["categories"][number]) => [t.slug, t])),
+    categoryIndex,
     manifest
   );
 
   const engine = await createSearchEngine(serviceEnv);
-  await engine.build(corpus.episodes, topicIndex.episodeToTopics, {
+  await engine.build(corpus.documents, categoryIndex.documentToCategories, {
     dataDir,
     manifest,
   });
 
-  return new PodcastService(store, engine, serviceEnv);
+  return new DocumentService(store, engine, serviceEnv);
 }
 
 export async function rebuildManifest(

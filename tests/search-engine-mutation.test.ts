@@ -6,16 +6,16 @@ async function search(engine: Awaited<ReturnType<typeof buildFixtureEngine>>, qu
 }
 
 describe("FlexSearchEngine mutations", () => {
-  it("addDocuments makes new episodes searchable", async () => {
+  it("addDocuments makes new documents searchable", async () => {
     const engine = await buildFixtureEngine();
     const before = await search(engine, "xyznewterm");
     expect(before.total).toBe(0);
 
     await engine.addDocuments([
       {
-        slug: "new-episode",
+        slug: "new-document",
         metadata: {
-          title: "New Episode",
+          title: "New DocumentRecord",
           guest: "Guest",
           publish_date: "2024-01-01",
           keywords: ["xyznewterm"],
@@ -23,15 +23,15 @@ describe("FlexSearchEngine mutations", () => {
         content: "",
         transcript: "We discussed xyznewterm.",
         wordCount: 5,
-      } as unknown as import("../src/domain/episode").Episode,
+      } as unknown as import("../src/domain/document").DocumentRecord,
     ]);
 
     const after = await search(engine, "xyznewterm");
     expect(after.total).toBe(1);
-    expect(after.results[0].slug).toBe("new-episode");
+    expect(after.results[0].slug).toBe("new-document");
   });
 
-  it("removeDocuments makes episodes unsearchable", async () => {
+  it("removeDocuments makes documents unsearchable", async () => {
     const engine = await buildFixtureEngine();
     const before = await search(engine, "product");
     expect(before.total).toBeGreaterThan(0);

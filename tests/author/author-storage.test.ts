@@ -83,7 +83,7 @@ describe("author storage", () => {
       authorsDir: dir,
     });
 
-    expect(result.posts.map((post) => post.episodeSlug)).toEqual(["same-title", "same-title-2"]);
+    expect(result.posts.map((post) => post.documentSlug)).toEqual(["same-title", "same-title-2"]);
 
     await fs.rm(dir, { recursive: true, force: true });
   });

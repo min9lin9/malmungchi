@@ -1,10 +1,10 @@
-import type { RankingSignals, SearchInput, SearchResult } from "../domain/episode";
+import type { RankingSignals, SearchInput, SearchResult } from "../domain/document";
 import type { SearchEngine } from "./search-engine";
 
 export interface SearchExplainCompareInput {
   readonly query: string;
   readonly limit?: number;
-  readonly topic?: string;
+  readonly category?: string;
   readonly guest?: string;
   readonly fromDate?: string;
   readonly toDate?: string;
@@ -59,7 +59,7 @@ export async function compareSearchExplanations(
   const base: Omit<SearchInput, "rankingMode"> = {
     query: input.query,
     limit,
-    topic: input.topic,
+    category: input.category,
     guest: input.guest,
     fromDate: input.fromDate,
     toDate: input.toDate,

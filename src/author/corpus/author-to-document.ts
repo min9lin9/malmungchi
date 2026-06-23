@@ -1,8 +1,8 @@
-import type { Episode, EpisodeMetadata } from "../../domain/episode";
+import type { DocumentMetadata, DocumentRecord } from "../../domain/document";
 import type { AuthorPost } from "../domain/author-post";
 
-export function authorPostToEpisode(post: AuthorPost): Episode {
-  const metadata: EpisodeMetadata = {
+export function authorPostToDocument(post: AuthorPost): DocumentRecord {
+  const metadata: DocumentMetadata = {
     title: post.title,
     guest: post.authorId,
     publish_date: post.publishedAt ?? undefined,
@@ -23,6 +23,6 @@ export function authorPostToEpisode(post: AuthorPost): Episode {
   };
 }
 
-export function authorPostsToEpisodes(posts: AuthorPost[]): Episode[] {
-  return posts.map(authorPostToEpisode);
+export function authorPostsToDocuments(posts: AuthorPost[]): DocumentRecord[] {
+  return posts.map(authorPostToDocument);
 }

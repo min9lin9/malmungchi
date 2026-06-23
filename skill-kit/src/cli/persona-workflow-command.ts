@@ -22,7 +22,7 @@ export async function handlePersonaWorkflowCommand(command: string): Promise<boo
           workspace,
           source,
           sourceLabel,
-          topic: arg("--topic"),
+          category: arg("--category"),
           sourceType: parseKnowledgeSourceType(arg("--source-type")),
           publishedAt: arg("--published-at"),
         })

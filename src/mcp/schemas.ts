@@ -17,7 +17,7 @@ export const SearchDocumentsSchema = z.object({
     .describe(`Maximum number of results (default: ${DEFAULT_SEARCH_LIMIT})`),
   offset: z.number().int().min(0).optional().describe("Number of results to skip"),
   page: z.number().int().min(1).optional().describe("1-based page number"),
-  topic: z.string().optional().describe("Filter by category slug"),
+  category: z.string().optional().describe("Filter by category slug"),
   guest: z.string().optional().describe("Legacy author-name filter"),
   fromDate: z
     .string()
@@ -118,7 +118,7 @@ export const CompareSearchExplainSchema = z.object({
     .max(MAX_SEARCH_LIMIT)
     .optional()
     .describe(`Maximum results to compare (default: ${DEFAULT_SEARCH_LIMIT})`),
-  topic: z.string().optional().describe("Filter by category slug"),
+  category: z.string().optional().describe("Filter by category slug"),
   guest: z.string().optional().describe("Legacy author-name filter"),
   fromDate: z
     .string()

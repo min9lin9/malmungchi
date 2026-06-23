@@ -1,6 +1,6 @@
 export interface AuthorPost {
   authorId: string;
-  episodeSlug: string;
+  documentSlug: string;
   slug: string;
   title: string;
   sourceUrl: string;
@@ -16,12 +16,12 @@ export interface AuthorImportResult {
   posts: AuthorPost[];
 }
 
-export function createAuthorSlug(authorId: string, episodeSlug: string): string {
-  return `author:${authorId}:${episodeSlug}`;
+export function createAuthorSlug(authorId: string, documentSlug: string): string {
+  return `author:${authorId}:${documentSlug}`;
 }
 
-export function parseAuthorSlug(slug: string): { authorId: string; episodeSlug: string } | null {
+export function parseAuthorSlug(slug: string): { authorId: string; documentSlug: string } | null {
   const match = /^author:([^:]+):([^:]+)$/.exec(slug);
   if (!match) return null;
-  return { authorId: match[1], episodeSlug: match[2] };
+  return { authorId: match[1], documentSlug: match[2] };
 }

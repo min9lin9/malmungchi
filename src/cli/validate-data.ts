@@ -1,6 +1,6 @@
 import { env } from "../config/env";
 import { DataIntegrityError } from "../domain/errors";
-import { buildEpisodeTopicIndex } from "../ingest/build-index";
+import { buildDocumentCategoryIndex } from "../ingest/build-index";
 import { buildManifest } from "../ingest/build-manifest";
 import { loadCorpus } from "../ingest/load-corpus";
 
@@ -14,41 +14,41 @@ async function validateData(): Promise<ValidationIssue[]> {
 
   const corpus = await loadCorpus(env.dataDir);
 
-  // 1. All episodes must have a slug
-  for (const episode of corpus.episodes) {
-    if (!episode.slug) {
-      issues.push({ type: "error", message: "Episode missing slug" });
+  // 1. All documents must have a slug
+  for (const document of corpus.documents) {
+    if (!document.slug) {
+      issues.push({ type: "error", message: "DocumentRecord missing slug" });
     }
   }
 
-  // 2. Every episode must have title or guest
-  for (const episode of corpus.episodes) {
-    if (!episode.metadata.title && !episode.metadata.guest) {
+  // 2. Every document must have title or guest
+  for (const document of corpus.documents) {
+    if (!document.metadata.title && !document.metadata.guest) {
       issues.push({
         type: "error",
-        message: `Episode "${episode.slug}" missing title and guest`,
+        message: `DocumentRecord "${document.slug}" missing title and guest`,
       });
     }
   }
 
   // 3. Transcript files are loaded as UTF-8 by loadCorpus; empty content is suspicious
-  for (const episode of corpus.episodes) {
-    if (episode.content.trim().length === 0) {
+  for (const document of corpus.documents) {
+    if (document.content.trim().length === 0) {
       issues.push({
         type: "warning",
-        message: `Episode "${episode.slug}" has empty content`,
+        message: `DocumentRecord "${document.slug}" has empty content`,
       });
     }
   }
 
-  // 4. Every topic entry references real episode slugs
-  const episodeSlugs = new Set(corpus.episodes.map((e) => e.slug));
-  for (const topic of corpus.topics) {
-    for (const slug of topic.episodeSlugs) {
-      if (!episodeSlugs.has(slug)) {
+  // 4. Every category entry references real document slugs
+  const documentSlugs = new Set(corpus.documents.map((e) => e.slug));
+  for (const category of corpus.categories) {
+    for (const slug of category.documentSlugs) {
+      if (!documentSlugs.has(slug)) {
         issues.push({
           type: "error",
-          message: `Topic "${topic.slug}" references unknown episode slug "${slug}"`,
+          message: `Category "${category.slug}" references unknown document slug "${slug}"`,
         });
       }
     }
@@ -60,26 +60,26 @@ async function validateData(): Promise<ValidationIssue[]> {
     dataDir: env.dataDir,
   });
 
-  if (manifest.episodeCount !== corpus.episodes.length) {
+  if (manifest.documentCount !== corpus.documents.length) {
     issues.push({
       type: "error",
-      message: `Manifest episodeCount (${manifest.episodeCount}) does not match loaded episodes (${corpus.episodes.length})`,
+      message: `Manifest documentCount (${manifest.documentCount}) does not match loaded documents (${corpus.documents.length})`,
     });
   }
-  if (manifest.topicCount !== corpus.topics.length) {
+  if (manifest.categoryCount !== corpus.categories.length) {
     issues.push({
       type: "error",
-      message: `Manifest topicCount (${manifest.topicCount}) does not match loaded topics (${corpus.topics.length})`,
+      message: `Manifest categoryCount (${manifest.categoryCount}) does not match loaded categories (${corpus.categories.length})`,
     });
   }
 
-  // 6. Search index covers all episodes
-  const topicIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const indexedCount = topicIndex.episodeToTopics.size;
-  if (indexedCount !== corpus.episodes.length) {
+  // 6. Search index covers all documents
+  const categoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const indexedCount = categoryIndex.documentToCategories.size;
+  if (indexedCount !== corpus.documents.length) {
     issues.push({
       type: "error",
-      message: `Topic index covers ${indexedCount} episodes, expected ${corpus.episodes.length}`,
+      message: `Category index covers ${indexedCount} documents, expected ${corpus.documents.length}`,
     });
   }
 

@@ -1,4 +1,4 @@
-export interface EpisodeMetadata {
+export interface DocumentMetadata {
   guest?: string;
   title?: string;
   youtube_url?: string;
@@ -10,25 +10,25 @@ export interface EpisodeMetadata {
   view_count?: number;
   channel?: string;
   keywords?: string[];
-  source?: "podcast" | "blog" | "author";
+  source?: "author";
   authorId?: string;
   originalUrl?: string;
 }
 
-export interface Episode {
+export interface DocumentRecord {
   slug: string;
-  metadata: EpisodeMetadata;
+  metadata: DocumentMetadata;
   content: string;
   transcript: string;
   wordCount: number;
   contentHash?: string;
 }
 
-export interface Topic {
+export interface Category {
   slug: string;
   name: string;
   content: string;
-  episodeSlugs: string[];
+  documentSlugs: string[];
   contentHash?: string;
 }
 
@@ -37,7 +37,7 @@ export interface SearchInput {
   limit?: number;
   offset?: number;
   page?: number;
-  topic?: string;
+  category?: string;
   guest?: string;
   fromDate?: string;
   toDate?: string;
@@ -71,8 +71,8 @@ export interface SearchResult {
   publishDate?: string;
   score: number;
   snippet: string;
-  topicSlugs: string[];
-  sourceType: "podcast" | "blog" | "author";
+  categorySlugs: string[];
+  sourceType: "author";
   sourceId: string;
   rankingMode: "weighted" | "rrf";
   rankingSignals?: RankingSignals;
@@ -81,21 +81,21 @@ export interface SearchResult {
 export interface CorpusStats {
   name: string;
   generatedAt: string;
-  episodeCount: number;
-  topicCount: number;
-  indexedEpisodeCount: number;
-  transcriptBytes: number;
-  transcriptWordCount: number;
+  documentCount: number;
+  categoryCount: number;
+  indexedDocumentCount: number;
+  contentBytes: number;
+  contentWordCount: number;
   schemaVersion: number;
-  episodeSlugs: string[];
-  topicSlugs: string[];
-  episodeHashes: Record<string, string>;
-  topicHashes: Record<string, string>;
+  documentSlugs: string[];
+  categorySlugs: string[];
+  documentHashes: Record<string, string>;
+  categoryHashes: Record<string, string>;
 }
 
 export interface CorpusManifest extends CorpusStats {}
 
-export interface EpisodeSectionRequest {
+export interface DocumentSectionRequest {
   slug?: string;
   guestName?: string;
   section: "metadata" | "summary" | "full";

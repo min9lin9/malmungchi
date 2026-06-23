@@ -1,5 +1,5 @@
 import { Meilisearch } from "meilisearch";
-import type { Episode, SearchInput, SearchResult } from "../domain/episode";
+import type { DocumentRecord, SearchInput, SearchResult } from "../domain/document";
 import type { SearchEngine, SearchEngineBuildOptions, SearchEngineStats } from "./search-engine";
 
 export interface MeilisearchEngineConfig {
@@ -15,7 +15,7 @@ interface SearchableDocument {
   keywords: string;
   transcript: string;
   publishDate: string;
-  topicSlugs: string;
+  categorySlugs: string;
 }
 
 const SNIPPET_WINDOW = 160;
@@ -58,7 +58,7 @@ export class MeilisearchEngine implements SearchEngine {
   readonly engineType = "meilisearch";
   private client: Meilisearch;
   private indexName: string;
-  private episodeToTopics = new Map<string, string[]>();
+  private documentToCategories = new Map<string, string[]>();
   private indexedCount = 0;
 
   constructor(config: MeilisearchEngineConfig) {
@@ -74,11 +74,11 @@ export class MeilisearchEngine implements SearchEngine {
   }
 
   async build(
-    episodes: Episode[],
-    episodeToTopics: Map<string, string[]>,
+    documents: DocumentRecord[],
+    documentToCategories: Map<string, string[]>,
     _options?: SearchEngineBuildOptions
   ): Promise<void> {
-    this.episodeToTopics = new Map(episodeToTopics);
+    this.documentToCategories = new Map(documentToCategories);
 
     try {
       await this.client.createIndex(this.indexName, { primaryKey: "slug" });
@@ -92,14 +92,14 @@ export class MeilisearchEngine implements SearchEngine {
       rankingRules: ["words", "typo", "proximity", "attribute", "sort", "exactness"],
     });
 
-    const docs: SearchableDocument[] = episodes.map((episode) =>
-      this.toDocument(episode, episodeToTopics.get(episode.slug) ?? [])
+    const docs: SearchableDocument[] = documents.map((document) =>
+      this.toDocument(document, documentToCategories.get(document.slug) ?? [])
     );
 
     if (docs.length > 0) {
       await waitTask(this.index.addDocuments(docs));
     }
-    this.indexedCount = episodes.length;
+    this.indexedCount = documents.length;
   }
 
   async search(input: SearchInput): Promise<SearchResult[]> {
@@ -116,7 +116,7 @@ export class MeilisearchEngine implements SearchEngine {
       attributesToHighlight: ["transcript"],
       highlightPreTag: MARK_OPEN,
       highlightPostTag: MARK_CLOSE,
-      attributesToRetrieve: ["slug", "title", "guest", "publishDate", "topicSlugs"],
+      attributesToRetrieve: ["slug", "title", "guest", "publishDate", "categorySlugs"],
       showRankingScore: true,
     });
 
@@ -125,7 +125,7 @@ export class MeilisearchEngine implements SearchEngine {
       title: string;
       guest: string;
       publishDate?: string;
-      topicSlugs?: string;
+      categorySlugs?: string;
       _formatted?: { transcript?: string };
       _rankingScore?: number;
     }>;
@@ -137,11 +137,11 @@ export class MeilisearchEngine implements SearchEngine {
       publishDate: hit.publishDate,
       score: hit._rankingScore ?? 0,
       snippet: extractSnippet(hit._formatted?.transcript ?? ""),
-      topicSlugs: this.episodeToTopics.get(hit.slug) ?? [],
-      sourceType: hit.slug.startsWith("blog:") ? "blog" : "podcast",
-      sourceId: hit.slug.startsWith("blog:")
-        ? `blog:${hit.slug.split(":")[1] ?? "unknown"}`
-        : "podcast",
+      categorySlugs: this.documentToCategories.get(hit.slug) ?? [],
+      sourceType: "author",
+      sourceId: hit.slug.startsWith("author:")
+        ? `author:${hit.slug.split(":")[1] ?? "unknown"}`
+        : "author:unknown",
       rankingMode: input.rankingMode ?? "weighted",
       rankingSignals: this.toRankingSignals(
         input.explain === true,
@@ -158,16 +158,19 @@ export class MeilisearchEngine implements SearchEngine {
     return { results, total };
   }
 
-  async addDocuments(episodes: Episode[]): Promise<void> {
-    const docs = episodes.map((episode) =>
-      this.toDocument(episode, this.episodeToTopics.get(episode.slug) ?? [])
+  async addDocuments(documents: DocumentRecord[]): Promise<void> {
+    const docs = documents.map((document) =>
+      this.toDocument(document, this.documentToCategories.get(document.slug) ?? [])
     );
     if (docs.length === 0) return;
     await waitTask(this.index.addDocuments(docs));
-    for (const episode of episodes) {
-      this.episodeToTopics.set(episode.slug, this.episodeToTopics.get(episode.slug) ?? []);
+    for (const document of documents) {
+      this.documentToCategories.set(
+        document.slug,
+        this.documentToCategories.get(document.slug) ?? []
+      );
     }
-    this.indexedCount += episodes.length;
+    this.indexedCount += documents.length;
   }
 
   async removeDocuments(slugs: string[]): Promise<void> {
@@ -175,7 +178,7 @@ export class MeilisearchEngine implements SearchEngine {
     await waitTask(this.index.deleteDocuments(slugs));
     this.indexedCount = Math.max(0, this.indexedCount - slugs.length);
     for (const slug of slugs) {
-      this.episodeToTopics.delete(slug);
+      this.documentToCategories.delete(slug);
     }
   }
 
@@ -183,15 +186,15 @@ export class MeilisearchEngine implements SearchEngine {
     return { indexedCount: this.indexedCount };
   }
 
-  private toDocument(episode: Episode, topics: string[]): SearchableDocument {
+  private toDocument(document: DocumentRecord, categories: string[]): SearchableDocument {
     return {
-      slug: episode.slug,
-      title: episode.metadata.title ?? episode.slug,
-      guest: episode.metadata.guest ?? "",
-      keywords: (episode.metadata.keywords ?? []).join(" "),
-      transcript: episode.transcript,
-      publishDate: episode.metadata.publish_date ?? "",
-      topicSlugs: topics.join(","),
+      slug: document.slug,
+      title: document.metadata.title ?? document.slug,
+      guest: document.metadata.guest ?? "",
+      keywords: (document.metadata.keywords ?? []).join(" "),
+      transcript: document.transcript,
+      publishDate: document.metadata.publish_date ?? "",
+      categorySlugs: categories.join(","),
     };
   }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import type { Episode } from "../src/domain/episode";
+import type { DocumentRecord } from "../src/domain/document";
 import { MeilisearchEngine } from "../src/search/meilisearch-engine";
 
 function createFakeClient(
@@ -8,7 +8,7 @@ function createFakeClient(
     title: string;
     guest: string;
     publishDate?: string;
-    topicSlugs?: string;
+    categorySlugs?: string;
     _formatted?: { transcript?: string };
     _rankingScore?: number;
   }> = []
@@ -61,15 +61,15 @@ describe("MeilisearchEngine", () => {
     Object.defineProperty(engine, "client", { value: client });
   }
 
-  it("build indexes episodes and configures settings", async () => {
+  it("build indexes documents and configures settings", async () => {
     const fake = createFakeClient();
     const engine = new MeilisearchEngine({ host: "http://localhost:7700", indexName: "test" });
     installFakeClient(engine, fake.client);
 
-    const episode: Episode = {
+    const document: DocumentRecord = {
       slug: "ep-1",
       metadata: {
-        title: "Episode 1",
+        title: "DocumentRecord 1",
         guest: "Alice",
         publish_date: "2024-01-01",
         keywords: ["alpha"],
@@ -79,7 +79,7 @@ describe("MeilisearchEngine", () => {
       wordCount: 3,
     };
 
-    await engine.build([episode], new Map([["ep-1", ["topic-a"]]]));
+    await engine.build([document], new Map([["ep-1", ["category-a"]]]));
     expect(engine.getStats().indexedCount).toBe(1);
     expect(fake.addCalls).toHaveLength(1);
     expect(fake.addCalls[0]).toHaveLength(1);
@@ -97,14 +97,14 @@ describe("MeilisearchEngine", () => {
     expect(result.total).toBe(0);
   });
 
-  it("maps search hits with snippets and topic slugs", async () => {
+  it("maps search hits with snippets and category slugs", async () => {
     const hits = [
       {
         slug: "ep-1",
-        title: "Episode 1",
+        title: "DocumentRecord 1",
         guest: "Alice",
         publishDate: "2024-01-01",
-        topicSlugs: "topic-a",
+        categorySlugs: "category-a",
         _formatted: { transcript: "... <mark>alpha</mark> content ..." },
         _rankingScore: 0.95,
       },
@@ -117,13 +117,13 @@ describe("MeilisearchEngine", () => {
       [
         {
           slug: "ep-1",
-          metadata: { title: "Episode 1", guest: "Alice", publish_date: "2024-01-01" },
+          metadata: { title: "DocumentRecord 1", guest: "Alice", publish_date: "2024-01-01" },
           content: "content",
           transcript: "content",
           wordCount: 1,
         },
       ],
-      new Map([["ep-1", ["topic-a"]]])
+      new Map([["ep-1", ["category-a"]]])
     );
 
     const result = await engine.searchWithTotal({ query: "alpha", limit: 10 });
@@ -136,14 +136,14 @@ describe("MeilisearchEngine", () => {
       })
     );
     expect(result.results[0].snippet).toContain("<mark>alpha</mark>");
-    expect(result.results[0].topicSlugs).toEqual(["topic-a"]);
+    expect(result.results[0].categorySlugs).toEqual(["category-a"]);
   });
 
   it("uses honest explain signals for Meilisearch scores", async () => {
     const fake = createFakeClient([
       {
         slug: "ep-1",
-        title: "Episode 1",
+        title: "DocumentRecord 1",
         guest: "Alice",
         _formatted: { transcript: "... <mark>alpha</mark> content ..." },
       },
@@ -172,7 +172,7 @@ describe("MeilisearchEngine", () => {
     const fake = createFakeClient([
       {
         slug: "ep-1",
-        title: "Episode 1",
+        title: "DocumentRecord 1",
         guest: "Alice",
         _formatted: { transcript: "... <mark>alpha</mark> content ..." },
         _rankingScore: 0.7,
@@ -203,15 +203,15 @@ describe("MeilisearchEngine", () => {
 
     await engine.build([], new Map());
 
-    const episode: Episode = {
+    const document: DocumentRecord = {
       slug: "ep-1",
-      metadata: { title: "Episode 1", guest: "Alice" },
+      metadata: { title: "DocumentRecord 1", guest: "Alice" },
       content: "content",
       transcript: "content",
       wordCount: 1,
     };
 
-    await engine.addDocuments([episode]);
+    await engine.addDocuments([document]);
     expect(engine.getStats().indexedCount).toBe(1);
     expect(fake.addCalls).toHaveLength(1);
 

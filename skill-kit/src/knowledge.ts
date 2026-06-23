@@ -1,13 +1,13 @@
 import { cp, mkdir, mkdtemp, readFile, realpath, rm, stat, writeFile } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { ingest } from "./ingestion.ts";
-import { safeTopicSlug } from "./security.ts";
+import { safeCategorySlug } from "./security.ts";
 
 export interface KnowledgeAddResult {
   readonly docs: readonly string[];
   readonly sourceLabel: string;
   readonly source: string;
-  readonly topic?: string;
+  readonly category?: string;
   readonly sourceType?: KnowledgeSourceType;
   readonly publishedAt?: string;
 }
@@ -40,7 +40,7 @@ export async function addKnowledge(options: {
   readonly workspace: string;
   readonly source: string;
   readonly sourceLabel: string;
-  readonly topic?: string;
+  readonly category?: string;
   readonly sourceType?: KnowledgeSourceType;
   readonly publishedAt?: string;
 }): Promise<KnowledgeAddResult> {
@@ -60,24 +60,24 @@ export async function addKnowledge(options: {
       docs: result.docs,
       source,
       sourceLabel: options.sourceLabel,
-      topic: options.topic,
+      category: options.category,
       sourceType: options.sourceType,
       publishedAt: options.publishedAt,
     };
     const manifest = join(options.workspace, "knowledge-sources.json");
     const existing = await readExistingSources(manifest);
     await writeFile(manifest, `${JSON.stringify([...existing, record], null, 2)}\n`);
-    if (options.topic && options.publishedAt) {
+    if (options.category && options.publishedAt) {
       await mkdir(join(options.workspace, "knowledge"), { recursive: true });
       await writeFile(
         join(
           options.workspace,
           "knowledge",
-          `${options.publishedAt}-${safeTopicSlug(options.topic)}.md`
+          `${options.publishedAt}-${safeCategorySlug(options.category)}.md`
         ),
         [
           "---",
-          `topic: ${options.topic}`,
+          `category: ${options.category}`,
           `source_type: ${options.sourceType ?? "file"}`,
           `source_path: ${source}`,
           `published_at: ${options.publishedAt}`,

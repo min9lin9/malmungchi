@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { CORPUS_SCHEMA_VERSION } from "../config/constants";
-import type { CorpusManifest } from "../domain/episode";
+import type { CorpusManifest } from "../domain/document";
 import { parseManifest } from "../domain/manifest";
 import type { Corpus } from "./load-corpus";
 
@@ -23,49 +23,49 @@ export async function buildManifest(
   corpus: Corpus,
   options: { name: string; dataDir: string }
 ): Promise<CorpusManifest> {
-  const { episodes, topics } = corpus;
+  const { documents, categories } = corpus;
 
-  let transcriptBytes = 0;
-  let transcriptWordCount = 0;
-  for (const episode of episodes) {
-    transcriptBytes += Buffer.byteLength(episode.content, "utf-8");
-    transcriptWordCount += episode.wordCount;
+  let contentBytes = 0;
+  let contentWordCount = 0;
+  for (const document of documents) {
+    contentBytes += Buffer.byteLength(document.content, "utf-8");
+    contentWordCount += document.wordCount;
   }
 
-  const episodeHashes: Record<string, string> = {};
-  for (const episode of episodes) {
-    if (episode.slug.startsWith("blog:")) continue;
-    if (episode.contentHash) {
-      episodeHashes[episode.slug] = episode.contentHash;
+  const documentHashes: Record<string, string> = {};
+  for (const document of documents) {
+    if (document.slug.startsWith("blog:")) continue;
+    if (document.contentHash) {
+      documentHashes[document.slug] = document.contentHash;
     } else {
-      const filePath = path.join(options.dataDir, "episodes", episode.slug, "transcript.md");
-      episodeHashes[episode.slug] = await hashFile(filePath);
+      const filePath = path.join(options.dataDir, "documents", document.slug, "transcript.md");
+      documentHashes[document.slug] = await hashFile(filePath);
     }
   }
 
-  const topicHashes: Record<string, string> = {};
-  for (const topic of topics) {
-    if (topic.contentHash) {
-      topicHashes[topic.slug] = topic.contentHash;
+  const categoryHashes: Record<string, string> = {};
+  for (const category of categories) {
+    if (category.contentHash) {
+      categoryHashes[category.slug] = category.contentHash;
     } else {
-      const filePath = path.join(options.dataDir, "topics", `${topic.slug}.md`);
-      topicHashes[topic.slug] = await hashFile(filePath);
+      const filePath = path.join(options.dataDir, "categories", `${category.slug}.md`);
+      categoryHashes[category.slug] = await hashFile(filePath);
     }
   }
 
   const manifest: CorpusManifest = {
     name: options.name,
     generatedAt: new Date().toISOString(),
-    episodeCount: episodes.length,
-    topicCount: topics.length,
-    indexedEpisodeCount: episodes.length,
-    transcriptBytes,
-    transcriptWordCount,
+    documentCount: documents.length,
+    categoryCount: categories.length,
+    indexedDocumentCount: documents.length,
+    contentBytes,
+    contentWordCount,
     schemaVersion: CORPUS_SCHEMA_VERSION,
-    episodeSlugs: episodes.map((e) => e.slug).sort(),
-    topicSlugs: topics.map((t) => t.slug).sort(),
-    episodeHashes,
-    topicHashes,
+    documentSlugs: documents.map((e) => e.slug).sort(),
+    categorySlugs: categories.map((t) => t.slug).sort(),
+    documentHashes,
+    categoryHashes,
   };
 
   return manifest;

@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 
-export function sourceRoutes(service: PodcastService) {
+export function sourceRoutes(service: DocumentService) {
   return new Elysia({ prefix: "/corpus" })
     .get("/sources", async () => ({ sources: await service.listSources() }))
     .get(

@@ -1,9 +1,9 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 import { registerTools } from "./tools";
 
 export function createMcpServer(
-  service: PodcastService,
+  service: DocumentService,
   options: { maxResponseChars: number }
 ): McpServer {
   const server = new McpServer({

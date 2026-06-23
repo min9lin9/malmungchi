@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import type { Episode, SearchResult } from "../../src/domain/episode";
+import type { DocumentRecord, SearchResult } from "../../src/domain/document";
 import { FlexSearchEngine } from "../../src/search/flexsearch-engine";
 
-function episode(slug: string, transcript: string): Episode {
+function document(slug: string, transcript: string): DocumentRecord {
   return {
     slug,
     metadata: { title: slug },
@@ -25,7 +25,7 @@ describe("FlexSearchEngine semantic rerank", () => {
       },
     });
     await engine.build(
-      Array.from({ length: 120 }, (_, index) => episode(`doc-${index}`, "alpha shared")),
+      Array.from({ length: 120 }, (_, index) => document(`doc-${index}`, "alpha shared")),
       new Map()
     );
 
@@ -46,7 +46,7 @@ describe("FlexSearchEngine semantic rerank", () => {
         },
       },
     });
-    await engine.build([episode("first", "alpha alpha"), episode("second", "alpha")], new Map());
+    await engine.build([document("first", "alpha alpha"), document("second", "alpha")], new Map());
 
     const withoutRerank = await engine.search({ query: "alpha", limit: 2, rerank: false });
     const failedRerank = await engine.search({ query: "alpha", limit: 2, rerank: true });
@@ -64,7 +64,7 @@ describe("FlexSearchEngine semantic rerank", () => {
           [...results].reverse().map((result, index) => ({ ...result, score: 1 - index * 0.1 })),
       },
     });
-    await engine.build([episode("first", "alpha"), episode("second", "alpha")], new Map());
+    await engine.build([document("first", "alpha"), document("second", "alpha")], new Map());
 
     const results = await engine.search({ query: "alpha", limit: 2, explain: true });
 

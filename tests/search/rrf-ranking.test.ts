@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import type { Episode } from "../../src/domain/episode";
+import type { DocumentRecord } from "../../src/domain/document";
 import { FlexSearchEngine } from "../../src/search/flexsearch-engine";
 
-function episode(slug: string, title: string, transcript: string): Episode {
+function document(slug: string, title: string, transcript: string): DocumentRecord {
   return {
     slug,
     metadata: { title },
@@ -17,9 +17,9 @@ describe("FlexSearchEngine RRF ranking", () => {
     const engine = new FlexSearchEngine();
     await engine.build(
       [
-        episode("title-only", "alpha", "background text"),
-        episode("transcript-repeat", "background", "alpha alpha alpha alpha"),
-        episode("balanced", "alpha", "alpha context"),
+        document("title-only", "alpha", "background text"),
+        document("transcript-repeat", "background", "alpha alpha alpha alpha"),
+        document("balanced", "alpha", "alpha context"),
       ],
       new Map()
     );
@@ -47,7 +47,7 @@ describe("FlexSearchEngine RRF ranking", () => {
     await engine.build(
       [
         {
-          ...episode("author:demo:essay", "Essay", "memory layer"),
+          ...document("author:demo:essay", "Essay", "memory layer"),
           metadata: { title: "Essay", source: "author", authorId: "demo" },
         },
       ],
@@ -68,7 +68,7 @@ describe("FlexSearchEngine RRF ranking", () => {
   it("can explain field-level ranking signals", async () => {
     const engine = new FlexSearchEngine();
     await engine.build(
-      [episode("explainable", "memory", "memory layer with source lifecycle")],
+      [document("explainable", "memory", "memory layer with source lifecycle")],
       new Map()
     );
 
@@ -94,7 +94,7 @@ describe("FlexSearchEngine RRF ranking", () => {
   it("includes evidence snippets and normalized shares in ranking explanations", async () => {
     const engine = new FlexSearchEngine();
     await engine.build(
-      [episode("evidence", "memory systems", "source lifecycle evidence for memory systems")],
+      [document("evidence", "memory systems", "source lifecycle evidence for memory systems")],
       new Map()
     );
 

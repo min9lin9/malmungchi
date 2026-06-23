@@ -17,4 +17,4 @@ Run:
 
 Only Markdown and JSON are supported. Reject traversal, unsafe absolute paths, symlink escapes, and generated/private output paths unless explicitly sanitized.
 
-`knowledge add` also accepts optional `--topic`, `--source-type`, and `--published-at`. URL and YouTube source types are metadata-only; this kit does not fetch remote content.
+`knowledge add` also accepts optional `--category`, `--source-type`, and `--published-at`. URL and YouTube source types are metadata-only; this kit does not fetch remote content.

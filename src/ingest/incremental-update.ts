@@ -1,12 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { CorpusManifest, Episode } from "../domain/episode";
+import type { CorpusManifest, DocumentRecord } from "../domain/document";
 import type { SearchEngine } from "../search/search-engine";
 import type { CorpusStore } from "../service/corpus-store";
-import { buildEpisodeTopicIndex } from "./build-index";
+import { buildDocumentCategoryIndex } from "./build-index";
 import { buildManifest, writeManifest } from "./build-manifest";
 import { type CorpusDiff, diffCorpus } from "./diff-corpus";
-import { enrichTopicIndex } from "./enrich-topics";
+import { enrichCategoryIndex } from "./enrich-categories";
 import { type Corpus, loadCorpus } from "./load-corpus";
 
 export interface IncrementalUpdateResult {
@@ -40,12 +40,12 @@ export async function applyIncrementalUpdate(
   const diff = await diffCorpus(store.manifest, dataDir);
 
   const hasAnyChange =
-    diff.addedEpisodes.length > 0 ||
-    diff.changedEpisodes.length > 0 ||
-    diff.removedEpisodes.length > 0 ||
-    diff.addedTopics.length > 0 ||
-    diff.changedTopics.length > 0 ||
-    diff.removedTopics.length > 0;
+    diff.addedDocuments.length > 0 ||
+    diff.changedDocuments.length > 0 ||
+    diff.removedDocuments.length > 0 ||
+    diff.addedCategories.length > 0 ||
+    diff.changedCategories.length > 0 ||
+    diff.removedCategories.length > 0;
 
   if (!hasAnyChange) {
     return { diff, reindexedAll: false, manifest: store.manifest };
@@ -54,20 +54,26 @@ export async function applyIncrementalUpdate(
   const corpus = await loadCorpus(dataDir);
   const manifest = await buildManifest(corpus, { name: corpusName, dataDir });
 
-  const topicIndexChanged =
-    diff.addedTopics.length > 0 || diff.changedTopics.length > 0 || diff.removedTopics.length > 0;
+  const categoryIndexChanged =
+    diff.addedCategories.length > 0 ||
+    diff.changedCategories.length > 0 ||
+    diff.removedCategories.length > 0;
 
-  if (topicIndexChanged) {
-    const baseTopicIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-    const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseTopicIndex);
+  if (categoryIndexChanged) {
+    const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+    const categoryIndex = enrichCategoryIndex(
+      corpus.documents,
+      corpus.categories,
+      baseCategoryIndex
+    );
 
-    const oldSlugs = Array.from(store.episodes.keys());
+    const oldSlugs = Array.from(store.documents.keys());
     await engine.removeDocuments(oldSlugs);
-    await engine.addDocuments(corpus.episodes);
+    await engine.addDocuments(corpus.documents);
 
-    store.episodes = new Map(corpus.episodes.map((e) => [e.slug, e]));
-    store.topics = new Map(corpus.topics.map((t) => [t.slug, t]));
-    store.topicIndex = topicIndex;
+    store.documents = new Map(corpus.documents.map((e) => [e.slug, e]));
+    store.categories = new Map(corpus.categories.map((t) => [t.slug, t]));
+    store.categoryIndex = categoryIndex;
     store.manifest = manifest;
 
     await writeManifest(manifest, path.join(dataDir, "manifest.json"));
@@ -76,24 +82,24 @@ export async function applyIncrementalUpdate(
     return { diff, reindexedAll: true, manifest };
   }
 
-  const slugsToRemove = unique([...diff.removedEpisodes, ...diff.changedEpisodes]);
-  const slugsToAdd = unique([...diff.addedEpisodes, ...diff.changedEpisodes]);
-  const episodesToAdd = slugsToAdd
-    .map((slug) => corpus.episodes.find((e) => e.slug === slug))
-    .filter((e): e is Episode => e !== undefined);
+  const slugsToRemove = unique([...diff.removedDocuments, ...diff.changedDocuments]);
+  const slugsToAdd = unique([...diff.addedDocuments, ...diff.changedDocuments]);
+  const documentsToAdd = slugsToAdd
+    .map((slug) => corpus.documents.find((e) => e.slug === slug))
+    .filter((e): e is DocumentRecord => e !== undefined);
 
   if (slugsToRemove.length > 0) {
     await engine.removeDocuments(slugsToRemove);
   }
-  if (episodesToAdd.length > 0) {
-    await engine.addDocuments(episodesToAdd);
+  if (documentsToAdd.length > 0) {
+    await engine.addDocuments(documentsToAdd);
   }
 
-  for (const slug of diff.removedEpisodes) {
-    store.episodes.delete(slug);
+  for (const slug of diff.removedDocuments) {
+    store.documents.delete(slug);
   }
-  for (const episode of episodesToAdd) {
-    store.episodes.set(episode.slug, episode);
+  for (const document of documentsToAdd) {
+    store.documents.set(document.slug, document);
   }
   store.manifest = manifest;
 
@@ -109,12 +115,12 @@ export async function canIncrementalUpdate(
 ): Promise<boolean> {
   const diff = await diffCorpus(manifest, dataDir);
   return (
-    diff.addedEpisodes.length > 0 ||
-    diff.changedEpisodes.length > 0 ||
-    diff.removedEpisodes.length > 0 ||
-    diff.addedTopics.length > 0 ||
-    diff.changedTopics.length > 0 ||
-    diff.removedTopics.length > 0
+    diff.addedDocuments.length > 0 ||
+    diff.changedDocuments.length > 0 ||
+    diff.removedDocuments.length > 0 ||
+    diff.addedCategories.length > 0 ||
+    diff.changedCategories.length > 0 ||
+    diff.removedCategories.length > 0
   );
 }
 

@@ -1,4 +1,4 @@
-import type { CorpusManifest, Episode, SearchInput, SearchResult } from "../domain/episode";
+import type { CorpusManifest, DocumentRecord, SearchInput, SearchResult } from "../domain/document";
 
 export interface SearchEngineBuildOptions {
   dataDir?: string;
@@ -12,13 +12,13 @@ export interface SearchEngineStats {
 export interface SearchEngine {
   readonly engineType: "flexsearch" | "meilisearch";
   build(
-    episodes: Episode[],
-    episodeToTopics: Map<string, string[]>,
+    documents: DocumentRecord[],
+    documentToCategories: Map<string, string[]>,
     options?: SearchEngineBuildOptions
   ): Promise<void>;
   search(input: SearchInput): Promise<SearchResult[]>;
   searchWithTotal(input: SearchInput): Promise<{ results: SearchResult[]; total: number }>;
-  addDocuments(episodes: Episode[]): Promise<void>;
+  addDocuments(documents: DocumentRecord[]): Promise<void>;
   removeDocuments(slugs: string[]): Promise<void>;
   getStats(): SearchEngineStats;
 }

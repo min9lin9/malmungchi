@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { Document } from "flexsearch";
 import { z } from "zod";
-import type { CorpusManifest } from "../domain/episode";
+import type { CorpusManifest } from "../domain/document";
 
 const CACHE_SCHEMA_VERSION = 1;
 
@@ -30,11 +30,11 @@ export function getCachePaths(dataDir: string): CachePaths {
 export function computeCorpusHash(manifest: CorpusManifest): string {
   const payload = JSON.stringify({
     schemaVersion: manifest.schemaVersion,
-    episodeCount: manifest.episodeCount,
-    topicCount: manifest.topicCount,
-    transcriptBytes: manifest.transcriptBytes,
-    episodeSlugs: manifest.episodeSlugs,
-    topicSlugs: manifest.topicSlugs,
+    documentCount: manifest.documentCount,
+    categoryCount: manifest.categoryCount,
+    contentBytes: manifest.contentBytes,
+    documentSlugs: manifest.documentSlugs,
+    categorySlugs: manifest.categorySlugs,
   });
   return crypto.createHash("sha256").update(payload).digest("hex").slice(0, 16);
 }

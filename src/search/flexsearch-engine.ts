@@ -1,5 +1,5 @@
 import { Document } from "flexsearch";
-import type { Episode, SearchInput, SearchResult } from "../domain/episode";
+import type { DocumentRecord, SearchInput, SearchResult } from "../domain/document";
 import { FIELD_WEIGHTS, FlexSearchRanker, type SemanticReranker } from "./flexsearch-ranker";
 import {
   computeCorpusHash,
@@ -18,7 +18,7 @@ interface SearchDocument {
   transcript: string;
   keywords: string;
   publishDate: string;
-  topicSlugs: string;
+  categorySlugs: string;
 }
 
 const ENGINE_CONFIG = {
@@ -37,10 +37,10 @@ export interface FlexSearchEngineConfig {
 export class FlexSearchEngine implements SearchEngine {
   readonly engineType = "flexsearch";
   private index?: Document<unknown, boolean>;
-  private episodes = new Map<string, Episode>();
-  private episodeSearchableText = new Map<string, string>();
-  private episodeWordSet = new Map<string, Set<string>>();
-  private episodeToTopics = new Map<string, string[]>();
+  private documents = new Map<string, DocumentRecord>();
+  private documentSearchableText = new Map<string, string>();
+  private documentWordSet = new Map<string, Set<string>>();
+  private documentToCategories = new Map<string, string[]>();
   private maxResults: number;
   private reranker?: SemanticReranker;
   private rerankTimeoutMs: number;
@@ -52,13 +52,13 @@ export class FlexSearchEngine implements SearchEngine {
   }
 
   async build(
-    episodes: Episode[],
-    episodeToTopics: Map<string, string[]>,
+    documents: DocumentRecord[],
+    documentToCategories: Map<string, string[]>,
     options?: SearchEngineBuildOptions
   ): Promise<void> {
-    this.episodes.clear();
-    this.episodeSearchableText.clear();
-    this.episodeToTopics.clear();
+    this.documents.clear();
+    this.documentSearchableText.clear();
+    this.documentToCategories.clear();
 
     this.index = new Document<SearchDocument, false>(
       {
@@ -85,25 +85,28 @@ export class FlexSearchEngine implements SearchEngine {
       }
     }
 
-    for (const episode of episodes) {
-      this.episodes.set(episode.slug, episode);
-      const searchableText = FlexSearchRanker.searchableText(episode).toLowerCase();
-      this.episodeSearchableText.set(episode.slug, searchableText);
-      this.episodeWordSet.set(episode.slug, new Set(searchableText.match(/[\p{L}\p{N}]+/gu) ?? []));
+    for (const document of documents) {
+      this.documents.set(document.slug, document);
+      const searchableText = FlexSearchRanker.searchableText(document).toLowerCase();
+      this.documentSearchableText.set(document.slug, searchableText);
+      this.documentWordSet.set(
+        document.slug,
+        new Set(searchableText.match(/[\p{L}\p{N}]+/gu) ?? [])
+      );
 
-      const topics = episodeToTopics.get(episode.slug) ?? [];
-      this.episodeToTopics.set(episode.slug, topics);
+      const categories = documentToCategories.get(document.slug) ?? [];
+      this.documentToCategories.set(document.slug, categories);
 
       if (cached) continue;
 
       this.index.add({
-        slug: episode.slug,
-        title: episode.metadata.title ?? episode.slug,
-        guest: episode.metadata.guest ?? "",
-        transcript: episode.transcript,
-        keywords: (episode.metadata.keywords ?? []).join(" "),
-        publishDate: episode.metadata.publish_date ?? "",
-        topicSlugs: topics.join(","),
+        slug: document.slug,
+        title: document.metadata.title ?? document.slug,
+        guest: document.metadata.guest ?? "",
+        transcript: document.transcript,
+        keywords: (document.metadata.keywords ?? []).join(" "),
+        publishDate: document.metadata.publish_date ?? "",
+        categorySlugs: categories.join(","),
       });
     }
 
@@ -111,7 +114,7 @@ export class FlexSearchEngine implements SearchEngine {
       const corpusHash = computeCorpusHash(options.manifest);
       await saveIndexCache(paths, this.index, corpusHash, engineConfigHash);
     }
-    await this.reranker?.prepare?.(episodes);
+    await this.reranker?.prepare?.(documents);
   }
 
   async search(input: SearchInput): Promise<SearchResult[]> {
@@ -123,53 +126,56 @@ export class FlexSearchEngine implements SearchEngine {
     if (!this.index) throw new Error("Search index not built");
 
     return new FlexSearchRanker(this.index, {
-      episodes: this.episodes,
-      episodeSearchableText: this.episodeSearchableText,
-      episodeWordSet: this.episodeWordSet,
-      episodeToTopics: this.episodeToTopics,
+      documents: this.documents,
+      documentSearchableText: this.documentSearchableText,
+      documentWordSet: this.documentWordSet,
+      documentToCategories: this.documentToCategories,
       maxResults: this.maxResults,
       reranker: this.reranker,
       rerankTimeoutMs: this.rerankTimeoutMs,
     }).searchWithTotal(input);
   }
 
-  async addDocuments(episodes: Episode[]): Promise<void> {
+  async addDocuments(documents: DocumentRecord[]): Promise<void> {
     if (!this.index) throw new Error("Search index not built");
 
-    for (const episode of episodes) {
-      this.episodes.set(episode.slug, episode);
-      const searchableText = FlexSearchRanker.searchableText(episode).toLowerCase();
-      this.episodeSearchableText.set(episode.slug, searchableText);
-      this.episodeWordSet.set(episode.slug, new Set(searchableText.match(/[\p{L}\p{N}]+/gu) ?? []));
+    for (const document of documents) {
+      this.documents.set(document.slug, document);
+      const searchableText = FlexSearchRanker.searchableText(document).toLowerCase();
+      this.documentSearchableText.set(document.slug, searchableText);
+      this.documentWordSet.set(
+        document.slug,
+        new Set(searchableText.match(/[\p{L}\p{N}]+/gu) ?? [])
+      );
 
-      const topics = this.episodeToTopics.get(episode.slug) ?? [];
+      const categories = this.documentToCategories.get(document.slug) ?? [];
 
       this.index.add({
-        slug: episode.slug,
-        title: episode.metadata.title ?? episode.slug,
-        guest: episode.metadata.guest ?? "",
-        transcript: episode.transcript,
-        keywords: (episode.metadata.keywords ?? []).join(" "),
-        publishDate: episode.metadata.publish_date ?? "",
-        topicSlugs: topics.join(","),
+        slug: document.slug,
+        title: document.metadata.title ?? document.slug,
+        guest: document.metadata.guest ?? "",
+        transcript: document.transcript,
+        keywords: (document.metadata.keywords ?? []).join(" "),
+        publishDate: document.metadata.publish_date ?? "",
+        categorySlugs: categories.join(","),
       });
     }
-    await this.reranker?.prepare?.(episodes);
+    await this.reranker?.prepare?.(documents);
   }
 
   async removeDocuments(slugs: string[]): Promise<void> {
     if (!this.index) throw new Error("Search index not built");
 
     for (const slug of slugs) {
-      this.episodes.delete(slug);
-      this.episodeSearchableText.delete(slug);
-      this.episodeWordSet.delete(slug);
-      this.episodeToTopics.delete(slug);
+      this.documents.delete(slug);
+      this.documentSearchableText.delete(slug);
+      this.documentWordSet.delete(slug);
+      this.documentToCategories.delete(slug);
       this.index.remove(slug);
     }
   }
 
   getStats(): SearchEngineStats {
-    return { indexedCount: this.episodes.size };
+    return { indexedCount: this.documents.size };
   }
 }

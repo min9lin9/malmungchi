@@ -1,6 +1,6 @@
 import { Elysia } from "elysia";
-import { CorpusError, EpisodeNotFoundError, InvalidInputError } from "../domain/errors";
-import type { PodcastService } from "../service/podcast-service";
+import { CorpusError, DocumentNotFoundError, InvalidInputError } from "../domain/errors";
+import type { DocumentService } from "../service/document-service";
 import { logger } from "../util/logger";
 import { checkApiKey } from "./auth";
 import { recordRequest } from "./metrics";
@@ -19,7 +19,7 @@ export interface HttpAppOptions {
 }
 
 function errorToStatus(error: Error): number {
-  if (error instanceof EpisodeNotFoundError) {
+  if (error instanceof DocumentNotFoundError) {
     return 404;
   }
   if (error instanceof InvalidInputError) {
@@ -31,7 +31,7 @@ function errorToStatus(error: Error): number {
   return 500;
 }
 
-export function createHttpApp(service: PodcastService, options: HttpAppOptions = {}) {
+export function createHttpApp(service: DocumentService, options: HttpAppOptions = {}) {
   const checkRateLimit = createRateLimiter({ limitRpm: options.rateLimitRpm });
 
   const app = new Elysia()

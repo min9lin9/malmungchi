@@ -1,7 +1,7 @@
 import { loadCorpusAndManifest } from "../bootstrap";
 import { env } from "../config/env";
-import { buildEpisodeTopicIndex } from "../ingest/build-index";
-import { enrichTopicIndex } from "../ingest/enrich-topics";
+import { buildDocumentCategoryIndex } from "../ingest/build-index";
+import { enrichCategoryIndex } from "../ingest/enrich-categories";
 import { MeilisearchEngine } from "../search/meilisearch-engine";
 import { logger } from "../util/logger";
 
@@ -9,8 +9,8 @@ async function main() {
   logger.info(`Syncing Meilisearch index ${env.meiliIndexName}...`);
 
   const { corpus } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
-  const baseIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseIndex);
+  const baseIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseIndex);
 
   const engine = new MeilisearchEngine({
     host: env.meiliHost,
@@ -18,7 +18,7 @@ async function main() {
     indexName: env.meiliIndexName,
   });
 
-  await engine.build(corpus.episodes, topicIndex.episodeToTopics);
+  await engine.build(corpus.documents, categoryIndex.documentToCategories);
 
   const stats = engine.getStats();
   logger.info("Meilisearch sync complete", { indexedCount: stats.indexedCount });

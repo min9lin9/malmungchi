@@ -1,6 +1,6 @@
-import type { CorpusStats, SearchResult } from "../domain/episode";
+import type { CorpusStats, SearchResult } from "../domain/document";
 import type { LlmStatus } from "../llm/llm-status";
-import type { ImportAuthorResult } from "../service/podcast-service";
+import type { ImportAuthorResult } from "../service/document-service";
 
 export function formatSearchResults(
   query: string,
@@ -31,7 +31,7 @@ export function formatSearchResults(
     lines.push(`- Ranking: ${r.rankingMode}`);
     if (r.guest) lines.push(`- Guest: ${r.guest}`);
     if (r.publishDate) lines.push(`- Published: ${r.publishDate}`);
-    if (r.topicSlugs.length > 0) lines.push(`- Topics: ${r.topicSlugs.join(", ")}`);
+    if (r.categorySlugs.length > 0) lines.push(`- Categories: ${r.categorySlugs.join(", ")}`);
     lines.push(`- Score: ${r.score.toFixed(2)}`);
     if (r.rankingSignals) {
       lines.push(`- Matched fields: ${r.rankingSignals.matchedFields.join(", ")}`);
@@ -95,11 +95,11 @@ export function formatCorpusStats(stats: CorpusStats): string {
   const lines = [
     `# Corpus Stats: ${stats.name}`,
     "",
-    `- Documents: ${stats.episodeCount}`,
-    `- Categories: ${stats.topicCount}`,
-    `- Indexed documents: ${stats.indexedEpisodeCount}`,
-    `- Content bytes: ${stats.transcriptBytes.toLocaleString()}`,
-    `- Content words: ${stats.transcriptWordCount.toLocaleString()}`,
+    `- Documents: ${stats.documentCount}`,
+    `- Categories: ${stats.categoryCount}`,
+    `- Indexed documents: ${stats.indexedDocumentCount}`,
+    `- Content bytes: ${stats.contentBytes.toLocaleString()}`,
+    `- Content words: ${stats.contentWordCount.toLocaleString()}`,
     `- Generated at: ${stats.generatedAt}`,
     `- Schema version: ${stats.schemaVersion}`,
   ];

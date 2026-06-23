@@ -1,5 +1,5 @@
 import type { Env } from "../config/env";
-import type { Episode } from "../domain/episode";
+import type { DocumentRecord } from "../domain/document";
 import { InvalidInputError } from "../domain/errors";
 import { SourceMemory, type SourceMemorySummary } from "../source/source-memory";
 import type { CorpusStore } from "./corpus-store";
@@ -54,7 +54,7 @@ export class SourceOperations {
     const memory = await this.memory?.summarize();
     const grouped = this.groupEpisodesBySource();
     return Array.from(grouped.entries())
-      .map(([sourceId, episodes]) => this.toSource(sourceId, episodes, memory?.get(sourceId)))
+      .map(([sourceId, documents]) => this.toSource(sourceId, documents, memory?.get(sourceId)))
       .sort((a, b) => a.id.localeCompare(b.id));
   }
 
@@ -65,9 +65,9 @@ export class SourceOperations {
     if (!source) throw new InvalidInputError(`Unknown source: ${sourceId}`);
     return {
       source,
-      documents: this.getEpisodesForSource(sourceId).map((episode) => ({
-        slug: episode.slug,
-        title: episode.metadata.title ?? episode.slug,
+      documents: this.getDocumentsForSource(sourceId).map((document) => ({
+        slug: document.slug,
+        title: document.metadata.title ?? document.slug,
       })),
     };
   }
@@ -77,7 +77,7 @@ export class SourceOperations {
     const options = normalizeRefreshInput(input);
     const sourceId = options.sourceId;
     assertMutableSourceId(sourceId);
-    const activeDocumentCount = this.getEpisodesForSource(sourceId).length;
+    const activeDocumentCount = this.getDocumentsForSource(sourceId).length;
     const result = await refreshMutableSource({
       env: this.env,
       importMutations: this.importMutations,
@@ -110,7 +110,7 @@ export class SourceOperations {
       : undefined;
     return buildSourceExportResult({
       detail,
-      episodes: this.getEpisodesForSource(options.sourceId),
+      documents: this.getDocumentsForSource(options.sourceId),
       sourceId: options.sourceId,
       manifestGeneratedAt: this.store.manifest.generatedAt,
       history,
@@ -146,7 +146,7 @@ export class SourceOperations {
 
   async getSourceStatus(sourceId: string): Promise<SourceStatusResult> {
     assertSourceId(sourceId);
-    const activeDocumentCount = this.getEpisodesForSource(sourceId).length;
+    const activeDocumentCount = this.getDocumentsForSource(sourceId).length;
     const memory = (await this.memory?.getStatus(sourceId)) ?? {
       sourceId,
       eventCount: 0,
@@ -175,7 +175,7 @@ export class SourceOperations {
   async compactSourceMemory(sourceId: string): Promise<CompactSourceMemoryResult> {
     if (!this.memory) throw new InvalidInputError("Source memory requires a configured dataDir");
     assertMutableSourceId(sourceId);
-    const activeDocumentCount = this.getEpisodesForSource(sourceId).length;
+    const activeDocumentCount = this.getDocumentsForSource(sourceId).length;
     const memoryEventCount = (await this.memory.readEvents(sourceId)).totalEvents;
     if (activeDocumentCount === 0 && memoryEventCount === 0) {
       throw new InvalidInputError(`Unknown source: ${sourceId}`);
@@ -185,43 +185,43 @@ export class SourceOperations {
 
   async deleteSource(sourceId: string): Promise<DeleteSourceResult> {
     assertMutableSourceId(sourceId);
-    const episodes = this.getEpisodesForSource(sourceId);
-    if (episodes.length === 0) throw new InvalidInputError(`Unknown source: ${sourceId}`);
-    await this.importMutations.removeEpisodes(episodes.map((episode) => episode.slug));
+    const documents = this.getDocumentsForSource(sourceId);
+    if (documents.length === 0) throw new InvalidInputError(`Unknown source: ${sourceId}`);
+    await this.importMutations.removeDocuments(documents.map((document) => document.slug));
     await removeSourceFiles(this.env, sourceId);
     await this.memory?.record({
       sourceId,
       action: "delete",
-      documentCount: episodes.length,
+      documentCount: documents.length,
     });
-    return { sourceId, deletedDocuments: episodes.length };
+    return { sourceId, deletedDocuments: documents.length };
   }
 
-  private groupEpisodesBySource(): Map<string, Episode[]> {
-    const grouped = new Map<string, Episode[]>();
-    for (const episode of this.store.allEpisodes) {
-      const sourceId = getSourceId(episode);
-      const episodes = grouped.get(sourceId) ?? [];
-      episodes.push(episode);
-      grouped.set(sourceId, episodes);
+  private groupEpisodesBySource(): Map<string, DocumentRecord[]> {
+    const grouped = new Map<string, DocumentRecord[]>();
+    for (const document of this.store.allDocuments) {
+      const sourceId = getSourceId(document);
+      const documents = grouped.get(sourceId) ?? [];
+      documents.push(document);
+      grouped.set(sourceId, documents);
     }
     return grouped;
   }
 
-  private getEpisodesForSource(sourceId: string): Episode[] {
-    return this.store.allEpisodes.filter((episode) => getSourceId(episode) === sourceId);
+  private getDocumentsForSource(sourceId: string): DocumentRecord[] {
+    return this.store.allDocuments.filter((document) => getSourceId(document) === sourceId);
   }
 
   private toSource(
     sourceId: string,
-    episodes: readonly Episode[],
+    documents: readonly DocumentRecord[],
     memory?: SourceMemorySummary
   ): CorpusSource {
     return {
       id: sourceId,
       type: getSourceType(sourceId),
       label: sourceId,
-      documentCount: episodes.length,
+      documentCount: documents.length,
       lastAction: memory?.lastAction,
       lastSeenAt: memory?.lastSeenAt,
       interactionCount: memory?.interactionCount ?? 0,

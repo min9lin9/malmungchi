@@ -2,19 +2,19 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { loadAllAuthorPosts } from "../author/storage/author-storage";
-import type { CorpusManifest } from "../domain/episode";
+import type { CorpusManifest } from "../domain/document";
 
 function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
 }
 
 export interface CorpusDiff {
-  addedEpisodes: string[];
-  changedEpisodes: string[];
-  removedEpisodes: string[];
-  addedTopics: string[];
-  changedTopics: string[];
-  removedTopics: string[];
+  addedDocuments: string[];
+  changedDocuments: string[];
+  removedDocuments: string[];
+  addedCategories: string[];
+  changedCategories: string[];
+  removedCategories: string[];
 }
 
 async function* readJsonlLines(filePath: string): AsyncGenerator<{ raw: string; data: unknown }> {
@@ -33,12 +33,12 @@ async function* readJsonlLines(filePath: string): AsyncGenerator<{ raw: string; 
   }
 }
 
-async function scanMarkdownEpisodeHashes(episodesDir: string): Promise<Record<string, string>> {
+async function scanMarkdownDocumentHashes(documentsDir: string): Promise<Record<string, string>> {
   const hashes: Record<string, string> = {};
   try {
-    const episodeSlugs = await fs.readdir(episodesDir);
-    for (const slug of episodeSlugs) {
-      const filePath = path.join(episodesDir, slug, "transcript.md");
+    const documentSlugs = await fs.readdir(documentsDir);
+    for (const slug of documentSlugs) {
+      const filePath = path.join(documentsDir, slug, "transcript.md");
       try {
         const content = await fs.readFile(filePath, "utf-8");
         hashes[slug] = hashContent(content);
@@ -47,12 +47,12 @@ async function scanMarkdownEpisodeHashes(episodesDir: string): Promise<Record<st
       }
     }
   } catch {
-    // episodesDir may not exist
+    // documentsDir may not exist
   }
   return hashes;
 }
 
-async function scanJsonlEpisodeHashes(jsonlPath: string): Promise<Record<string, string>> {
+async function scanJsonlDocumentHashes(jsonlPath: string): Promise<Record<string, string>> {
   const hashes: Record<string, string> = {};
   try {
     for await (const { raw, data } of readJsonlLines(jsonlPath)) {
@@ -75,23 +75,23 @@ async function scanAuthorPostHashes(authorsDir: string): Promise<Record<string, 
   return hashes;
 }
 
-async function scanMarkdownTopicHashes(topicsDir: string): Promise<Record<string, string>> {
+async function scanMarkdownCategoryHashes(categoriesDir: string): Promise<Record<string, string>> {
   const hashes: Record<string, string> = {};
   try {
-    const topicFiles = await fs.readdir(topicsDir);
-    for (const file of topicFiles) {
+    const categoryFiles = await fs.readdir(categoriesDir);
+    for (const file of categoryFiles) {
       if (!file.endsWith(".md")) continue;
       const slug = file.slice(0, -3);
-      const content = await fs.readFile(path.join(topicsDir, file), "utf-8");
+      const content = await fs.readFile(path.join(categoriesDir, file), "utf-8");
       hashes[slug] = hashContent(content);
     }
   } catch {
-    // topicsDir may not exist
+    // categoriesDir may not exist
   }
   return hashes;
 }
 
-async function scanJsonlTopicHashes(jsonlPath: string): Promise<Record<string, string>> {
+async function scanJsonlCategoryHashes(jsonlPath: string): Promise<Record<string, string>> {
   const hashes: Record<string, string> = {};
   try {
     for await (const { raw, data } of readJsonlLines(jsonlPath)) {
@@ -107,45 +107,48 @@ async function scanJsonlTopicHashes(jsonlPath: string): Promise<Record<string, s
 }
 
 export async function diffCorpus(manifest: CorpusManifest, dataDir: string): Promise<CorpusDiff> {
-  const episodesDir = path.join(dataDir, "episodes");
-  const topicsDir = path.join(dataDir, "topics");
+  const documentsDir = path.join(dataDir, "documents");
+  const categoriesDir = path.join(dataDir, "categories");
 
-  const currentEpisodeHashes: Record<string, string> = {
-    ...(await scanMarkdownEpisodeHashes(episodesDir)),
-    ...(await scanJsonlEpisodeHashes(path.join(dataDir, "episodes.jsonl"))),
+  const currentDocumentHashes: Record<string, string> = {
+    ...(await scanMarkdownDocumentHashes(documentsDir)),
+    ...(await scanJsonlDocumentHashes(path.join(dataDir, "documents.jsonl"))),
     ...(await scanAuthorPostHashes(path.join(dataDir, "authors"))),
   };
 
-  const currentTopicHashes: Record<string, string> = {
-    ...(await scanMarkdownTopicHashes(topicsDir)),
-    ...(await scanJsonlTopicHashes(path.join(dataDir, "topics.jsonl"))),
+  const currentCategoryHashes: Record<string, string> = {
+    ...(await scanMarkdownCategoryHashes(categoriesDir)),
+    ...(await scanJsonlCategoryHashes(path.join(dataDir, "categories.jsonl"))),
   };
 
-  const addedEpisodes = Object.keys(currentEpisodeHashes).filter(
-    (slug) => !manifest.episodeHashes[slug]
+  const addedDocuments = Object.keys(currentDocumentHashes).filter(
+    (slug) => !manifest.documentHashes[slug]
   );
-  const changedEpisodes = Object.keys(currentEpisodeHashes).filter(
+  const changedDocuments = Object.keys(currentDocumentHashes).filter(
     (slug) =>
-      manifest.episodeHashes[slug] && manifest.episodeHashes[slug] !== currentEpisodeHashes[slug]
+      manifest.documentHashes[slug] && manifest.documentHashes[slug] !== currentDocumentHashes[slug]
   );
-  const removedEpisodes = Object.keys(manifest.episodeHashes).filter(
-    (slug) => !currentEpisodeHashes[slug]
+  const removedDocuments = Object.keys(manifest.documentHashes).filter(
+    (slug) => !currentDocumentHashes[slug]
   );
 
-  const addedTopics = Object.keys(currentTopicHashes).filter((slug) => !manifest.topicHashes[slug]);
-  const changedTopics = Object.keys(currentTopicHashes).filter(
-    (slug) => manifest.topicHashes[slug] && manifest.topicHashes[slug] !== currentTopicHashes[slug]
+  const addedCategories = Object.keys(currentCategoryHashes).filter(
+    (slug) => !manifest.categoryHashes[slug]
   );
-  const removedTopics = Object.keys(manifest.topicHashes).filter(
-    (slug) => !currentTopicHashes[slug]
+  const changedCategories = Object.keys(currentCategoryHashes).filter(
+    (slug) =>
+      manifest.categoryHashes[slug] && manifest.categoryHashes[slug] !== currentCategoryHashes[slug]
+  );
+  const removedCategories = Object.keys(manifest.categoryHashes).filter(
+    (slug) => !currentCategoryHashes[slug]
   );
 
   return {
-    addedEpisodes,
-    changedEpisodes,
-    removedEpisodes,
-    addedTopics,
-    changedTopics,
-    removedTopics,
+    addedDocuments,
+    changedDocuments,
+    removedDocuments,
+    addedCategories,
+    changedCategories,
+    removedCategories,
   };
 }

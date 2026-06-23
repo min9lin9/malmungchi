@@ -1,8 +1,8 @@
 import { describe, expect, it } from "bun:test";
-import type { Episode, SearchResult } from "../../src/domain/episode";
+import type { DocumentRecord, SearchResult } from "../../src/domain/document";
 import { EmbeddingReranker } from "../../src/search/rerank/embedding-reranker";
 
-function episode(slug: string): Episode {
+function document(slug: string): DocumentRecord {
   return {
     slug,
     metadata: { title: slug },
@@ -20,9 +20,9 @@ function result(slug: string, score: number): SearchResult {
     guest: "",
     score,
     snippet: "",
-    topicSlugs: [],
-    sourceType: "podcast",
-    sourceId: "podcast",
+    categorySlugs: [],
+    sourceType: "author",
+    sourceId: "author:test",
     rankingMode: "weighted",
   };
 }
@@ -37,7 +37,7 @@ describe("EmbeddingReranker", () => {
         embed: async (text) => (text.includes("semantic") || text === "query" ? [1, 0] : [0, 1]),
       },
     });
-    await reranker.prepare([episode("keyword"), episode("semantic")]);
+    await reranker.prepare([document("keyword"), document("semantic")]);
 
     const reranked = await reranker.rerank("query", [result("keyword", 10), result("semantic", 1)]);
 
@@ -74,11 +74,11 @@ describe("EmbeddingReranker", () => {
       },
     });
 
-    await reranker.prepare([episode("same")]);
+    await reranker.prepare([document("same")]);
     await reranker.rerank("query", [result("same", 1)]);
     await reranker.prepare([
       {
-        ...episode("same"),
+        ...document("same"),
         transcript: "new",
         contentHash: "same-new-hash",
       },

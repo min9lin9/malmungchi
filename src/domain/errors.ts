@@ -8,17 +8,17 @@ export class CorpusError extends Error {
   }
 }
 
-export class EpisodeNotFoundError extends CorpusError {
+export class DocumentNotFoundError extends CorpusError {
   constructor(identifier: string) {
-    super(`Episode not found: "${identifier}"`, "EPISODE_NOT_FOUND");
-    this.name = "EpisodeNotFoundError";
+    super(`Document not found: "${identifier}"`, "DOCUMENT_NOT_FOUND");
+    this.name = "DocumentNotFoundError";
   }
 }
 
-export class TopicNotFoundError extends CorpusError {
+export class CategoryNotFoundError extends CorpusError {
   constructor(slug: string) {
-    super(`Topic not found: "${slug}"`, "TOPIC_NOT_FOUND");
-    this.name = "TopicNotFoundError";
+    super(`Category not found: "${slug}"`, "CATEGORY_NOT_FOUND");
+    this.name = "CategoryNotFoundError";
   }
 }
 
@@ -29,10 +29,10 @@ export class InvalidInputError extends CorpusError {
   }
 }
 
-export class BlogNotFoundError extends CorpusError {
+export class SourceNotFoundError extends CorpusError {
   constructor(blogId: string) {
-    super(`Blog not found: "${blogId}"`, "BLOG_NOT_FOUND");
-    this.name = "BlogNotFoundError";
+    super(`Source not found: "${blogId}"`, "SOURCE_NOT_FOUND");
+    this.name = "SourceNotFoundError";
   }
 }
 

@@ -22,7 +22,7 @@ async function ensureFixture(dir: string): Promise<void> {
   );
   await writeFile(
     join(dir, "data.json"),
-    JSON.stringify({ topic: "growth", nested: { ko: "안녕하세요" } }, null, 2)
+    JSON.stringify({ category: "growth", nested: { ko: "안녕하세요" } }, null, 2)
   );
 }
 

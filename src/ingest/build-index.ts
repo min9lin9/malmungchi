@@ -1,32 +1,35 @@
-import type { Episode, Topic } from "../domain/episode";
+import type { Category, DocumentRecord } from "../domain/document";
 
-export interface EpisodeTopicIndex {
-  episodeToTopics: Map<string, string[]>;
-  topicToEpisodes: Map<string, string[]>;
+export interface DocumentCategoryIndex {
+  documentToCategories: Map<string, string[]>;
+  categoryToDocuments: Map<string, string[]>;
 }
 
-export function buildEpisodeTopicIndex(episodes: Episode[], topics: Topic[]): EpisodeTopicIndex {
-  const episodeSlugs = new Set(episodes.map((e) => e.slug));
-  const episodeToTopics = new Map<string, string[]>();
-  const topicToEpisodes = new Map<string, string[]>();
+export function buildDocumentCategoryIndex(
+  documents: DocumentRecord[],
+  categories: Category[]
+): DocumentCategoryIndex {
+  const documentSlugs = new Set(documents.map((e) => e.slug));
+  const documentToCategories = new Map<string, string[]>();
+  const categoryToDocuments = new Map<string, string[]>();
 
-  for (const episode of episodes) {
-    episodeToTopics.set(episode.slug, []);
+  for (const document of documents) {
+    documentToCategories.set(document.slug, []);
   }
 
-  for (const topic of topics) {
-    const validSlugs = topic.episodeSlugs.filter((slug) => episodeSlugs.has(slug));
-    topicToEpisodes.set(topic.slug, validSlugs);
+  for (const category of categories) {
+    const validSlugs = category.documentSlugs.filter((slug) => documentSlugs.has(slug));
+    categoryToDocuments.set(category.slug, validSlugs);
     for (const slug of validSlugs) {
-      const list = episodeToTopics.get(slug) ?? [];
-      list.push(topic.slug);
-      episodeToTopics.set(slug, list);
+      const list = documentToCategories.get(slug) ?? [];
+      list.push(category.slug);
+      documentToCategories.set(slug, list);
     }
   }
 
-  for (const [slug, list] of episodeToTopics) {
-    episodeToTopics.set(slug, Array.from(new Set(list)).sort());
+  for (const [slug, list] of documentToCategories) {
+    documentToCategories.set(slug, Array.from(new Set(list)).sort());
   }
 
-  return { episodeToTopics, topicToEpisodes };
+  return { documentToCategories, categoryToDocuments };
 }

@@ -7,8 +7,8 @@ export type SearchEngineType = "flexsearch" | "meilisearch";
 
 export interface Env {
   dataDir: string;
-  episodesDir: string;
-  topicsDir: string;
+  documentsDir: string;
+  categoriesDir: string;
   blogsDir: string;
   authorsDir: string;
   authorImportDir: string;
@@ -106,8 +106,8 @@ function readEnv(name: string, legacyName?: string): string | undefined {
 export function createEnv(): Env {
   return {
     dataDir: getDataDir(),
-    episodesDir: path.join(getDataDir(), "episodes"),
-    topicsDir: path.join(getDataDir(), "topics"),
+    documentsDir: path.join(getDataDir(), "documents"),
+    categoriesDir: path.join(getDataDir(), "categories"),
     blogsDir: path.join(getDataDir(), "blogs"),
     authorsDir: path.join(getDataDir(), "authors"),
     authorImportDir: path.resolve(

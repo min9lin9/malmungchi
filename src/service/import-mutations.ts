@@ -1,6 +1,6 @@
-import { authorPostToEpisode } from "../author/corpus/author-to-episode";
+import { authorPostToDocument } from "../author/corpus/author-to-document";
 import type { AuthorPost } from "../author/domain/author-post";
-import type { Episode } from "../domain/episode";
+import type { DocumentRecord } from "../domain/document";
 import { writeManifest } from "../ingest/build-manifest";
 import type { SearchEngine } from "../search/search-engine";
 import type { CorpusStore } from "./corpus-store";
@@ -42,38 +42,38 @@ export class ImportMutations {
   ) {}
 
   async importAuthorPosts(posts: readonly AuthorPost[], options?: ImportMutationOptions) {
-    return this.applyEpisodes(
+    return this.applyDocuments(
       posts.map((post) => ({
         slug: post.slug,
         contentHash: post.contentHash,
-        episode: authorPostToEpisode(post),
+        document: authorPostToDocument(post),
         onApply: () => undefined,
       })),
       options
     );
   }
 
-  async removeEpisodes(slugs: readonly string[]): Promise<void> {
-    const removed: Episode[] = [];
+  async removeDocuments(slugs: readonly string[]): Promise<void> {
+    const removed: DocumentRecord[] = [];
     for (const slug of slugs) {
-      const episode = this.store.getEpisode(slug);
-      if (!episode) continue;
-      removed.push(episode);
-      this.store.episodes.delete(slug);
+      const document = this.store.getDocument(slug);
+      if (!document) continue;
+      removed.push(document);
+      this.store.documents.delete(slug);
     }
     if (removed.length === 0) return;
-    await this.searchEngine.removeDocuments(removed.map((episode) => episode.slug));
-    this.updateManifestForRemovedEpisodes(removed);
+    await this.searchEngine.removeDocuments(removed.map((document) => document.slug));
+    this.updateManifestForRemovedDocuments(removed);
     if (this.manifestPath) {
       await writeManifest(this.store.manifest, this.manifestPath);
     }
   }
 
-  private async applyEpisodes(
+  private async applyDocuments(
     inputs: Array<{
       slug: string;
       contentHash: string;
-      episode: Episode;
+      document: DocumentRecord;
       onApply: () => void;
     }>,
     options?: ImportMutationOptions
@@ -81,17 +81,17 @@ export class ImportMutations {
     let added = 0;
     let updated = 0;
     let skipped = 0;
-    const episodesToAdd: Episode[] = [];
-    const episodesToUpdate: Array<{ previous: Episode; next: Episode }> = [];
+    const documentsToAdd: DocumentRecord[] = [];
+    const documentsToUpdate: Array<{ previous: DocumentRecord; next: DocumentRecord }> = [];
     const changes: ImportMutationChange[] = [];
 
     for (const input of inputs) {
-      const previous = this.store.getEpisode(input.slug);
+      const previous = this.store.getDocument(input.slug);
       if (previous?.contentHash === input.contentHash) {
         skipped++;
         changes.push({
           slug: input.slug,
-          title: input.episode.metadata.title ?? input.slug,
+          title: input.document.metadata.title ?? input.slug,
           action: "skipped",
           previousHash: previous.contentHash,
           nextHash: input.contentHash,
@@ -100,32 +100,32 @@ export class ImportMutations {
       }
       if (previous) {
         updated++;
-        episodesToUpdate.push({ previous, next: input.episode });
+        documentsToUpdate.push({ previous, next: input.document });
         changes.push({
           slug: input.slug,
-          title: input.episode.metadata.title ?? input.slug,
+          title: input.document.metadata.title ?? input.slug,
           action: "updated",
           previousHash: previous.contentHash,
           nextHash: input.contentHash,
         });
       } else {
         added++;
-        episodesToAdd.push(input.episode);
+        documentsToAdd.push(input.document);
         changes.push({
           slug: input.slug,
-          title: input.episode.metadata.title ?? input.slug,
+          title: input.document.metadata.title ?? input.slug,
           action: "added",
           nextHash: input.contentHash,
         });
       }
       if (!options?.dryRun) {
         input.onApply();
-        this.store.episodes.set(input.slug, input.episode);
+        this.store.documents.set(input.slug, input.document);
       }
     }
 
     if (!options?.dryRun) {
-      await this.updateSearchAndManifest(episodesToAdd, episodesToUpdate);
+      await this.updateSearchAndManifest(documentsToAdd, documentsToUpdate);
     }
     const addedSlugs = changes
       .filter((change) => change.action === "added")
@@ -154,20 +154,20 @@ export class ImportMutations {
   }
 
   private async updateSearchAndManifest(
-    episodesToAdd: Episode[],
-    episodesToUpdate: Array<{ previous: Episode; next: Episode }>
+    documentsToAdd: DocumentRecord[],
+    documentsToUpdate: Array<{ previous: DocumentRecord; next: DocumentRecord }>
   ): Promise<void> {
-    if (episodesToAdd.length > 0) {
-      await this.searchEngine.addDocuments(episodesToAdd);
-      this.updateManifestForNewEpisodes(episodesToAdd);
+    if (documentsToAdd.length > 0) {
+      await this.searchEngine.addDocuments(documentsToAdd);
+      this.updateManifestForNewDocuments(documentsToAdd);
     }
 
-    if (episodesToUpdate.length > 0) {
-      const nextEpisodes = episodesToUpdate.map((entry) => entry.next);
-      const slugs = nextEpisodes.map((episode) => episode.slug);
+    if (documentsToUpdate.length > 0) {
+      const nextDocuments = documentsToUpdate.map((entry) => entry.next);
+      const slugs = nextDocuments.map((document) => document.slug);
       await this.searchEngine.removeDocuments(slugs);
-      await this.searchEngine.addDocuments(nextEpisodes);
-      this.updateManifestForUpdatedEpisodes(episodesToUpdate);
+      await this.searchEngine.addDocuments(nextDocuments);
+      this.updateManifestForUpdatedDocuments(documentsToUpdate);
     }
 
     if (this.manifestPath) {
@@ -175,52 +175,54 @@ export class ImportMutations {
     }
   }
 
-  private updateManifestForNewEpisodes(episodes: Episode[]): void {
+  private updateManifestForNewDocuments(documents: DocumentRecord[]): void {
     const manifest = this.store.manifest;
-    for (const slug of episodes.map((episode) => episode.slug)) {
-      if (!manifest.episodeSlugs.includes(slug)) {
-        manifest.episodeSlugs.push(slug);
+    for (const slug of documents.map((document) => document.slug)) {
+      if (!manifest.documentSlugs.includes(slug)) {
+        manifest.documentSlugs.push(slug);
       }
     }
-    manifest.episodeSlugs.sort();
-    manifest.episodeCount += episodes.length;
-    manifest.indexedEpisodeCount += episodes.length;
+    manifest.documentSlugs.sort();
+    manifest.documentCount += documents.length;
+    manifest.indexedDocumentCount += documents.length;
 
-    for (const episode of episodes) {
-      manifest.transcriptBytes += Buffer.byteLength(episode.content, "utf-8");
-      manifest.transcriptWordCount += episode.wordCount;
-      this.updateEpisodeHash(episode);
+    for (const document of documents) {
+      manifest.contentBytes += Buffer.byteLength(document.content, "utf-8");
+      manifest.contentWordCount += document.wordCount;
+      this.updateDocumentHash(document);
     }
     manifest.generatedAt = new Date().toISOString();
   }
 
-  private updateManifestForUpdatedEpisodes(episodes: Array<{ previous: Episode; next: Episode }>) {
+  private updateManifestForUpdatedDocuments(
+    documents: Array<{ previous: DocumentRecord; next: DocumentRecord }>
+  ) {
     const manifest = this.store.manifest;
-    for (const { previous, next } of episodes) {
-      manifest.transcriptBytes -= Buffer.byteLength(previous.content, "utf-8");
-      manifest.transcriptWordCount -= previous.wordCount;
-      manifest.transcriptBytes += Buffer.byteLength(next.content, "utf-8");
-      manifest.transcriptWordCount += next.wordCount;
-      this.updateEpisodeHash(next);
+    for (const { previous, next } of documents) {
+      manifest.contentBytes -= Buffer.byteLength(previous.content, "utf-8");
+      manifest.contentWordCount -= previous.wordCount;
+      manifest.contentBytes += Buffer.byteLength(next.content, "utf-8");
+      manifest.contentWordCount += next.wordCount;
+      this.updateDocumentHash(next);
     }
     manifest.generatedAt = new Date().toISOString();
   }
 
-  private updateManifestForRemovedEpisodes(episodes: readonly Episode[]): void {
+  private updateManifestForRemovedDocuments(documents: readonly DocumentRecord[]): void {
     const manifest = this.store.manifest;
-    const removedSlugs = new Set(episodes.map((episode) => episode.slug));
-    manifest.episodeSlugs = manifest.episodeSlugs.filter((slug) => !removedSlugs.has(slug));
-    manifest.episodeCount -= episodes.length;
-    manifest.indexedEpisodeCount -= episodes.length;
-    for (const episode of episodes) {
-      manifest.transcriptBytes -= Buffer.byteLength(episode.content, "utf-8");
-      manifest.transcriptWordCount -= episode.wordCount;
-      delete manifest.episodeHashes[episode.slug];
+    const removedSlugs = new Set(documents.map((document) => document.slug));
+    manifest.documentSlugs = manifest.documentSlugs.filter((slug) => !removedSlugs.has(slug));
+    manifest.documentCount -= documents.length;
+    manifest.indexedDocumentCount -= documents.length;
+    for (const document of documents) {
+      manifest.contentBytes -= Buffer.byteLength(document.content, "utf-8");
+      manifest.contentWordCount -= document.wordCount;
+      delete manifest.documentHashes[document.slug];
     }
     manifest.generatedAt = new Date().toISOString();
   }
 
-  private updateEpisodeHash(episode: Episode): void {
-    this.store.manifest.episodeHashes[episode.slug] = episode.contentHash ?? "";
+  private updateDocumentHash(document: DocumentRecord): void {
+    this.store.manifest.documentHashes[document.slug] = document.contentHash ?? "";
   }
 }

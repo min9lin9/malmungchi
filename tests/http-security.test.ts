@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from "bun:test";
 import { legacyEnvName } from "../src/config/env-names";
 import { createHttpApp } from "../src/http/app";
-import { buildFixturePodcastService } from "./helpers/build-fixture-service";
+import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
 async function buildApp() {
-  const service = await buildFixturePodcastService();
+  const service = await buildFixtureDocumentService();
   return createHttpApp(service);
 }
 

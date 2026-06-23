@@ -1,5 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 import { formatImportAuthorResult, formatLlmStatus } from "./formatters";
 import {
   formatCompactSourceMemoryResult,
@@ -27,7 +27,7 @@ import { handleToolError } from "./tool-error";
 
 export function registerSourceTools(
   server: McpServer,
-  service: PodcastService,
+  service: DocumentService,
   maxResponseChars = 12000
 ): void {
   server.registerTool(

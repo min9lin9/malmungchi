@@ -2,19 +2,19 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { authorPostsToEpisodes } from "../author/corpus/author-to-episode";
+import { authorPostsToDocuments } from "../author/corpus/author-to-document";
 import type { AuthorPost } from "../author/domain/author-post";
 import { loadAllAuthorPosts } from "../author/storage/author-storage";
-import type { Episode, Topic } from "../domain/episode";
+import type { Category, DocumentRecord } from "../domain/document";
 import { parseTranscriptFile } from "./parse-transcript";
 
-const EPISODE_LINK_RE = /\[.*?\]\(\.\.\/episodes\/([^/\s)]+)\/transcript\.md\)/g;
+const DOCUMENT_LINK_RE = /\[.*?\]\(\.\.\/documents\/([^/\s)]+)\/transcript\.md\)/g;
 
 function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
 }
 
-const EpisodeMetadataSchema = z
+const DocumentMetadataSchema = z
   .object({
     guest: z.string().optional(),
     title: z.string().optional(),
@@ -32,7 +32,7 @@ const EpisodeMetadataSchema = z
 
 const EpisodeJsonlSchema = z.object({
   slug: z.string().min(1),
-  metadata: EpisodeMetadataSchema.optional(),
+  metadata: DocumentMetadataSchema.optional(),
   content: z.string().optional(),
   transcript: z.string().optional(),
   wordCount: z.number().int().nonnegative().optional(),
@@ -42,7 +42,7 @@ const TopicJsonlSchema = z.object({
   slug: z.string().min(1),
   name: z.string().optional(),
   content: z.string().optional(),
-  episodeSlugs: z.array(z.string()).optional(),
+  documentSlugs: z.array(z.string()).optional(),
 });
 
 async function* readJsonlLines(
@@ -63,7 +63,7 @@ async function* readJsonlLines(
   }
 }
 
-function parseEpisodeJsonlRecord(record: unknown, raw: string): Episode {
+function parseDocumentJsonlRecord(record: unknown, raw: string): DocumentRecord {
   const parsed = EpisodeJsonlSchema.parse(record);
   const content = parsed.content ?? parsed.transcript ?? "";
   const transcript = parsed.transcript ?? content;
@@ -77,7 +77,7 @@ function parseEpisodeJsonlRecord(record: unknown, raw: string): Episode {
   };
 }
 
-function parseTopicJsonlRecord(record: unknown, raw: string): Topic {
+function parseCategoryJsonlRecord(record: unknown, raw: string): Category {
   const parsed = TopicJsonlSchema.parse(record);
   const content = parsed.content ?? "";
   const name = parsed.name ?? content.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? parsed.slug;
@@ -85,37 +85,37 @@ function parseTopicJsonlRecord(record: unknown, raw: string): Topic {
     slug: parsed.slug,
     name,
     content,
-    episodeSlugs: parsed.episodeSlugs ?? extractEpisodeSlugsFromTopic(content),
+    documentSlugs: parsed.documentSlugs ?? extractDocumentSlugsFromCategory(content),
     contentHash: hashContent(raw),
   };
 }
 
-export async function loadEpisodes(episodesDir: string): Promise<Episode[]> {
-  const episodes = await loadMarkdownEpisodes(episodesDir);
-  const jsonlPath = path.join(path.dirname(episodesDir), "episodes.jsonl");
-  const jsonlEpisodes = await loadJsonlEpisodes(jsonlPath);
-  return mergeBySlug(episodes, jsonlEpisodes, jsonlPath);
+export async function loadDocuments(documentsDir: string): Promise<DocumentRecord[]> {
+  const documents = await loadMarkdownDocuments(documentsDir);
+  const jsonlPath = path.join(path.dirname(documentsDir), "documents.jsonl");
+  const jsonlEpisodes = await loadJsonlDocuments(jsonlPath);
+  return mergeBySlug(documents, jsonlEpisodes, jsonlPath);
 }
 
-async function loadMarkdownEpisodes(episodesDir: string): Promise<Episode[]> {
-  const entries = await fs.readdir(episodesDir, { withFileTypes: true }).catch(() => []);
+async function loadMarkdownDocuments(documentsDir: string): Promise<DocumentRecord[]> {
+  const entries = await fs.readdir(documentsDir, { withFileTypes: true }).catch(() => []);
   const slugs = entries.filter((e) => e.isDirectory()).map((e) => e.name);
 
-  const episodes: Episode[] = [];
+  const documents: DocumentRecord[] = [];
   for (const slug of slugs) {
-    const filePath = path.join(episodesDir, slug, "transcript.md");
+    const filePath = path.join(documentsDir, slug, "transcript.md");
     try {
       const raw = await fs.readFile(filePath, "utf-8");
-      const episode = parseTranscriptFile(slug, raw);
-      episode.contentHash = hashContent(raw);
-      episodes.push(episode);
+      const document = parseTranscriptFile(slug, raw);
+      document.contentHash = hashContent(raw);
+      documents.push(document);
     } catch (err) {
       throw new Error(
-        `Failed to load episode "${slug}": ${err instanceof Error ? err.message : String(err)}`
+        `Failed to load document "${slug}": ${err instanceof Error ? err.message : String(err)}`
       );
     }
   }
-  return episodes;
+  return documents;
 }
 
 async function fileExists(filePath: string): Promise<boolean> {
@@ -127,62 +127,62 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
-async function loadJsonlEpisodes(filePath: string): Promise<Episode[]> {
+async function loadJsonlDocuments(filePath: string): Promise<DocumentRecord[]> {
   if (!(await fileExists(filePath))) return [];
-  const episodes: Episode[] = [];
+  const documents: DocumentRecord[] = [];
   for await (const { raw, data } of readJsonlLines(filePath)) {
-    episodes.push(parseEpisodeJsonlRecord(data, raw));
+    documents.push(parseDocumentJsonlRecord(data, raw));
   }
-  return episodes;
+  return documents;
 }
 
-export function extractEpisodeSlugsFromTopic(content: string): string[] {
+export function extractDocumentSlugsFromCategory(content: string): string[] {
   const slugs = new Set<string>();
-  EPISODE_LINK_RE.lastIndex = 0;
-  for (const match of content.matchAll(EPISODE_LINK_RE)) {
+  DOCUMENT_LINK_RE.lastIndex = 0;
+  for (const match of content.matchAll(DOCUMENT_LINK_RE)) {
     slugs.add(match[1]);
   }
   return Array.from(slugs).sort();
 }
 
-export async function loadTopics(topicsDir: string): Promise<Topic[]> {
-  const topics = await loadMarkdownTopics(topicsDir);
-  const jsonlPath = path.join(path.dirname(topicsDir), "topics.jsonl");
-  const jsonlTopics = await loadJsonlTopics(jsonlPath);
-  return mergeBySlug(topics, jsonlTopics, jsonlPath);
+export async function loadCategories(categoriesDir: string): Promise<Category[]> {
+  const categories = await loadMarkdownCategories(categoriesDir);
+  const jsonlPath = path.join(path.dirname(categoriesDir), "categories.jsonl");
+  const jsonlTopics = await loadJsonlCategories(jsonlPath);
+  return mergeBySlug(categories, jsonlTopics, jsonlPath);
 }
 
-async function loadMarkdownTopics(topicsDir: string): Promise<Topic[]> {
-  const entries = await fs.readdir(topicsDir, { withFileTypes: true }).catch(() => []);
+async function loadMarkdownCategories(categoriesDir: string): Promise<Category[]> {
+  const entries = await fs.readdir(categoriesDir, { withFileTypes: true }).catch(() => []);
   const files = entries.filter((e) => e.isFile() && e.name.endsWith(".md")).map((e) => e.name);
 
-  const topics: Topic[] = [];
+  const categories: Category[] = [];
   for (const file of files) {
     const slug = file.slice(0, -3);
-    if (slug === "README" || slug === "episodes") continue;
+    if (slug === "README" || slug === "documents") continue;
 
-    const filePath = path.join(topicsDir, file);
+    const filePath = path.join(categoriesDir, file);
     const content = await fs.readFile(filePath, "utf-8");
     const name = content.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? slug;
 
-    topics.push({
+    categories.push({
       slug,
       name,
       content,
-      episodeSlugs: extractEpisodeSlugsFromTopic(content),
+      documentSlugs: extractDocumentSlugsFromCategory(content),
       contentHash: hashContent(content),
     });
   }
-  return topics;
+  return categories;
 }
 
-async function loadJsonlTopics(filePath: string): Promise<Topic[]> {
+async function loadJsonlCategories(filePath: string): Promise<Category[]> {
   if (!(await fileExists(filePath))) return [];
-  const topics: Topic[] = [];
+  const categories: Category[] = [];
   for await (const { raw, data } of readJsonlLines(filePath)) {
-    topics.push(parseTopicJsonlRecord(data, raw));
+    categories.push(parseCategoryJsonlRecord(data, raw));
   }
-  return topics;
+  return categories;
 }
 
 function mergeBySlug<T extends { slug: string }>(
@@ -206,16 +206,16 @@ function mergeBySlug<T extends { slug: string }>(
 }
 
 export interface Corpus {
-  episodes: Episode[];
-  topics: Topic[];
+  documents: DocumentRecord[];
+  categories: Category[];
   authorPosts: AuthorPost[];
 }
 
 export async function loadCorpus(dataDir: string): Promise<Corpus> {
   const authorPosts = await loadAllAuthorPosts(path.join(dataDir, "authors"));
   return {
-    episodes: authorPostsToEpisodes(authorPosts),
-    topics: [],
+    documents: authorPostsToDocuments(authorPosts),
+    categories: [],
     authorPosts,
   };
 }

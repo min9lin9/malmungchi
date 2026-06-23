@@ -1,8 +1,8 @@
 import { loadCorpusAndManifest } from "../bootstrap";
 import { env } from "../config/env";
-import type { SearchInput } from "../domain/episode";
-import { buildEpisodeTopicIndex } from "../ingest/build-index";
-import { enrichTopicIndex } from "../ingest/enrich-topics";
+import type { SearchInput } from "../domain/document";
+import { buildDocumentCategoryIndex } from "../ingest/build-index";
+import { enrichCategoryIndex } from "../ingest/enrich-categories";
 import { FlexSearchEngine } from "../search/flexsearch-engine";
 import { MeilisearchEngine } from "../search/meilisearch-engine";
 
@@ -25,11 +25,11 @@ function formatScore(n: number): string {
 
 async function main() {
   const { corpus } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
-  const baseIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseIndex);
+  const baseIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseIndex);
 
   const flex = new FlexSearchEngine({ maxResults: env.maxResults });
-  await flex.build(corpus.episodes, topicIndex.episodeToTopics, {
+  await flex.build(corpus.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
   });
 
@@ -38,7 +38,7 @@ async function main() {
     apiKey: env.meiliApiKey,
     indexName: `${env.meiliIndexName}-compare`,
   });
-  await meili.build(corpus.episodes, topicIndex.episodeToTopics);
+  await meili.build(corpus.documents, categoryIndex.documentToCategories);
 
   const input: SearchInput = { query: "", limit: 5 };
 

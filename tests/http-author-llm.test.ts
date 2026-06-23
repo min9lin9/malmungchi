@@ -7,8 +7,8 @@ import { createHttpApp } from "../src/http/app";
 
 async function makeDataDir(): Promise<string> {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), "http-author-test-"));
-  await fs.mkdir(path.join(dir, "episodes"), { recursive: true });
-  await fs.mkdir(path.join(dir, "topics"), { recursive: true });
+  await fs.mkdir(path.join(dir, "documents"), { recursive: true });
+  await fs.mkdir(path.join(dir, "categories"), { recursive: true });
   await fs.mkdir(path.join(dir, "imports"), { recursive: true });
   return dir;
 }
@@ -121,12 +121,12 @@ describe("author and llm http routes", () => {
     }
 
     await importContent("# Stable Essay\n\nshort body");
-    const firstCount = service.getStats().transcriptWordCount;
+    const firstCount = service.getStats().contentWordCount;
     const second = await importContent("# Stable Essay\n\nshort body with many additional words");
 
     expect(second.updatedPosts).toBe(1);
-    expect(service.getStats().transcriptWordCount).toBeGreaterThan(firstCount);
-    expect(service.getStats().episodeHashes["author:demo-author:stable-essay"]).toBeTruthy();
+    expect(service.getStats().contentWordCount).toBeGreaterThan(firstCount);
+    expect(service.getStats().documentHashes["author:demo-author:stable-essay"]).toBeTruthy();
 
     await fs.rm(dataDir, { recursive: true, force: true });
   });

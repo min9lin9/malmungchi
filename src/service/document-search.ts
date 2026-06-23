@@ -1,5 +1,5 @@
 import { DEFAULT_SEARCH_LIMIT } from "../config/constants";
-import type { SearchInput, SearchResult } from "../domain/episode";
+import type { SearchInput, SearchResult } from "../domain/document";
 import {
   compareSearchExplanations,
   type SearchExplainCompareInput,
@@ -8,7 +8,7 @@ import {
 import { logSearchTiming } from "../search/perf-log";
 import type { SearchEngine } from "../search/search-engine";
 
-export type SearchTranscriptResult = {
+export type SearchDocumentResult = {
   readonly query: string;
   readonly returned: number;
   readonly total: number;
@@ -17,10 +17,10 @@ export type SearchTranscriptResult = {
   readonly results: SearchResult[];
 };
 
-export async function searchTranscriptsWithTiming(
+export async function searchDocumentsWithTiming(
   searchEngine: SearchEngine,
   input: SearchInput
-): Promise<SearchTranscriptResult> {
+): Promise<SearchDocumentResult> {
   const start = performance.now();
   const { results, total } = await searchEngine.searchWithTotal(input);
   const elapsed = performance.now() - start;

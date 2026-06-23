@@ -1,5 +1,5 @@
 ---
-topic: product-fit
+category: product-fit
 source_type: file
 published_at: 2026-06-19
 fetched: false

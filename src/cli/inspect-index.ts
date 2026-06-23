@@ -1,7 +1,7 @@
 import { loadCorpusAndManifest } from "../bootstrap";
 import { env } from "../config/env";
-import { buildEpisodeTopicIndex } from "../ingest/build-index";
-import { enrichTopicIndex } from "../ingest/enrich-topics";
+import { buildDocumentCategoryIndex } from "../ingest/build-index";
+import { enrichCategoryIndex } from "../ingest/enrich-categories";
 import { FlexSearchEngine } from "../search/flexsearch-engine";
 import { logger } from "../util/logger";
 
@@ -10,16 +10,16 @@ async function main() {
 
   const { corpus, manifest } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
 
-  const baseTopicIndex = buildEpisodeTopicIndex(corpus.episodes, corpus.topics);
-  const topicIndex = enrichTopicIndex(corpus.episodes, corpus.topics, baseTopicIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
+  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
   const engine = new FlexSearchEngine();
-  await engine.build(corpus.episodes, topicIndex.episodeToTopics);
+  await engine.build(corpus.documents, categoryIndex.documentToCategories);
 
-  const episodesWithoutTopics = corpus.episodes.filter(
-    (e: { slug: string }) => (topicIndex.episodeToTopics.get(e.slug)?.length ?? 0) === 0
+  const documentsWithoutCategories = corpus.documents.filter(
+    (e: { slug: string }) => (categoryIndex.documentToCategories.get(e.slug)?.length ?? 0) === 0
   );
 
-  const topicEpisodeCounts = Array.from(topicIndex.topicToEpisodes.entries())
+  const categoryDocumentCounts = Array.from(categoryIndex.categoryToDocuments.entries())
     .map(([slug, slugs]) => ({ slug, count: slugs.length }))
     .sort((a, b) => b.count - a.count);
 
@@ -27,11 +27,11 @@ async function main() {
     JSON.stringify(
       {
         manifest,
-        episodes: corpus.episodes.length,
-        topics: corpus.topics.length,
-        episodesWithoutTopics: episodesWithoutTopics.length,
-        topTopics: topicEpisodeCounts.slice(0, 10),
-        bottomTopics: topicEpisodeCounts.slice(-10),
+        documents: corpus.documents.length,
+        categories: corpus.categories.length,
+        documentsWithoutCategories: documentsWithoutCategories.length,
+        topCategories: categoryDocumentCounts.slice(0, 10),
+        bottomCategories: categoryDocumentCounts.slice(-10),
       },
       null,
       2

@@ -129,12 +129,12 @@ function postFromSection(input: {
   body: string;
   source: string;
 }): AuthorPost {
-  const episodeSlug = slugify(input.title);
+  const documentSlug = slugify(input.title);
   const contentMarkdown = input.body;
   return {
     authorId: input.authorId,
-    episodeSlug,
-    slug: createAuthorSlug(input.authorId, episodeSlug),
+    documentSlug,
+    slug: createAuthorSlug(input.authorId, documentSlug),
     title: input.title,
     sourceUrl: input.source,
     publishedAt: null,
@@ -146,11 +146,11 @@ function postFromSection(input: {
 
 export async function saveAuthorPosts(posts: AuthorPost[], authorsDir: string): Promise<void> {
   for (const post of posts) {
-    const postDir = path.join(authorsDir, post.authorId, "posts", post.episodeSlug);
+    const postDir = path.join(authorsDir, post.authorId, "posts", post.documentSlug);
     await fs.mkdir(postDir, { recursive: true });
     const frontmatter = {
       author_id: post.authorId,
-      episode_slug: post.episodeSlug,
+      document_slug: post.documentSlug,
       slug: post.slug,
       title: post.title,
       source_url: post.sourceUrl,
@@ -203,12 +203,12 @@ export async function loadAuthorPost(filePath: string): Promise<AuthorPost | nul
     const metadata = JSON.parse(raw.slice(4, frontmatterEnd)) as Record<string, unknown>;
     const contentMarkdown = raw.slice(frontmatterEnd + 5).trim();
     const authorId = String(metadata.author_id ?? "");
-    const episodeSlug = String(metadata.episode_slug ?? "");
+    const documentSlug = String(metadata.document_slug ?? "");
     return {
       authorId,
-      episodeSlug,
-      slug: String(metadata.slug ?? createAuthorSlug(authorId, episodeSlug)),
-      title: String(metadata.title ?? episodeSlug),
+      documentSlug,
+      slug: String(metadata.slug ?? createAuthorSlug(authorId, documentSlug)),
+      title: String(metadata.title ?? documentSlug),
       sourceUrl: String(metadata.source_url ?? ""),
       publishedAt: metadata.published_at ? String(metadata.published_at) : null,
       contentText: stripMarkdown(contentMarkdown),

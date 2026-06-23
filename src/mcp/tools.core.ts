@@ -1,6 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DEFAULT_SEARCH_LIMIT } from "../config/constants";
-import type { PodcastService } from "../service/podcast-service";
+import type { DocumentService } from "../service/document-service";
 import { formatCorpusStats, formatDocument, formatSearchResults } from "./formatters";
 import { formatSearchCompareResult } from "./formatters.search";
 import {
@@ -13,7 +13,7 @@ import { handleToolError } from "./tool-error";
 
 export function registerCoreTools(
   server: McpServer,
-  service: PodcastService,
+  service: DocumentService,
   maxResponseChars: number
 ): void {
   server.registerTool(
@@ -37,7 +37,7 @@ export function registerCoreTools(
           limit: params.limit ?? DEFAULT_SEARCH_LIMIT,
           offset: params.offset,
           page: params.page,
-          topic: params.topic,
+          category: params.category,
           guest: params.guest,
           fromDate: params.fromDate,
           toDate: params.toDate,
@@ -111,7 +111,7 @@ export function registerCoreTools(
     },
     async (params) => {
       try {
-        const result = service.getEpisode({
+        const result = service.getDocument({
           slug: params.slug,
           guestName: params.guestName,
           section: params.section,
@@ -134,7 +134,7 @@ export function registerCoreTools(
     "get_corpus_stats",
     {
       title: "Get corpus statistics",
-      description: "Return episode count, topic count, index status, and generated timestamp.",
+      description: "Return document count, category count, index status, and generated timestamp.",
       inputSchema: GetCorpusStatsSchema,
       annotations: {
         readOnlyHint: true,

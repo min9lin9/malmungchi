@@ -49,6 +49,13 @@ curl -sS 'http://127.0.0.1:3000/corpus/sources/author:demo/export?includeHistory
 - `get_corpus_stats`
 - `get_llm_status`
 
+## Internal Shape
+
+- Core document lifecycle and search orchestration: `src/service/document-service.ts`
+- Shared document model: `src/domain/document.ts`
+- Source lifecycle and export logic: `src/service/source-operations.ts`
+- Persona, panel, room, and benchmark workflows: `skill-kit/`
+
 ## CLI And Skills
 
 The bundled CLI is exposed as `malmunchi`:

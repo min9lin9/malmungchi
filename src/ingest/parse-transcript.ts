@@ -1,5 +1,5 @@
 import matter from "gray-matter";
-import type { Episode, EpisodeMetadata } from "../domain/episode";
+import type { DocumentMetadata, DocumentRecord } from "../domain/document";
 
 function normalizeString(value: unknown): string | undefined {
   if (typeof value === "string") return value.trim() || undefined;
@@ -24,11 +24,11 @@ function normalizeStringArray(value: unknown): string[] | undefined {
   return undefined;
 }
 
-export function parseTranscriptFile(slug: string, raw: string): Episode {
+export function parseTranscriptFile(slug: string, raw: string): DocumentRecord {
   const parsed = matter(raw);
   const data = parsed.data ?? {};
 
-  const metadata: EpisodeMetadata = {
+  const metadata: DocumentMetadata = {
     guest: normalizeString(data.guest),
     title: normalizeString(data.title),
     youtube_url: normalizeString(data.youtube_url),

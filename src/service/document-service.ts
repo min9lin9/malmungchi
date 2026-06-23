@@ -1,6 +1,11 @@
 import type { Env } from "../config/env";
-import type { CorpusStats, Episode, EpisodeSectionRequest, SearchInput } from "../domain/episode";
-import { EpisodeNotFoundError, InvalidInputError } from "../domain/errors";
+import type {
+  CorpusStats,
+  DocumentRecord,
+  DocumentSectionRequest,
+  SearchInput,
+} from "../domain/document";
+import { DocumentNotFoundError, InvalidInputError } from "../domain/errors";
 import { getLlmStatus, type LlmStatus } from "../llm/llm-status";
 import type { SearchEngine } from "../search/search-engine";
 import {
@@ -9,14 +14,14 @@ import {
   type ImportAuthorResult,
 } from "./author-operations";
 import type { CorpusStore } from "./corpus-store";
-import { ImportMutations } from "./import-mutations";
 import {
   compareSearchExplanations,
+  type SearchDocumentResult,
   type SearchExplainCompareInput,
   type SearchExplainCompareResult,
-  type SearchTranscriptResult,
-  searchTranscriptsWithTiming,
-} from "./podcast-search";
+  searchDocumentsWithTiming,
+} from "./document-search";
+import { ImportMutations } from "./import-mutations";
 import type { ReadinessStatus } from "./readiness-status";
 import {
   type CompactSourceMemoryResult,
@@ -35,7 +40,7 @@ import {
 
 export type { ImportAuthorInput, ImportAuthorResult } from "./author-operations";
 
-export class PodcastService {
+export class DocumentService {
   private readonly importMutations: ImportMutations;
   private readonly authorOperations: AuthorOperations;
   private readonly sourceOperations: SourceOperations;
@@ -59,9 +64,9 @@ export class PodcastService {
   }
 
   getReadiness(): ReadinessStatus {
-    const { episodeCount, topicCount, indexedEpisodeCount } = this.store.manifest;
-    const corpusLoaded = episodeCount > 0;
-    const searchIndexLoaded = indexedEpisodeCount > 0;
+    const { documentCount, categoryCount, indexedDocumentCount } = this.store.manifest;
+    const corpusLoaded = documentCount > 0;
+    const searchIndexLoaded = indexedDocumentCount > 0;
 
     return {
       ready: corpusLoaded && searchIndexLoaded,
@@ -70,19 +75,15 @@ export class PodcastService {
         searchIndexLoaded,
       },
       stats: {
-        episodeCount,
-        topicCount,
-        indexedEpisodeCount,
+        documentCount,
+        categoryCount,
+        indexedDocumentCount,
       },
     };
   }
 
-  async searchDocuments(input: SearchInput): Promise<SearchTranscriptResult> {
-    return searchTranscriptsWithTiming(this.searchEngine, input);
-  }
-
-  async searchTranscripts(input: SearchInput): Promise<SearchTranscriptResult> {
-    return this.searchDocuments(input);
+  async searchDocuments(input: SearchInput): Promise<SearchDocumentResult> {
+    return searchDocumentsWithTiming(this.searchEngine, input);
   }
 
   async compareSearchExplanations(
@@ -91,27 +92,27 @@ export class PodcastService {
     return compareSearchExplanations(this.searchEngine, input);
   }
 
-  getEpisode(input: EpisodeSectionRequest): {
+  getDocument(input: DocumentSectionRequest): {
     slug: string;
     section: string;
     content: string;
   } {
-    const slug = this.resolveEpisodeSlug(input);
-    const episode = this.store.getEpisode(slug);
-    if (!episode) {
-      throw new EpisodeNotFoundError(input.slug ?? input.guestName ?? "unknown");
+    const slug = this.resolveDocumentSlug(input);
+    const document = this.store.getDocument(slug);
+    if (!document) {
+      throw new DocumentNotFoundError(input.slug ?? input.guestName ?? "unknown");
     }
 
     let content: string;
     switch (input.section) {
       case "metadata":
-        content = this.getMetadataSection(episode);
+        content = this.getMetadataSection(document);
         break;
       case "summary":
-        content = this.getSummarySection(episode);
+        content = this.getSummarySection(document);
         break;
       case "full":
-        content = episode.content;
+        content = document.content;
         break;
       default:
         throw new InvalidInputError(`Unknown section: ${input.section}`);
@@ -120,14 +121,14 @@ export class PodcastService {
     return { slug, section: input.section, content };
   }
 
-  findEpisodeByGuestName(guestName: string): Episode | undefined {
+  findDocumentByGuestName(guestName: string): DocumentRecord | undefined {
     const normalized = guestName.toLowerCase();
-    for (const episode of this.store.allEpisodes) {
-      if (episode.metadata.guest?.toLowerCase().includes(normalized)) {
-        return episode;
+    for (const document of this.store.allDocuments) {
+      if (document.metadata.guest?.toLowerCase().includes(normalized)) {
+        return document;
       }
-      if (episode.slug.includes(normalized.replace(/\s+/g, "-"))) {
-        return episode;
+      if (document.slug.includes(normalized.replace(/\s+/g, "-"))) {
+        return document;
       }
     }
     return undefined;
@@ -173,17 +174,17 @@ export class PodcastService {
     return this.sourceOperations.deleteSource(sourceId);
   }
 
-  private resolveEpisodeSlug(input: EpisodeSectionRequest): string {
+  private resolveDocumentSlug(input: DocumentSectionRequest): string {
     if (input.slug) return input.slug;
     if (input.guestName) {
-      const episode = this.findEpisodeByGuestName(input.guestName);
-      if (episode) return episode.slug;
+      const document = this.findDocumentByGuestName(input.guestName);
+      if (document) return document.slug;
     }
-    throw new EpisodeNotFoundError(input.slug ?? input.guestName ?? "unknown");
+    throw new DocumentNotFoundError(input.slug ?? input.guestName ?? "unknown");
   }
 
-  private getMetadataSection(episode: Episode): string {
-    const lines = episode.content.split("\n");
+  private getMetadataSection(document: DocumentRecord): string {
+    const lines = document.content.split("\n");
     const transcriptHeader = lines.findIndex((l) => l.trim().startsWith("## Transcript"));
     if (transcriptHeader >= 0) {
       return lines.slice(0, transcriptHeader).join("\n").trim();
@@ -191,8 +192,8 @@ export class PodcastService {
     return lines.slice(0, 50).join("\n");
   }
 
-  private getSummarySection(episode: Episode): string {
-    const lines = episode.content.split("\n");
+  private getSummarySection(document: DocumentRecord): string {
+    const lines = document.content.split("\n");
     return lines.slice(0, 200).join("\n");
   }
 }

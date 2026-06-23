@@ -6,8 +6,8 @@ import type { createHttpApp } from "../src/http/app";
 
 export async function makePrototypeDataDir(prefix: string): Promise<string> {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), prefix));
-  await fs.mkdir(path.join(dir, "episodes"), { recursive: true });
-  await fs.mkdir(path.join(dir, "topics"), { recursive: true });
+  await fs.mkdir(path.join(dir, "documents"), { recursive: true });
+  await fs.mkdir(path.join(dir, "categories"), { recursive: true });
   await fs.mkdir(path.join(dir, "imports"), { recursive: true });
   return dir;
 }

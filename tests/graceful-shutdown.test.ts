@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createHttpApp } from "../src/http/app";
 import { startHttpTransport } from "../src/transports/http";
-import { buildFixturePodcastService } from "./helpers/build-fixture-service";
+import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
 async function testLockPath(): Promise<string> {
   return join(await mkdtemp(join(tmpdir(), "corpus-http-lock-")), "server.lock");
@@ -12,7 +12,7 @@ async function testLockPath(): Promise<string> {
 
 describe("graceful shutdown", () => {
   it("starts and stops HTTP server", async () => {
-    const service = await buildFixturePodcastService();
+    const service = await buildFixtureDocumentService();
     const app = createHttpApp(service);
     const stop = await startHttpTransport(app, 0, "127.0.0.1", await testLockPath());
 
@@ -23,7 +23,7 @@ describe("graceful shutdown", () => {
   });
 
   it("rejects a second HTTP server while one is running", async () => {
-    const service = await buildFixturePodcastService();
+    const service = await buildFixtureDocumentService();
     const lockPath = await testLockPath();
     const stop = await startHttpTransport(createHttpApp(service), 0, "127.0.0.1", lockPath);
     let secondStop: (() => Promise<void>) | undefined;

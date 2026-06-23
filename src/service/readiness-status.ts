@@ -1,4 +1,4 @@
-import type { CorpusStats } from "../domain/episode";
+import type { CorpusStats } from "../domain/document";
 
 export interface ReadinessStatus {
   ready: boolean;
@@ -6,5 +6,5 @@ export interface ReadinessStatus {
     corpusLoaded: boolean;
     searchIndexLoaded: boolean;
   };
-  stats: Pick<CorpusStats, "episodeCount" | "topicCount" | "indexedEpisodeCount">;
+  stats: Pick<CorpusStats, "documentCount" | "categoryCount" | "indexedDocumentCount">;
 }

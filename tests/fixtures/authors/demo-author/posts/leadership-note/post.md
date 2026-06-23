@@ -1,7 +1,7 @@
 ---
 {
   "author_id": "demo-author",
-  "episode_slug": "leadership-note",
+  "document_slug": "leadership-note",
   "slug": "author:demo-author:leadership-note",
   "title": "Leadership Note",
   "source_url": "fixture:leadership-note.md",

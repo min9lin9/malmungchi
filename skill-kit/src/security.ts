@@ -29,12 +29,12 @@ export function redactSecrets(text: string): string {
     .replace(/\/\/([^:\s]+):([^@\s]+)@/g, "//<redacted>:<redacted>@");
 }
 
-export function safeTopicSlug(topic: string): string {
-  if (/(\.\.|[/\\\p{Cc}])/u.test(topic)) {
-    throw new Error(`Unsafe topic: ${topic}`);
+export function safeCategorySlug(category: string): string {
+  if (/(\.\.|[/\\\p{Cc}])/u.test(category)) {
+    throw new Error(`Unsafe category: ${category}`);
   }
-  const slug = topic.trim().replace(/\s+/g, "-");
-  if (!slug) throw new Error("Unsafe topic: empty");
+  const slug = category.trim().replace(/\s+/g, "-");
+  if (!slug) throw new Error("Unsafe category: empty");
   return slug;
 }
 

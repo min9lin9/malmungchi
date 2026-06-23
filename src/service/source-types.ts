@@ -1,4 +1,4 @@
-import type { Episode } from "../domain/episode";
+import type { DocumentRecord } from "../domain/document";
 import type { SourceMemoryEvent, SourceMemorySummary } from "../source/source-memory";
 import type { ImportMutationResult } from "./import-mutations";
 
@@ -147,11 +147,11 @@ export interface CompactSourceMemoryResult extends SourceMemoryCompactionRecord 
   readonly compacted: true;
 }
 
-export function getSourceId(episode: Episode): string {
-  if (episode.metadata.source === "author") {
-    return `author:${episode.metadata.authorId ?? episode.slug.split(":")[1] ?? "unknown"}`;
+export function getSourceId(document: DocumentRecord): string {
+  if (document.metadata.source === "author") {
+    return `author:${document.metadata.authorId ?? document.slug.split(":")[1] ?? "unknown"}`;
   }
-  return `author:${episode.metadata.authorId ?? episode.slug.split(":")[1] ?? "unknown"}`;
+  return `author:${document.metadata.authorId ?? document.slug.split(":")[1] ?? "unknown"}`;
 }
 
 export function getSourceType(sourceId: string): SourceType {
