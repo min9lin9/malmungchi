@@ -1,5 +1,7 @@
 # Malmungchi
 
+[한국어 README](./README.ko.md)
+
 Malmungchi is a local document memory server and persona workflow kit for Codex.
 It imports user-provided Markdown or JSONL author sources, searches them through
 MCP or HTTP, exports evidence bundles with provenance, and uses those exports to
