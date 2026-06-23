@@ -13,13 +13,13 @@ import {
 } from "./formatters.sources";
 import {
   CompactSourceMemorySchema,
-  CorpusImportAuthorSchema,
   DeleteSourceSchema,
   ExportSourceSchema,
   GetLlmStatusSchema,
   GetSourceHistorySchema,
   GetSourceSchema,
   GetSourceStatusSchema,
+  ImportAuthorSchema,
   ListSourcesSchema,
   RefreshSourceSchema,
 } from "./schemas";
@@ -33,7 +33,7 @@ export function registerSourceTools(
   server.registerTool(
     "list_sources",
     {
-      title: "List corpus sources",
+      title: "List malmunchi sources",
       description: "List imported document sources currently loaded in Malmunchi.",
       inputSchema: ListSourcesSchema,
       annotations: {
@@ -56,7 +56,7 @@ export function registerSourceTools(
   server.registerTool(
     "get_source",
     {
-      title: "Inspect a corpus source",
+      title: "Inspect a malmunchi source",
       description: "Inspect one source and list the documents it contributes.",
       inputSchema: GetSourceSchema,
       annotations: {
@@ -105,7 +105,7 @@ export function registerSourceTools(
       title: "Import an author source",
       description:
         "Import a server-local or inline Markdown/JSONL source as author documents and add them to search.",
-      inputSchema: CorpusImportAuthorSchema,
+      inputSchema: ImportAuthorSchema,
       annotations: {
         readOnlyHint: false,
         destructiveHint: false,
@@ -133,7 +133,7 @@ export function registerSourceTools(
   server.registerTool(
     "refresh_source",
     {
-      title: "Refresh a mutable corpus source",
+      title: "Refresh a mutable malmunchi source",
       description: "Re-import a stored author source and update search/manifest state.",
       inputSchema: RefreshSourceSchema,
       annotations: {
@@ -185,7 +185,7 @@ export function registerSourceTools(
     "get_source_status",
     {
       title: "Read source status",
-      description: "Read active document count and source-memory health for a corpus source.",
+      description: "Read active document count and source-memory health for a malmunchi source.",
       inputSchema: GetSourceStatusSchema,
       annotations: {
         readOnlyHint: true,
@@ -208,8 +208,8 @@ export function registerSourceTools(
   server.registerTool(
     "export_source",
     {
-      title: "Export a corpus source",
-      description: "Export source metadata and document content from the loaded corpus.",
+      title: "Export a malmunchi source",
+      description: "Export source metadata and document content from the loaded malmunchi.",
       inputSchema: ExportSourceSchema,
       annotations: {
         readOnlyHint: true,
@@ -235,7 +235,7 @@ export function registerSourceTools(
     "get_source_history",
     {
       title: "Read source history",
-      description: "Read import, refresh, and delete events recorded for a corpus source.",
+      description: "Read import, refresh, and delete events recorded for a malmunchi source.",
       inputSchema: GetSourceHistorySchema,
       annotations: {
         readOnlyHint: true,
@@ -258,7 +258,7 @@ export function registerSourceTools(
   server.registerTool(
     "delete_source",
     {
-      title: "Delete a mutable corpus source",
+      title: "Delete a mutable malmunchi source",
       description: "Delete an imported author source from storage, manifest, and search.",
       inputSchema: DeleteSourceSchema,
       annotations: {

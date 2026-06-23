@@ -1,7 +1,7 @@
 import { z } from "zod";
-import type { CorpusManifest } from "./document";
+import type { MalmunchiManifest } from "./document";
 
-export const CorpusManifestSchema = z.object({
+export const MalmunchiManifestSchema = z.object({
   name: z.string(),
   generatedAt: z.string(),
   documentCount: z.number().int().nonnegative(),
@@ -14,10 +14,10 @@ export const CorpusManifestSchema = z.object({
   categorySlugs: z.array(z.string()),
   documentHashes: z.record(z.string()),
   categoryHashes: z.record(z.string()),
-}) satisfies z.ZodType<CorpusManifest>;
+}) satisfies z.ZodType<MalmunchiManifest>;
 
-export function parseManifest(raw: unknown): CorpusManifest | null {
-  const result = CorpusManifestSchema.safeParse(raw);
+export function parseManifest(raw: unknown): MalmunchiManifest | null {
+  const result = MalmunchiManifestSchema.safeParse(raw);
   if (!result.success) {
     return null;
   }

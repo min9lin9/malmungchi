@@ -1,11 +1,11 @@
 ---
-name: corpus
+name: malmunchi
 description: Use Malmunchi for local source storage, search, lifecycle export, author-source generation, personas, persona benchmarks, panels, and rooms.
 ---
 
-# Malmunchi Corpus Skill
+# Malmunchi Skill
 
-Use this skill when the user mentions Malmunchi, `/corpus`, source import/export,
+Use this skill when the user mentions Malmunchi, `/malmunchi`, source import/export,
 source-backed personas, persona benchmarks, panel debate, or room debate.
 
 Local install:

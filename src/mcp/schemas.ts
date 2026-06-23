@@ -46,7 +46,7 @@ export const GetDocumentSchema = z.object({
     .describe("Which section to return"),
 });
 
-export const GetCorpusStatsSchema = z.object({});
+export const GetMalmunchiStatsSchema = z.object({});
 export const ListSourcesSchema = z.object({});
 
 export const GetSourceSchema = z.object({
@@ -91,7 +91,7 @@ export const GetSourceStatusSchema = z.object({
   sourceId: z.string().min(1).describe('Source ID to inspect status for, e.g. "author:demo"'),
 });
 
-export const CorpusImportAuthorSchema = z
+export const ImportAuthorSchema = z
   .object({
     filePath: z.string().min(1).optional().describe("Server-local markdown or JSONL file path"),
     fileContent: z.string().min(1).optional().describe("Inline markdown or JSONL content"),
@@ -134,12 +134,12 @@ export const CompareSearchExplainSchema = z.object({
 
 export type SearchDocumentsInput = z.infer<typeof SearchDocumentsSchema>;
 export type GetDocumentInput = z.infer<typeof GetDocumentSchema>;
-export type GetCorpusStatsInput = z.infer<typeof GetCorpusStatsSchema>;
+export type GetMalmunchiStatsInput = z.infer<typeof GetMalmunchiStatsSchema>;
 export type ExportSourceInput = z.infer<typeof ExportSourceSchema>;
 export type CompactSourceMemoryInput = z.infer<typeof CompactSourceMemorySchema>;
 export type GetSourceHistoryInput = z.infer<typeof GetSourceHistorySchema>;
 export type GetSourceStatusInput = z.infer<typeof GetSourceStatusSchema>;
 export type RefreshSourceInput = z.infer<typeof RefreshSourceSchema>;
-export type CorpusImportAuthorInput = z.infer<typeof CorpusImportAuthorSchema>;
+export type ImportAuthorInput = z.infer<typeof ImportAuthorSchema>;
 export type GetLlmStatusInput = z.infer<typeof GetLlmStatusSchema>;
 export type CompareSearchExplainInput = z.infer<typeof CompareSearchExplainSchema>;

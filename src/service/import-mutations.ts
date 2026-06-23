@@ -1,9 +1,9 @@
-import { authorPostToDocument } from "../author/corpus/author-to-document";
+import { authorPostToDocument } from "../author/document/author-to-document";
 import type { AuthorPost } from "../author/domain/author-post";
 import type { DocumentRecord } from "../domain/document";
 import { writeManifest } from "../ingest/build-manifest";
 import type { SearchEngine } from "../search/search-engine";
-import type { CorpusStore } from "./corpus-store";
+import type { DocumentStore } from "./document-store";
 
 export interface ImportMutationResult {
   added: number;
@@ -36,7 +36,7 @@ export type ImportMutationOptions = { readonly dryRun?: boolean };
 
 export class ImportMutations {
   constructor(
-    private readonly store: CorpusStore,
+    private readonly store: DocumentStore,
     private readonly searchEngine: SearchEngine,
     private readonly manifestPath?: string
   ) {}

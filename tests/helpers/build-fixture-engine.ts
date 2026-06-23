@@ -1,16 +1,16 @@
 import path from "node:path";
 import { buildDocumentCategoryIndex } from "../../src/ingest/build-index";
 import { enrichCategoryIndex } from "../../src/ingest/enrich-categories";
-import { loadCorpus } from "../../src/ingest/load-corpus";
+import { loadDocuments } from "../../src/ingest/load-documents";
 import { FlexSearchEngine } from "../../src/search/flexsearch-engine";
 
 const FIXTURE_DIR = path.join(import.meta.dir, "..", "fixtures");
 
 export async function buildFixtureEngine() {
-  const corpus = await loadCorpus(FIXTURE_DIR);
-  const baseIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
-  const index = enrichCategoryIndex(corpus.documents, corpus.categories, baseIndex);
+  const malmunchi = await loadDocuments(FIXTURE_DIR);
+  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const index = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
   const engine = new FlexSearchEngine();
-  await engine.build(corpus.documents, index.documentToCategories);
+  await engine.build(malmunchi.documents, index.documentToCategories);
   return engine;
 }

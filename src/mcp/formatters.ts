@@ -1,4 +1,4 @@
-import type { CorpusStats, SearchResult } from "../domain/document";
+import type { MalmunchiStats, SearchResult } from "../domain/document";
 import type { LlmStatus } from "../llm/llm-status";
 import type { ImportAuthorResult } from "../service/document-service";
 
@@ -91,9 +91,9 @@ export function formatDocument(
   return output;
 }
 
-export function formatCorpusStats(stats: CorpusStats): string {
+export function formatMalmunchiStats(stats: MalmunchiStats): string {
   const lines = [
-    `# Corpus Stats: ${stats.name}`,
+    `# Malmunchi Stats: ${stats.name}`,
     "",
     `- Documents: ${stats.documentCount}`,
     `- Categories: ${stats.categoryCount}`,

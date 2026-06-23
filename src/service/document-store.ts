@@ -1,12 +1,12 @@
-import type { Category, CorpusManifest, DocumentRecord } from "../domain/document";
+import type { Category, DocumentRecord, MalmunchiManifest } from "../domain/document";
 import type { DocumentCategoryIndex } from "../ingest/build-index";
 
-export class CorpusStore {
+export class DocumentStore {
   constructor(
     public documents: Map<string, DocumentRecord>,
     public categories: Map<string, Category>,
     public categoryIndex: DocumentCategoryIndex,
-    public manifest: CorpusManifest
+    public manifest: MalmunchiManifest
   ) {}
 
   getDocument(slug: string): DocumentRecord | undefined {

@@ -5,8 +5,8 @@ It imports user-provided Markdown or JSONL author sources, searches them through
 MCP or HTTP, exports evidence bundles with provenance, and uses those exports to
 generate bounded simulated personas.
 
-This repository does not include private corpora, private evidence, generated
-caches, or provider credentials.
+This repository does not include private document collections, private evidence,
+generated caches, or provider credentials.
 
 ## Quickstart
 
@@ -20,7 +20,7 @@ bun run start:http
 Import a source:
 
 ```bash
-curl -sS -X POST http://127.0.0.1:3000/corpus/import-author \
+curl -sS -X POST http://127.0.0.1:3000/malmunchi/import-author \
   -H 'content-type: application/json' \
   -d '{"authorId":"demo","fileName":"note.md","fileContent":"# Product Note\n\nCustomer interviews guide planning."}'
 ```
@@ -29,7 +29,7 @@ Search and export:
 
 ```bash
 curl -sS 'http://127.0.0.1:3000/search?q=customer&limit=3'
-curl -sS 'http://127.0.0.1:3000/corpus/sources/author:demo/export?includeHistory=true'
+curl -sS 'http://127.0.0.1:3000/malmunchi/sources/author:demo/export?includeHistory=true'
 ```
 
 ## MCP Tools
@@ -46,7 +46,7 @@ curl -sS 'http://127.0.0.1:3000/corpus/sources/author:demo/export?includeHistory
 - `export_source`
 - `get_source_history`
 - `delete_source`
-- `get_corpus_stats`
+- `get_malmunchi_stats`
 - `get_llm_status`
 
 ## Internal Shape
@@ -78,11 +78,11 @@ bun run benchmark:persona --fixture fixtures/persona-benchmark --out /tmp/malmun
 
 ## Environment
 
-- `CORPUS_TRANSPORT`: `stdio` or `http`
-- `CORPUS_DATA_DIR`: local storage directory, default `./data`
-- `CORPUS_IMPORT_DIR`: allowed local import root
-- `CORPUS_API_KEY`: optional bearer token for HTTP routes except health
-- `CORPUS_SEARCH_ENGINE`: `flexsearch` or `meilisearch`
+- `MALMUNCHI_TRANSPORT`: `stdio` or `http`
+- `MALMUNCHI_DATA_DIR`: local storage directory, default `./data`
+- `MALMUNCHI_IMPORT_DIR`: allowed local import root
+- `MALMUNCHI_API_KEY`: optional bearer token for HTTP routes except health
+- `MALMUNCHI_SEARCH_ENGINE`: `flexsearch` or `meilisearch`
 - `EMBED_PROVIDER`: `openai` or `kimi`
 - `EMBED_MODEL`: embedding model name
 

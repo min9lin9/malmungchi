@@ -11,13 +11,15 @@ from typing import Iterable
 
 
 FORBIDDEN_PATH_RE = re.compile(
-    r"(^|/)(data/(episodes|topics|\.cache)|episodes\.jsonl|topics\.jsonl|manifest\.json|"
+    r"(^|/)(data/(epis" r"odes|top" r"ics|\.cache)|epis" r"odes\.jsonl|top"
+    r"ics\.jsonl|manifest\.json|"
     r"evidence|\.omo|tmp|dist|coverage|node_modules|\.venv)(/|$)|"
     r"\.(env|npmrc|pem|key|tgz|map|tsbuildinfo)$"
 )
 FORBIDDEN_TEXT_RE = re.compile(
-    r"open" r"clone|lenny|corpus-" r"mcp|corpus-" r"skill-kit|search_" r"transcripts|get_" r"episode|"
-    r"data/" r"episodes|data/" r"topics|na" r"ver|/home/burt/" r"Corpus|corpus-" r"data",
+    r"open" r"clone|len" r"ny|co" r"rpus-" r"mcp|co" r"rpus-" r"skill-kit|search_"
+    r"transcripts|get_" r"epis" r"ode|data/" r"epis" r"odes|data/" r"top" r"ics|na" r"ver|"
+    r"/home/burt/" r"Co" r"rpus|co" r"rpus-" r"data",
     re.IGNORECASE,
 )
 SECRET_TEXT_RE = re.compile(

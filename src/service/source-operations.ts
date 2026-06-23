@@ -2,7 +2,7 @@ import type { Env } from "../config/env";
 import type { DocumentRecord } from "../domain/document";
 import { InvalidInputError } from "../domain/errors";
 import { SourceMemory, type SourceMemorySummary } from "../source/source-memory";
-import type { CorpusStore } from "./corpus-store";
+import type { DocumentStore } from "./document-store";
 import type { ImportMutations } from "./import-mutations";
 import { toCompactSourceMemoryResult, toPublicCompaction } from "./source-compaction-public";
 import { buildSourceExportResult } from "./source-export-result";
@@ -11,7 +11,6 @@ import { assertMutableSourceId, assertSourceId } from "./source-id";
 import { normalizeRefreshInput, refreshMutableSource } from "./source-refresh";
 import {
   type CompactSourceMemoryResult,
-  type CorpusSource,
   type DeleteSourceResult,
   type ExportSourceInput,
   type ExportSourceResult,
@@ -19,6 +18,7 @@ import {
   getSourceType,
   type RefreshSourceInput,
   type RefreshSourceResult,
+  type Source,
   type SourceDetail,
   type SourceHistoryInput,
   type SourceHistoryResult,
@@ -27,12 +27,12 @@ import {
 
 export type {
   CompactSourceMemoryResult,
-  CorpusSource,
   DeleteSourceResult,
   ExportSourceInput,
   ExportSourceResult,
   RefreshSourceInput,
   RefreshSourceResult,
+  Source,
   SourceDetail,
   SourceHistoryInput,
   SourceHistoryResult,
@@ -43,14 +43,14 @@ export class SourceOperations {
   private readonly memory?: SourceMemory;
 
   constructor(
-    private readonly store: CorpusStore,
+    private readonly store: DocumentStore,
     private readonly importMutations: ImportMutations,
     private readonly env?: Env
   ) {
     this.memory = env ? SourceMemory.fromDataDir(env.dataDir) : undefined;
   }
 
-  async listSources(): Promise<CorpusSource[]> {
+  async listSources(): Promise<Source[]> {
     const memory = await this.memory?.summarize();
     const grouped = this.groupEpisodesBySource();
     return Array.from(grouped.entries())
@@ -216,7 +216,7 @@ export class SourceOperations {
     sourceId: string,
     documents: readonly DocumentRecord[],
     memory?: SourceMemorySummary
-  ): CorpusSource {
+  ): Source {
     return {
       id: sourceId,
       type: getSourceType(sourceId),

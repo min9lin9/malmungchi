@@ -1,8 +1,8 @@
 import type { Env } from "../config/env";
 import type {
-  CorpusStats,
   DocumentRecord,
   DocumentSectionRequest,
+  MalmunchiStats,
   SearchInput,
 } from "../domain/document";
 import { DocumentNotFoundError, InvalidInputError } from "../domain/errors";
@@ -13,7 +13,6 @@ import {
   type ImportAuthorInput,
   type ImportAuthorResult,
 } from "./author-operations";
-import type { CorpusStore } from "./corpus-store";
 import {
   compareSearchExplanations,
   type SearchDocumentResult,
@@ -21,16 +20,17 @@ import {
   type SearchExplainCompareResult,
   searchDocumentsWithTiming,
 } from "./document-search";
+import type { DocumentStore } from "./document-store";
 import { ImportMutations } from "./import-mutations";
 import type { ReadinessStatus } from "./readiness-status";
 import {
   type CompactSourceMemoryResult,
-  type CorpusSource,
   type DeleteSourceResult,
   type ExportSourceInput,
   type ExportSourceResult,
   type RefreshSourceInput,
   type RefreshSourceResult,
+  type Source,
   type SourceDetail,
   type SourceHistoryInput,
   type SourceHistoryResult,
@@ -46,7 +46,7 @@ export class DocumentService {
   private readonly sourceOperations: SourceOperations;
 
   constructor(
-    private readonly store: CorpusStore,
+    private readonly store: DocumentStore,
     private readonly searchEngine: SearchEngine,
     private readonly env?: Env
   ) {
@@ -59,19 +59,19 @@ export class DocumentService {
 
   stopSubscriptions(): void {}
 
-  getStats(): CorpusStats {
+  getStats(): MalmunchiStats {
     return { ...this.store.manifest };
   }
 
   getReadiness(): ReadinessStatus {
     const { documentCount, categoryCount, indexedDocumentCount } = this.store.manifest;
-    const corpusLoaded = documentCount > 0;
+    const documentsLoaded = documentCount > 0;
     const searchIndexLoaded = indexedDocumentCount > 0;
 
     return {
-      ready: corpusLoaded && searchIndexLoaded,
+      ready: documentsLoaded && searchIndexLoaded,
       checks: {
-        corpusLoaded,
+        documentsLoaded,
         searchIndexLoaded,
       },
       stats: {
@@ -142,7 +142,7 @@ export class DocumentService {
     return this.authorOperations.importAuthor(input);
   }
 
-  async listSources(): Promise<CorpusSource[]> {
+  async listSources(): Promise<Source[]> {
     return this.sourceOperations.listSources();
   }
 

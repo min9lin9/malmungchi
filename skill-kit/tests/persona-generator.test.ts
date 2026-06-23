@@ -33,12 +33,12 @@ test("empty source produces bounded persona without fabricated claims", async ()
   expect(persona.caveats[0]).toContain("No source evidence");
 });
 
-test("corpus backed persona uses exported author evidence", async () => {
-  const out = await mkdtemp(join(tmpdir(), "persona-corpus-"));
+test("malmunchi backed persona uses exported author evidence", async () => {
+  const out = await mkdtemp(join(tmpdir(), "persona-malmunchi-"));
   const originalFetch = globalThis.fetch;
   globalThis.fetch = Object.assign(
     async (input: string | URL | Request) => {
-      expect(String(input)).toContain("/corpus/sources/author%3Ademo/export");
+      expect(String(input)).toContain("/malmunchi/sources/author%3Ademo/export");
       return new Response(
         JSON.stringify({
           documents: [
@@ -56,7 +56,7 @@ test("corpus backed persona uses exported author evidence", async () => {
   );
   try {
     const persona = await generatePersona({
-      corpusUrl: "http://127.0.0.1:3000",
+      malmunchiUrl: "http://127.0.0.1:3000",
       authorId: "demo",
       provider: "fake",
       out: join(out, "p.json"),

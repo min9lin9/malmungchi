@@ -56,11 +56,11 @@ export async function assertRootBoundPath(root: string, candidate: string): Prom
   return fullReal;
 }
 
-export function assertLocalCorpusUrl(urlText: string, allowRemote: boolean): URL {
+export function assertLocalMalmunchiUrl(urlText: string, allowRemote: boolean): URL {
   const url = new URL(urlText);
   const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
   if (!allowRemote && !localHosts.has(url.hostname)) {
-    throw new Error(`Remote Corpus URL requires --allow-remote-corpus: ${url.origin}`);
+    throw new Error(`Remote Malmunchi URL requires --allow-remote-malmunchi: ${url.origin}`);
   }
   return url;
 }

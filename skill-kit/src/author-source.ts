@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { loadElements } from "./provenance.ts";
-import { assertLocalCorpusUrl, redactSecrets } from "./security.ts";
+import { assertLocalMalmunchiUrl, redactSecrets } from "./security.ts";
 
 export async function generateAuthorJsonl(
   workspace: string,
@@ -34,11 +34,11 @@ export async function generateAuthorJsonl(
 export async function importAuthorHttp(options: {
   authorId: string;
   fileContent: string;
-  corpusUrl: string;
+  malmunchiUrl: string;
   allowRemote: boolean;
 }): Promise<unknown> {
-  const url = assertLocalCorpusUrl(options.corpusUrl, options.allowRemote);
-  const response = await fetch(new URL("/corpus/import-author", url), {
+  const url = assertLocalMalmunchiUrl(options.malmunchiUrl, options.allowRemote);
+  const response = await fetch(new URL("/malmunchi/import-author", url), {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -50,7 +50,7 @@ export async function importAuthorHttp(options: {
   });
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Corpus import failed ${response.status}: ${redactSecrets(text)}`);
+    throw new Error(`Malmunchi import failed ${response.status}: ${redactSecrets(text)}`);
   }
   const parsed: unknown = JSON.parse(text);
   return parsed;

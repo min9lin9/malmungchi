@@ -3,7 +3,7 @@ import { legacyEnvName } from "../config/env-names";
 const PUBLIC_PATHS = new Set(["/health", "/health/ready"]);
 
 function getApiKey(): string | undefined {
-  return process.env.CORPUS_API_KEY ?? process.env[legacyEnvName("API_KEY")];
+  return process.env.MALMUNCHI_API_KEY ?? process.env[legacyEnvName("API_KEY")];
 }
 
 export function checkApiKey(

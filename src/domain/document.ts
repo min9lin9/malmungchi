@@ -78,7 +78,7 @@ export interface SearchResult {
   rankingSignals?: RankingSignals;
 }
 
-export interface CorpusStats {
+export interface MalmunchiStats {
   name: string;
   generatedAt: string;
   documentCount: number;
@@ -93,7 +93,7 @@ export interface CorpusStats {
   categoryHashes: Record<string, string>;
 }
 
-export interface CorpusManifest extends CorpusStats {}
+export interface MalmunchiManifest extends MalmunchiStats {}
 
 export interface DocumentSectionRequest {
   slug?: string;

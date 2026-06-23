@@ -1,22 +1,22 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { evaluatePersonaBenchmark } from "../persona-benchmark.ts";
-import { evaluateCorpusPersonaQuality } from "../persona-quality-benchmark.ts";
+import { type BenchmarkDimension, evaluatePersonaBenchmark } from "../persona-benchmark.ts";
+import { evaluateMalmunchiPersonaQuality } from "../persona-quality-benchmark.ts";
 import { arg, has } from "./args.ts";
 
 export async function handleBenchmarkCommand(command: string): Promise<boolean> {
   if (command !== "benchmark:persona") return false;
   const fixture = arg("--fixture", "fixtures/persona-benchmark") ?? "fixtures/persona-benchmark";
-  const corpusUrl = arg("--corpus-url");
+  const malmunchiUrl = arg("--malmunchi-url");
   const authorId = arg("--author-id");
   const out = arg("--out");
   const markdown = arg("--markdown");
   if (!out) throw new Error("Usage: skill-kit benchmark:persona --fixture <dir> --out <json>");
-  const report = corpusUrl
-    ? await evaluateCorpusPersonaQuality({
-        corpusUrl,
+  const report = malmunchiUrl
+    ? await evaluateMalmunchiPersonaQuality({
+        malmunchiUrl,
         authorId: authorId ?? missingAuthorId(),
-        allowRemote: has("--allow-remote-corpus"),
+        allowRemote: has("--allow-remote-malmunchi"),
       })
     : await evaluatePersonaBenchmark(fixture);
   await mkdir(dirname(out), { recursive: true });
@@ -33,16 +33,20 @@ export async function handleBenchmarkCommand(command: string): Promise<boolean> 
 function renderBenchmarkMarkdown(
   report:
     | Awaited<ReturnType<typeof evaluatePersonaBenchmark>>
-    | Awaited<ReturnType<typeof evaluateCorpusPersonaQuality>>
+    | Awaited<ReturnType<typeof evaluateMalmunchiPersonaQuality>>
 ): string {
-  const rows = Object.entries(report.dimensions).map(
-    ([name, dimension]) => `- ${name}: ${dimension.pass ? "PASS" : "FAIL"} (${dimension.score})`
+  const rows = Object.entries(report.dimensions).map(([name, dimension]) =>
+    renderDimension(name, dimension)
   );
   return ["# Persona Benchmark", "", ...rows, ""].join("\n");
 }
 
+function renderDimension(name: string, dimension: BenchmarkDimension): string {
+  return `- ${name}: ${dimension.pass ? "PASS" : "FAIL"} (${dimension.score})`;
+}
+
 function missingAuthorId(): never {
   throw new Error(
-    "Usage: skill-kit benchmark:persona --corpus-url <url> --author-id <id> --out <json>"
+    "Usage: skill-kit benchmark:persona --malmunchi-url <url> --author-id <id> --out <json>"
   );
 }

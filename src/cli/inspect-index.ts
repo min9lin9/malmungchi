@@ -1,4 +1,4 @@
-import { loadCorpusAndManifest } from "../bootstrap";
+import { loadDocumentsAndManifest } from "../bootstrap";
 import { env } from "../config/env";
 import { buildDocumentCategoryIndex } from "../ingest/build-index";
 import { enrichCategoryIndex } from "../ingest/enrich-categories";
@@ -8,14 +8,18 @@ import { logger } from "../util/logger";
 async function main() {
   logger.info(`Inspecting index in ${env.dataDir}...`);
 
-  const { corpus, manifest } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
+  const { malmunchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
-  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const categoryIndex = enrichCategoryIndex(
+    malmunchi.documents,
+    malmunchi.categories,
+    baseCategoryIndex
+  );
   const engine = new FlexSearchEngine();
-  await engine.build(corpus.documents, categoryIndex.documentToCategories);
+  await engine.build(malmunchi.documents, categoryIndex.documentToCategories);
 
-  const documentsWithoutCategories = corpus.documents.filter(
+  const documentsWithoutCategories = malmunchi.documents.filter(
     (e: { slug: string }) => (categoryIndex.documentToCategories.get(e.slug)?.length ?? 0) === 0
   );
 
@@ -27,8 +31,8 @@ async function main() {
     JSON.stringify(
       {
         manifest,
-        documents: corpus.documents.length,
-        categories: corpus.categories.length,
+        documents: malmunchi.documents.length,
+        categories: malmunchi.categories.length,
         documentsWithoutCategories: documentsWithoutCategories.length,
         topCategories: categoryDocumentCounts.slice(0, 10),
         bottomCategories: categoryDocumentCounts.slice(-10),

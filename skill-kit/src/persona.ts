@@ -8,7 +8,7 @@ import {
   loadElements,
   validatePersonaProvenance,
 } from "./provenance.ts";
-import { assertLocalCorpusUrl, redactSecrets } from "./security.ts";
+import { assertLocalMalmunchiUrl, redactSecrets } from "./security.ts";
 import type { Persona } from "./types.ts";
 
 export async function generatePersona(options: {
@@ -17,15 +17,15 @@ export async function generatePersona(options: {
   provider: ProviderName;
   out: string;
   markdown?: string;
-  corpusUrl?: string;
-  allowRemoteCorpus?: boolean;
+  malmunchiUrl?: string;
+  allowRemoteMalmunchi?: boolean;
 }): Promise<Persona> {
   const provider = createProvider(options.provider);
-  const chunks = options.corpusUrl
-    ? await loadCorpusChunks({
-        corpusUrl: options.corpusUrl,
+  const chunks = options.malmunchiUrl
+    ? await loadDocumentsChunks({
+        malmunchiUrl: options.malmunchiUrl,
         authorId: options.authorId,
-        allowRemote: options.allowRemoteCorpus ?? false,
+        allowRemote: options.allowRemoteMalmunchi ?? false,
       })
     : chunkElements(options.source ? await loadElements(options.source).catch(() => []) : []).slice(
         0,
@@ -69,26 +69,26 @@ export async function generatePersona(options: {
   return persona;
 }
 
-async function loadCorpusChunks(options: {
-  corpusUrl: string;
+async function loadDocumentsChunks(options: {
+  malmunchiUrl: string;
   authorId: string;
   allowRemote: boolean;
 }) {
-  const url = assertLocalCorpusUrl(options.corpusUrl, options.allowRemote);
+  const url = assertLocalMalmunchiUrl(options.malmunchiUrl, options.allowRemote);
   const sourceId = `author:${options.authorId}`;
-  const exportUrl = new URL(`/corpus/sources/${encodeURIComponent(sourceId)}/export`, url);
+  const exportUrl = new URL(`/malmunchi/sources/${encodeURIComponent(sourceId)}/export`, url);
   exportUrl.searchParams.set("format", "json");
   exportUrl.searchParams.set("includeHistory", "true");
   const response = await fetch(exportUrl);
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Corpus source export failed ${response.status}: ${redactSecrets(text)}`);
+    throw new Error(`Malmunchi source export failed ${response.status}: ${redactSecrets(text)}`);
   }
-  return corpusDocuments(JSON.parse(text), sourceId)
+  return malmunchiDocuments(JSON.parse(text), sourceId)
     .slice(0, 5)
     .map((document, index) => ({
       docId: document.slug,
-      elementId: `corpus-export-${index + 1}`,
+      elementId: `malmunchi-export-${index + 1}`,
       chunkId: `${document.slug}#${index + 1}`,
       text: document.content,
       sourceFile: document.sourceId,
@@ -97,7 +97,7 @@ async function loadCorpusChunks(options: {
     }));
 }
 
-function corpusDocuments(
+function malmunchiDocuments(
   value: unknown,
   sourceId: string
 ): Array<{ slug: string; content: string; sourceId: string }> {
@@ -105,7 +105,7 @@ function corpusDocuments(
   return value.documents
     .filter(isRecord)
     .map((document) => ({
-      slug: stringField(document.slug) ?? "corpus-document",
+      slug: stringField(document.slug) ?? "malmunchi-document",
       content: stringField(document.content) ?? "",
       sourceId: stringField(document.sourceId) ?? sourceId,
     }))

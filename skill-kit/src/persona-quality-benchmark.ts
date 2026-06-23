@@ -1,8 +1,8 @@
 import type { BenchmarkDimension } from "./persona-benchmark.ts";
-import { assertLocalCorpusUrl, redactSecrets } from "./security.ts";
+import { assertLocalMalmunchiUrl, redactSecrets } from "./security.ts";
 
-export interface CorpusPersonaQualityReport {
-  readonly corpusBacked: true;
+export interface MalmunchiPersonaQualityReport {
+  readonly malmunchiBacked: true;
   readonly authorId: string;
   readonly sourceId: string;
   readonly documentCount: number;
@@ -16,20 +16,20 @@ export interface CorpusPersonaQualityReport {
   };
 }
 
-export async function evaluateCorpusPersonaQuality(options: {
-  readonly corpusUrl: string;
+export async function evaluateMalmunchiPersonaQuality(options: {
+  readonly malmunchiUrl: string;
   readonly authorId: string;
   readonly allowRemote: boolean;
-}): Promise<CorpusPersonaQualityReport> {
+}): Promise<MalmunchiPersonaQualityReport> {
   const sourceId = `author:${options.authorId}`;
-  const value = await fetchCorpusSourceExport(options.corpusUrl, sourceId, {
+  const value = await fetchSourceExport(options.malmunchiUrl, sourceId, {
     allowRemote: options.allowRemote,
   });
   const documents = exportDocuments(value);
   const maybePass = (ok: boolean): BenchmarkDimension =>
     ok ? { pass: true, score: 1 } : { pass: false, score: 0 };
   const hasDocuments = documents.length > 0;
-  const allCorpusCitations = documents.every(
+  const allMalmunchiCitations = documents.every(
     (document) => document.sourceId === sourceId && document.provenanceSourceId === sourceId
   );
   const hasKorean = documents.some((document) => /[가-힣]/u.test(document.content));
@@ -43,15 +43,15 @@ export async function evaluateCorpusPersonaQuality(options: {
       .split(/\s+/u)
       .filter(Boolean).length >= 8;
   const overall =
-    hasDocuments && allCorpusCitations && hasKorean && noForbiddenClaims && enoughForTurns;
+    hasDocuments && allMalmunchiCitations && hasKorean && noForbiddenClaims && enoughForTurns;
   return {
-    corpusBacked: true,
+    malmunchiBacked: true,
     authorId: options.authorId,
     sourceId,
     documentCount: documents.length,
     dimensions: {
       retrievalGrounding: maybePass(hasDocuments),
-      citationCoverage: maybePass(allCorpusCitations),
+      citationCoverage: maybePass(allMalmunchiCitations),
       koreanVoiceFidelity: maybePass(hasKorean),
       hallucinationGuard: maybePass(noForbiddenClaims),
       multiTurnReadiness: maybePass(enoughForTurns),
@@ -60,19 +60,19 @@ export async function evaluateCorpusPersonaQuality(options: {
   };
 }
 
-async function fetchCorpusSourceExport(
-  corpusUrl: string,
+async function fetchSourceExport(
+  malmunchiUrl: string,
   sourceId: string,
   options: { readonly allowRemote: boolean }
 ): Promise<unknown> {
-  const url = assertLocalCorpusUrl(corpusUrl, options.allowRemote);
-  const exportUrl = new URL(`/corpus/sources/${encodeURIComponent(sourceId)}/export`, url);
+  const url = assertLocalMalmunchiUrl(malmunchiUrl, options.allowRemote);
+  const exportUrl = new URL(`/malmunchi/sources/${encodeURIComponent(sourceId)}/export`, url);
   exportUrl.searchParams.set("format", "json");
   exportUrl.searchParams.set("includeHistory", "true");
   const response = await fetch(exportUrl);
   const text = await response.text();
   if (!response.ok) {
-    throw new Error(`Corpus source export failed ${response.status}: ${redactSecrets(text)}`);
+    throw new Error(`Malmunchi source export failed ${response.status}: ${redactSecrets(text)}`);
   }
   return JSON.parse(text);
 }

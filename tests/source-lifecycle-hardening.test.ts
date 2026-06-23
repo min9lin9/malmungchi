@@ -16,11 +16,11 @@ async function makeDataDir(): Promise<string> {
 describe("source lifecycle hardening", () => {
   it("reports source status, refresh document changes, export bundles, and paginated history", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const importRes = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -33,7 +33,7 @@ describe("source lifecycle hardening", () => {
     expect(importRes.status).toBe(200);
 
     const statusRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:memory-author/status")
+      new Request("http://localhost/malmunchi/sources/author:memory-author/status")
     );
     expect(statusRes.status).toBe(200);
     const statusBody = (await statusRes.json()) as {
@@ -73,7 +73,7 @@ describe("source lifecycle hardening", () => {
     );
 
     const refreshRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:memory-author/refresh", {
+      new Request("http://localhost/malmunchi/sources/author:memory-author/refresh", {
         method: "POST",
       })
     );
@@ -103,7 +103,7 @@ describe("source lifecycle hardening", () => {
 
     const exportRes = await app.handle(
       new Request(
-        "http://localhost/corpus/sources/author:memory-author/export?format=markdown&includeHistory=true"
+        "http://localhost/malmunchi/sources/author:memory-author/export?format=markdown&includeHistory=true"
       )
     );
     expect(exportRes.status).toBe(200);
@@ -126,7 +126,9 @@ describe("source lifecycle hardening", () => {
     expect(exportBody.history.events.map((event) => event.action)).toEqual(["import", "refresh"]);
 
     const historyRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:memory-author/history?offset=1&limit=1")
+      new Request(
+        "http://localhost/malmunchi/sources/author:memory-author/history?offset=1&limit=1"
+      )
     );
     expect(historyRes.status).toBe(200);
     const historyBody = (await historyRes.json()) as {
@@ -146,11 +148,11 @@ describe("source lifecycle hardening", () => {
 
   it("keeps valid source memory readable when malformed JSONL events exist", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const importRes = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -168,7 +170,7 @@ describe("source lifecycle hardening", () => {
     );
 
     const statusRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:memory-author/status")
+      new Request("http://localhost/malmunchi/sources/author:memory-author/status")
     );
     expect(statusRes.status).toBe(200);
     const statusBody = (await statusRes.json()) as {
@@ -179,7 +181,7 @@ describe("source lifecycle hardening", () => {
     );
 
     const historyRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:memory-author/history")
+      new Request("http://localhost/malmunchi/sources/author:memory-author/history")
     );
     const historyBody = (await historyRes.json()) as {
       events: Array<{ action: string }>;

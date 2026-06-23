@@ -1,32 +1,36 @@
-import { loadCorpusAndManifest } from "../bootstrap";
+import { loadDocumentsAndManifest } from "../bootstrap";
 import { env } from "../config/env";
 import { buildDocumentCategoryIndex } from "../ingest/build-index";
 import { enrichCategoryIndex } from "../ingest/enrich-categories";
 import { applyIncrementalUpdate } from "../ingest/incremental-update";
 import { FlexSearchEngine } from "../search/flexsearch-engine";
-import { CorpusStore } from "../service/corpus-store";
+import { DocumentStore } from "../service/document-store";
 import { logger } from "../util/logger";
 
 async function main() {
-  const { corpus, manifest } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
+  const { malmunchi, manifest } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
-  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const categoryIndex = enrichCategoryIndex(
+    malmunchi.documents,
+    malmunchi.categories,
+    baseCategoryIndex
+  );
 
-  const store = new CorpusStore(
-    new Map(corpus.documents.map((e) => [e.slug, e])),
-    new Map(corpus.categories.map((t) => [t.slug, t])),
+  const store = new DocumentStore(
+    new Map(malmunchi.documents.map((e) => [e.slug, e])),
+    new Map(malmunchi.categories.map((t) => [t.slug, t])),
     categoryIndex,
     manifest
   );
 
   const engine = new FlexSearchEngine();
-  await engine.build(corpus.documents, categoryIndex.documentToCategories, {
+  await engine.build(malmunchi.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
     manifest,
   });
 
-  const result = await applyIncrementalUpdate(store, engine, env.dataDir, env.corpusName);
+  const result = await applyIncrementalUpdate(store, engine, env.dataDir, env.instanceName);
 
   const diff = result.diff;
   const totalChanges =
@@ -38,11 +42,11 @@ async function main() {
     diff.removedCategories.length;
 
   if (totalChanges === 0) {
-    logger.info("No corpus changes detected");
+    logger.info("No malmunchi changes detected");
     return;
   }
 
-  logger.info("Corpus updated incrementally", {
+  logger.info("Malmunchi updated incrementally", {
     ...diff,
     reindexedAll: result.reindexedAll,
   });

@@ -2,13 +2,13 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { loadAllAuthorPosts } from "../author/storage/author-storage";
-import type { CorpusManifest } from "../domain/document";
+import type { MalmunchiManifest } from "../domain/document";
 
 function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
 }
 
-export interface CorpusDiff {
+export interface DocumentCollectionDiff {
   addedDocuments: string[];
   changedDocuments: string[];
   removedDocuments: string[];
@@ -106,7 +106,10 @@ async function scanJsonlCategoryHashes(jsonlPath: string): Promise<Record<string
   return hashes;
 }
 
-export async function diffCorpus(manifest: CorpusManifest, dataDir: string): Promise<CorpusDiff> {
+export async function diffDocuments(
+  manifest: MalmunchiManifest,
+  dataDir: string
+): Promise<DocumentCollectionDiff> {
   const documentsDir = path.join(dataDir, "documents");
   const categoriesDir = path.join(dataDir, "categories");
 

@@ -1,10 +1,10 @@
-import type { CorpusStats } from "../domain/document";
+import type { MalmunchiStats } from "../domain/document";
 
 export interface ReadinessStatus {
   ready: boolean;
   checks: {
-    corpusLoaded: boolean;
+    documentsLoaded: boolean;
     searchIndexLoaded: boolean;
   };
-  stats: Pick<CorpusStats, "documentCount" | "categoryCount" | "indexedDocumentCount">;
+  stats: Pick<MalmunchiStats, "documentCount" | "categoryCount" | "indexedDocumentCount">;
 }

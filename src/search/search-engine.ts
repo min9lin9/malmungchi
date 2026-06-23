@@ -1,8 +1,13 @@
-import type { CorpusManifest, DocumentRecord, SearchInput, SearchResult } from "../domain/document";
+import type {
+  DocumentRecord,
+  MalmunchiManifest,
+  SearchInput,
+  SearchResult,
+} from "../domain/document";
 
 export interface SearchEngineBuildOptions {
   dataDir?: string;
-  manifest?: CorpusManifest;
+  manifest?: MalmunchiManifest;
 }
 
 export interface SearchEngineStats {

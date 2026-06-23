@@ -1,8 +1,8 @@
 # Contributing
 
 Malmunchi is kept public-safe by default. Contributions should use synthetic
-fixtures and must not include private corpora, generated caches, provider keys,
-or local evidence.
+fixtures and must not include private document collections, generated caches,
+provider keys, or local evidence.
 
 Before opening a pull request, run:
 

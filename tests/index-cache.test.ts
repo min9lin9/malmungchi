@@ -3,10 +3,10 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { buildManifest } from "../src/ingest/build-manifest";
-import { loadCorpus } from "../src/ingest/load-corpus";
+import { loadDocuments } from "../src/ingest/load-documents";
 import {
-  computeCorpusHash,
   computeEngineConfigHash,
+  computeMalmunchiHash,
   getCachePaths,
   importIndexCache,
   loadIndexCache,
@@ -17,20 +17,20 @@ import { buildFixtureEngine } from "./helpers/build-fixture-engine";
 const DATA_DIR = path.join(import.meta.dir, "..", "data");
 
 describe("index cache", () => {
-  it("computeCorpusHash is stable across manifest rebuilds with same content", async () => {
-    const corpus = await loadCorpus(DATA_DIR);
-    const manifest1 = await buildManifest(corpus, {
-      name: "test-corpus",
+  it("computeMalmunchiHash is stable across manifest rebuilds with same content", async () => {
+    const malmunchi = await loadDocuments(DATA_DIR);
+    const manifest1 = await buildManifest(malmunchi, {
+      name: "test-malmunchi",
       dataDir: DATA_DIR,
     });
     await new Promise((resolve) => setTimeout(resolve, 10));
-    const manifest2 = await buildManifest(corpus, {
-      name: "test-corpus",
+    const manifest2 = await buildManifest(malmunchi, {
+      name: "test-malmunchi",
       dataDir: DATA_DIR,
     });
 
     expect(manifest1.generatedAt).not.toBe(manifest2.generatedAt);
-    expect(computeCorpusHash(manifest1)).toBe(computeCorpusHash(manifest2));
+    expect(computeMalmunchiHash(manifest1)).toBe(computeMalmunchiHash(manifest2));
   });
 
   it("returns null for invalid cache JSON", async () => {
@@ -51,7 +51,7 @@ describe("index cache", () => {
       paths.cacheFile,
       JSON.stringify({
         schemaVersion: 999,
-        corpusHash: "hash1",
+        libraryHash: "hash1",
         engineConfigHash: "hash2",
         indices: {},
       }),
@@ -71,14 +71,14 @@ describe("index cache", () => {
     };
     const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cache-test-"));
     const paths = getCachePaths(tmpDir);
-    const corpusHash = "roundtrip-corpus";
+    const libraryHash = "roundtrip-malmunchi";
     const engineConfigHash = computeEngineConfigHash({
       tokenize: "forward",
       weights: { title: 3, guest: 2, keywords: 2, transcript: 1 },
     });
 
-    await saveIndexCache(paths, engine.index as never, corpusHash, engineConfigHash);
-    const cached = await loadIndexCache(paths, corpusHash, engineConfigHash);
+    await saveIndexCache(paths, engine.index as never, libraryHash, engineConfigHash);
+    const cached = await loadIndexCache(paths, libraryHash, engineConfigHash);
     expect(cached).not.toBeNull();
     if (cached) {
       await importIndexCache(engine.index as never, cached);

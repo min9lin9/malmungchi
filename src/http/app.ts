@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { CorpusError, DocumentNotFoundError, InvalidInputError } from "../domain/errors";
+import { DocumentNotFoundError, InvalidInputError, MalmunchiError } from "../domain/errors";
 import type { DocumentService } from "../service/document-service";
 import { logger } from "../util/logger";
 import { checkApiKey } from "./auth";
@@ -25,7 +25,7 @@ function errorToStatus(error: Error): number {
   if (error instanceof InvalidInputError) {
     return 400;
   }
-  if (error instanceof CorpusError) {
+  if (error instanceof MalmunchiError) {
     return 400;
   }
   return 500;
@@ -86,7 +86,7 @@ export function createHttpApp(service: DocumentService, options: HttpAppOptions 
       set.status = errorToStatus(err);
       return {
         error: err.message,
-        code: err instanceof CorpusError ? err.code : code,
+        code: err instanceof MalmunchiError ? err.code : code,
       };
     })
     .use(healthRoutes(service))

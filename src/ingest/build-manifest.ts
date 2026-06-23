@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { CORPUS_SCHEMA_VERSION } from "../config/constants";
-import type { CorpusManifest } from "../domain/document";
+import { MALMUNCHI_SCHEMA_VERSION } from "../config/constants";
+import type { MalmunchiManifest } from "../domain/document";
 import { parseManifest } from "../domain/manifest";
-import type { Corpus } from "./load-corpus";
+import type { DocumentCollection } from "./load-documents";
 
 function hashContent(content: string): string {
   return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
@@ -20,10 +20,10 @@ async function hashFile(filePath: string): Promise<string> {
 }
 
 export async function buildManifest(
-  corpus: Corpus,
+  malmunchi: DocumentCollection,
   options: { name: string; dataDir: string }
-): Promise<CorpusManifest> {
-  const { documents, categories } = corpus;
+): Promise<MalmunchiManifest> {
+  const { documents, categories } = malmunchi;
 
   let contentBytes = 0;
   let contentWordCount = 0;
@@ -53,7 +53,7 @@ export async function buildManifest(
     }
   }
 
-  const manifest: CorpusManifest = {
+  const manifest: MalmunchiManifest = {
     name: options.name,
     generatedAt: new Date().toISOString(),
     documentCount: documents.length,
@@ -61,7 +61,7 @@ export async function buildManifest(
     indexedDocumentCount: documents.length,
     contentBytes,
     contentWordCount,
-    schemaVersion: CORPUS_SCHEMA_VERSION,
+    schemaVersion: MALMUNCHI_SCHEMA_VERSION,
     documentSlugs: documents.map((e) => e.slug).sort(),
     categorySlugs: categories.map((t) => t.slug).sort(),
     documentHashes,
@@ -71,12 +71,15 @@ export async function buildManifest(
   return manifest;
 }
 
-export async function writeManifest(manifest: CorpusManifest, manifestPath: string): Promise<void> {
+export async function writeManifest(
+  manifest: MalmunchiManifest,
+  manifestPath: string
+): Promise<void> {
   await fs.mkdir(path.dirname(manifestPath), { recursive: true });
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), "utf-8");
 }
 
-export async function readManifest(manifestPath: string): Promise<CorpusManifest | null> {
+export async function readManifest(manifestPath: string): Promise<MalmunchiManifest | null> {
   try {
     const raw = await fs.readFile(manifestPath, "utf-8");
     return parseManifest(JSON.parse(raw));

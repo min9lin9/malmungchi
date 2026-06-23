@@ -4,7 +4,7 @@ import type { ImportMutationResult } from "./import-mutations";
 
 export type SourceType = "author";
 
-export interface CorpusSource {
+export interface Source {
   readonly id: string;
   readonly type: SourceType;
   readonly label: string;
@@ -38,7 +38,7 @@ export interface SourceDocumentProvenance {
 }
 
 export interface SourceDetail {
-  readonly source: CorpusSource;
+  readonly source: Source;
   readonly documents: readonly SourceDocument[];
 }
 
@@ -93,7 +93,7 @@ export interface ExportSourceInput {
 }
 
 export interface ExportSourceResult {
-  readonly source: CorpusSource;
+  readonly source: Source;
   readonly manifest: {
     readonly version: 1;
     readonly exportedAt: string;

@@ -17,7 +17,7 @@ export async function importPrototypeAuthor(
   authorId: string
 ): Promise<void> {
   const res = await app.handle(
-    new Request("http://localhost/corpus/import-author", {
+    new Request("http://localhost/malmunchi/import-author", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({

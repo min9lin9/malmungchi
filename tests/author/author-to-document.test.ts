@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { authorPostToDocument } from "../../src/author/corpus/author-to-document";
+import { authorPostToDocument } from "../../src/author/document/author-to-document";
 import type { AuthorPost } from "../../src/author/domain/author-post";
 
 describe("authorPostToDocument", () => {

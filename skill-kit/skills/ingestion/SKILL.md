@@ -1,11 +1,11 @@
 ---
 name: ingestion
-description: Normalize local Markdown and JSON source folders into Corpus Skill Kit raw/normalized document layout while preserving Korean text and provenance.
+description: Normalize local Markdown and JSON source folders into Malmunchi raw/normalized document layout while preserving Korean text and provenance.
 ---
 
 # Ingestion
 
-Use this skill when a user needs local `.md` or `.json` files normalized for Corpus author import or persona generation.
+Use this skill when a user needs local `.md` or `.json` files normalized for Malmunchi author import or persona generation.
 
 Run:
 

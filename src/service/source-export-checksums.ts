@@ -1,13 +1,13 @@
 import { sha256Hex, stableJson } from "../util/hash";
 import type {
-  CorpusSource,
   ExportedSourceDocument,
+  Source,
   SourceHistoryResult,
   SourceType,
 } from "./source-types";
 
 export function buildExportDocuments(input: {
-  readonly source: CorpusSource;
+  readonly source: Source;
   readonly documents: readonly {
     readonly slug: string;
     readonly title: string;

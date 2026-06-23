@@ -1,7 +1,7 @@
 import { legacyEnvName } from "../config/env-names";
 
 export function getCorsOrigin(): string {
-  return process.env.CORPUS_CORS_ORIGIN ?? process.env[legacyEnvName("CORS_ORIGIN")] ?? "*";
+  return process.env.MALMUNCHI_CORS_ORIGIN ?? process.env[legacyEnvName("CORS_ORIGIN")] ?? "*";
 }
 
 export function applySecurityHeaders(

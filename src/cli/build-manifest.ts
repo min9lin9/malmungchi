@@ -3,7 +3,7 @@ import { env } from "../config/env";
 import { logger } from "../util/logger";
 
 async function main() {
-  const manifest = await rebuildManifest(env.dataDir, env.corpusName);
+  const manifest = await rebuildManifest(env.dataDir, env.instanceName);
   logger.info("Manifest rebuilt");
   console.log(JSON.stringify(manifest, null, 2));
 }

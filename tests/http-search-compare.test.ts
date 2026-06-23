@@ -1,13 +1,13 @@
 import { describe, expect, it } from "bun:test";
-import type { CorpusManifest, SearchInput, SearchResult } from "../src/domain/document";
+import type { MalmunchiManifest, SearchInput, SearchResult } from "../src/domain/document";
 import { createHttpApp } from "../src/http/app";
 import type {
   SearchEngine,
   SearchEngineBuildOptions,
   SearchEngineStats,
 } from "../src/search/search-engine";
-import { CorpusStore } from "../src/service/corpus-store";
 import { DocumentService } from "../src/service/document-service";
+import { DocumentStore } from "../src/service/document-store";
 import { buildFixtureDocumentService } from "./helpers/build-fixture-service";
 
 async function buildApp() {
@@ -60,7 +60,7 @@ describe("http search compare", () => {
   });
 
   it("search compare reports Meilisearch unsupported fallback", async () => {
-    const manifest: CorpusManifest = {
+    const manifest: MalmunchiManifest = {
       name: "fake",
       generatedAt: new Date(0).toISOString(),
       documentCount: 0,
@@ -76,7 +76,7 @@ describe("http search compare", () => {
     };
     const engine = new FakeMeilisearchEngine();
     const service = new DocumentService(
-      new CorpusStore(
+      new DocumentStore(
         new Map(),
         new Map(),
         { documentToCategories: new Map(), categoryToDocuments: new Map() },
@@ -116,7 +116,7 @@ class FakeMeilisearchEngine implements SearchEngine {
   searchCalls = 0;
 
   async build(
-    _episodes: unknown[],
+    _documents: unknown[],
     _documentToCategories: Map<string, string[]>,
     _options?: SearchEngineBuildOptions
   ) {}
@@ -131,7 +131,7 @@ class FakeMeilisearchEngine implements SearchEngine {
     return { results: [], total: 0 };
   }
 
-  async addDocuments(_episodes: unknown[]): Promise<void> {}
+  async addDocuments(_documents: unknown[]): Promise<void> {}
 
   async removeDocuments(_slugs: string[]): Promise<void> {}
 

@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { generateAuthorJsonl, importAuthorHttp } from "../src/author-source.ts";
 import { ingest } from "../src/ingestion.ts";
 
-test("generates corpus-friendly jsonl", async () => {
+test("generates malmunchi-friendly jsonl", async () => {
   const out = await mkdtemp(join(tmpdir(), "author-"));
   await ingest("fixtures/ingestion", out);
   const content = await generateAuthorJsonl(out, "skill-kit-demo", join(out, "author.jsonl"));
@@ -35,7 +35,7 @@ test("author http import sends tocKey for jsonl content", async () => {
     await importAuthorHttp({
       authorId: "demo",
       fileContent: '{"tocKey":"intro","content":"Body"}\n',
-      corpusUrl: "http://127.0.0.1:3000",
+      malmunchiUrl: "http://127.0.0.1:3000",
       allowRemote: false,
     });
   } finally {

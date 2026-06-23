@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { exportCloneMarkdown, importCloneMarkdown } from "../src/clone-markdown.ts";
 import { evaluatePersonaBenchmark } from "../src/persona-benchmark.ts";
-import { evaluateCorpusPersonaQuality } from "../src/persona-quality-benchmark.ts";
+import { evaluateMalmunchiPersonaQuality } from "../src/persona-quality-benchmark.ts";
 
 async function tempRoot(): Promise<string> {
   return mkdtemp(join(tmpdir(), "persona-blockers-"));
@@ -123,7 +123,7 @@ test("clone export preserves importable simulated disclaimer", async () => {
   }
 });
 
-test("corpus quality benchmark requires corpus-backed citations", async () => {
+test("malmunchi quality benchmark requires malmunchi-backed citations", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = Object.assign(
     async () =>
@@ -141,8 +141,8 @@ test("corpus quality benchmark requires corpus-backed citations", async () => {
     { preconnect: originalFetch.preconnect }
   );
   try {
-    const report = await evaluateCorpusPersonaQuality({
-      corpusUrl: "http://127.0.0.1:3000",
+    const report = await evaluateMalmunchiPersonaQuality({
+      malmunchiUrl: "http://127.0.0.1:3000",
       authorId: "demo",
       allowRemote: false,
     });
@@ -154,7 +154,7 @@ test("corpus quality benchmark requires corpus-backed citations", async () => {
   }
 });
 
-test("corpus quality benchmark rejects missing provenance source id", async () => {
+test("malmunchi quality benchmark rejects missing provenance source id", async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = Object.assign(
     async () =>
@@ -172,8 +172,8 @@ test("corpus quality benchmark rejects missing provenance source id", async () =
     { preconnect: originalFetch.preconnect }
   );
   try {
-    const report = await evaluateCorpusPersonaQuality({
-      corpusUrl: "http://127.0.0.1:3000",
+    const report = await evaluateMalmunchiPersonaQuality({
+      malmunchiUrl: "http://127.0.0.1:3000",
       authorId: "demo",
       allowRemote: false,
     });

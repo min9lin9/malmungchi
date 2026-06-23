@@ -16,11 +16,11 @@ async function makeDataDir(): Promise<string> {
 describe("source lifecycle", () => {
   it("rejects malformed source id export", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const exportRes = await app.handle(
-      new Request("http://localhost/corpus/sources/not-valid/export")
+      new Request("http://localhost/malmunchi/sources/not-valid/export")
     );
 
     expect(exportRes.status).toBe(400);
@@ -28,11 +28,11 @@ describe("source lifecycle", () => {
 
   it("lists, inspects, and deletes an imported author source", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const importRes = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -44,7 +44,7 @@ describe("source lifecycle", () => {
     );
     expect(importRes.status).toBe(200);
 
-    const listRes = await app.handle(new Request("http://localhost/corpus/sources"));
+    const listRes = await app.handle(new Request("http://localhost/malmunchi/sources"));
     expect(listRes.status).toBe(200);
     const listBody = (await listRes.json()) as {
       sources: Array<{
@@ -66,7 +66,7 @@ describe("source lifecycle", () => {
     );
 
     const detailRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author")
+      new Request("http://localhost/malmunchi/sources/author:demo-author")
     );
     expect(detailRes.status).toBe(200);
     const detailBody = (await detailRes.json()) as {
@@ -79,7 +79,7 @@ describe("source lifecycle", () => {
     ]);
 
     const refreshRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author/refresh", {
+      new Request("http://localhost/malmunchi/sources/author:demo-author/refresh", {
         method: "POST",
       })
     );
@@ -121,7 +121,7 @@ describe("source lifecycle", () => {
     );
 
     const changedRefreshRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author/refresh", {
+      new Request("http://localhost/malmunchi/sources/author:demo-author/refresh", {
         method: "POST",
       })
     );
@@ -141,7 +141,7 @@ describe("source lifecycle", () => {
 
     const exportRes = await app.handle(
       new Request(
-        "http://localhost/corpus/sources/author:demo-author/export?format=json&includeHistory=true"
+        "http://localhost/malmunchi/sources/author:demo-author/export?format=json&includeHistory=true"
       )
     );
     expect(exportRes.status).toBe(200);
@@ -194,7 +194,7 @@ describe("source lifecycle", () => {
       "utf-8"
     );
     const historyRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author/history?limit=2&offset=1")
+      new Request("http://localhost/malmunchi/sources/author:demo-author/history?limit=2&offset=1")
     );
     expect(historyRes.status).toBe(200);
     const historyBody = (await historyRes.json()) as {
@@ -211,7 +211,7 @@ describe("source lifecycle", () => {
     expect(historyBody.events.map((event) => event.action)).toEqual(["refresh", "refresh"]);
 
     const deleteRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author", {
+      new Request("http://localhost/malmunchi/sources/author:demo-author", {
         method: "DELETE",
       })
     );
@@ -225,7 +225,7 @@ describe("source lifecycle", () => {
     const searchBody = (await searchRes.json()) as { returned: number };
     expect(searchBody.returned).toBe(0);
 
-    const listAfterDelete = await app.handle(new Request("http://localhost/corpus/sources"));
+    const listAfterDelete = await app.handle(new Request("http://localhost/malmunchi/sources"));
     const afterBody = (await listAfterDelete.json()) as {
       sources: Array<{ id: string; lastAction?: string }>;
     };
@@ -234,7 +234,7 @@ describe("source lifecycle", () => {
     );
 
     const historyAfterDeleteRes = await app.handle(
-      new Request("http://localhost/corpus/sources/author:demo-author/history")
+      new Request("http://localhost/malmunchi/sources/author:demo-author/history")
     );
     const historyAfterDeleteBody = (await historyAfterDeleteRes.json()) as {
       totalEvents: number;

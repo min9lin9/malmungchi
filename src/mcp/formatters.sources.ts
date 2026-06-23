@@ -1,18 +1,18 @@
 import type {
   CompactSourceMemoryResult,
-  CorpusSource,
   DeleteSourceResult,
   ExportSourceResult,
   RefreshSourceResult,
+  Source,
   SourceDetail,
   SourceHistoryResult,
   SourceStatusResult,
 } from "../service/source-operations";
 
-export function formatSources(sources: readonly CorpusSource[]): string {
-  if (sources.length === 0) return "# Corpus Sources\n\nNo sources are loaded.";
+export function formatSources(sources: readonly Source[]): string {
+  if (sources.length === 0) return "# Malmunchi Sources\n\nNo sources are loaded.";
   return [
-    `# Corpus Sources (${sources.length})`,
+    `# Malmunchi Sources (${sources.length})`,
     "",
     ...sources.map((source) =>
       [
@@ -45,7 +45,7 @@ export function formatDeleteSourceResult(result: DeleteSourceResult): string {
     "",
     `- Documents removed: ${result.deletedDocuments}`,
     "",
-    "The source has been removed from the corpus and search index.",
+    "The source has been removed from Malmunchi and the search index.",
   ].join("\n");
 }
 

@@ -1,4 +1,4 @@
-import { loadCorpusAndManifest } from "../bootstrap";
+import { loadDocumentsAndManifest } from "../bootstrap";
 import { env } from "../config/env";
 import type { SearchInput } from "../domain/document";
 import { buildDocumentCategoryIndex } from "../ingest/build-index";
@@ -24,12 +24,12 @@ function formatScore(n: number): string {
 }
 
 async function main() {
-  const { corpus } = await loadCorpusAndManifest(env.dataDir, env.corpusName);
-  const baseIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
-  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseIndex);
+  const { malmunchi } = await loadDocumentsAndManifest(env.dataDir, env.instanceName);
+  const baseIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const categoryIndex = enrichCategoryIndex(malmunchi.documents, malmunchi.categories, baseIndex);
 
   const flex = new FlexSearchEngine({ maxResults: env.maxResults });
-  await flex.build(corpus.documents, categoryIndex.documentToCategories, {
+  await flex.build(malmunchi.documents, categoryIndex.documentToCategories, {
     dataDir: env.dataDir,
   });
 
@@ -38,7 +38,7 @@ async function main() {
     apiKey: env.meiliApiKey,
     indexName: `${env.meiliIndexName}-compare`,
   });
-  await meili.build(corpus.documents, categoryIndex.documentToCategories);
+  await meili.build(malmunchi.documents, categoryIndex.documentToCategories);
 
   const input: SearchInput = { query: "", limit: 5 };
 

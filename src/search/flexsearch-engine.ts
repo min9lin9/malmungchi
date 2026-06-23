@@ -2,8 +2,8 @@ import { Document } from "flexsearch";
 import type { DocumentRecord, SearchInput, SearchResult } from "../domain/document";
 import { FIELD_WEIGHTS, FlexSearchRanker, type SemanticReranker } from "./flexsearch-ranker";
 import {
-  computeCorpusHash,
   computeEngineConfigHash,
+  computeMalmunchiHash,
   getCachePaths,
   importIndexCache,
   loadIndexCache,
@@ -78,8 +78,8 @@ export class FlexSearchEngine implements SearchEngine {
     let cached = null;
 
     if (paths && options?.manifest) {
-      const corpusHash = computeCorpusHash(options.manifest);
-      cached = await loadIndexCache(paths, corpusHash, engineConfigHash);
+      const libraryHash = computeMalmunchiHash(options.manifest);
+      cached = await loadIndexCache(paths, libraryHash, engineConfigHash);
       if (cached) {
         await importIndexCache(this.index, cached);
       }
@@ -111,8 +111,8 @@ export class FlexSearchEngine implements SearchEngine {
     }
 
     if (paths && options?.manifest && !cached) {
-      const corpusHash = computeCorpusHash(options.manifest);
-      await saveIndexCache(paths, this.index, corpusHash, engineConfigHash);
+      const libraryHash = computeMalmunchiHash(options.manifest);
+      await saveIndexCache(paths, this.index, libraryHash, engineConfigHash);
     }
     await this.reranker?.prepare?.(documents);
   }

@@ -3,13 +3,13 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import type { Document } from "flexsearch";
 import { z } from "zod";
-import type { CorpusManifest } from "../domain/document";
+import type { MalmunchiManifest } from "../domain/document";
 
 const CACHE_SCHEMA_VERSION = 1;
 
 export const IndexCacheSchema = z.object({
   schemaVersion: z.number(),
-  corpusHash: z.string(),
+  libraryHash: z.string(),
   engineConfigHash: z.string(),
   indices: z.record(z.unknown()),
 });
@@ -27,7 +27,7 @@ export function getCachePaths(dataDir: string): CachePaths {
   return { cacheDir, cacheFile };
 }
 
-export function computeCorpusHash(manifest: CorpusManifest): string {
+export function computeMalmunchiHash(manifest: MalmunchiManifest): string {
   const payload = JSON.stringify({
     schemaVersion: manifest.schemaVersion,
     documentCount: manifest.documentCount,
@@ -49,7 +49,7 @@ export function computeEngineConfigHash(config: {
 
 export async function loadIndexCache(
   paths: CachePaths,
-  corpusHash: string,
+  libraryHash: string,
   engineConfigHash: string
 ): Promise<IndexCache | null> {
   try {
@@ -63,7 +63,7 @@ export async function loadIndexCache(
 
     if (
       cached.data.schemaVersion !== CACHE_SCHEMA_VERSION ||
-      cached.data.corpusHash !== corpusHash ||
+      cached.data.libraryHash !== libraryHash ||
       cached.data.engineConfigHash !== engineConfigHash
     ) {
       return null;
@@ -81,7 +81,7 @@ export async function loadIndexCache(
 export async function saveIndexCache(
   paths: CachePaths,
   index: Document<unknown, boolean>,
-  corpusHash: string,
+  libraryHash: string,
   engineConfigHash: string
 ): Promise<void> {
   const indices: Record<string, unknown> = {};
@@ -91,7 +91,7 @@ export async function saveIndexCache(
 
   const cache: IndexCache = {
     schemaVersion: CACHE_SCHEMA_VERSION,
-    corpusHash,
+    libraryHash,
     engineConfigHash,
     indices,
   };

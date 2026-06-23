@@ -20,7 +20,7 @@ function env(overrides: Partial<Env>): Env {
     searchEngine: "flexsearch",
     httpHost: "127.0.0.1",
     httpPort: 3000,
-    corpusName: "test",
+    instanceName: "test",
     rateLimitRpm: 60,
     corsOrigin: "*",
     meiliHost: "http://localhost:7700",

@@ -14,15 +14,15 @@ async function makeDataDir(): Promise<string> {
 }
 
 describe("author and llm http routes", () => {
-  it("POST /corpus/import-author imports a local markdown source", async () => {
+  it("POST /malmunchi/import-author imports a local markdown source", async () => {
     const dataDir = await makeDataDir();
     const source = path.join(dataDir, "imports", "source.md");
     await fs.writeFile(source, "# Imported Essay\n\nSemantic search notes.", "utf-8");
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const res = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ filePath: source, authorId: "demo-author" }),
@@ -42,15 +42,15 @@ describe("author and llm http routes", () => {
     await fs.rm(dataDir, { recursive: true, force: true });
   });
 
-  it("POST /corpus/import-author rejects server-local paths outside the import directory", async () => {
+  it("POST /malmunchi/import-author rejects server-local paths outside the import directory", async () => {
     const dataDir = await makeDataDir();
     const outside = path.join(dataDir, "outside.md");
     await fs.writeFile(outside, "# Outside\n\nShould not import.", "utf-8");
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const res = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ filePath: outside, authorId: "demo-author" }),
@@ -64,7 +64,7 @@ describe("author and llm http routes", () => {
 
   it("GET /llm/status returns sanitized embedding configuration", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const res = await app.handle(new Request("http://localhost/llm/status"));
@@ -78,13 +78,13 @@ describe("author and llm http routes", () => {
     await fs.rm(dataDir, { recursive: true, force: true });
   });
 
-  it("POST /corpus/import-author rejects invalid author IDs", async () => {
+  it("POST /malmunchi/import-author rejects invalid author IDs", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     const res = await app.handle(
-      new Request("http://localhost/corpus/import-author", {
+      new Request("http://localhost/malmunchi/import-author", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -100,14 +100,14 @@ describe("author and llm http routes", () => {
     await fs.rm(dataDir, { recursive: true, force: true });
   });
 
-  it("POST /corpus/import-author updates manifest counts for changed posts", async () => {
+  it("POST /malmunchi/import-author updates manifest counts for changed posts", async () => {
     const dataDir = await makeDataDir();
-    const service = await buildService(dataDir, "test-corpus");
+    const service = await buildService(dataDir, "test-malmunchi");
     const app = createHttpApp(service);
 
     async function importContent(content: string) {
       const res = await app.handle(
-        new Request("http://localhost/corpus/import-author", {
+        new Request("http://localhost/malmunchi/import-author", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({

@@ -1,5 +1,5 @@
 {
-  "description": "Static synthetic Phase 1 benchmark: natural-language queries and relevance judgments over existing corpus chunks.",
+  "description": "Static synthetic Phase 1 benchmark: natural-language queries and relevance judgments over existing malmunchi chunks.",
   "groups": [
     {"sourceOffset":0,"relevantPositions":[2,3],"queries":["product retention lessons from this interview","quality signals for product teams","recall of onboarding strategy examples","ranking product insights for operators"]},
     {"sourceOffset":4,"relevantPositions":[2,3],"queries":["growth model lessons from the discussion","product strategy quality signals","onboarding recall for marketplace teams","ranking durable retention examples"]},

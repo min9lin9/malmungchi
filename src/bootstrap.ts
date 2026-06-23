@@ -1,39 +1,42 @@
 import path from "node:path";
 import { env } from "./config/env";
-import type { CorpusManifest } from "./domain/document";
+import type { MalmunchiManifest } from "./domain/document";
 import { buildDocumentCategoryIndex } from "./ingest/build-index";
 import { buildManifest, readManifest, writeManifest } from "./ingest/build-manifest";
 import { enrichCategoryIndex } from "./ingest/enrich-categories";
-import { type Corpus, loadCorpus } from "./ingest/load-corpus";
+import { type DocumentCollection, loadDocuments } from "./ingest/load-documents";
 import { createSearchEngine } from "./search/engine-factory";
-import { CorpusStore } from "./service/corpus-store";
 import { DocumentService } from "./service/document-service";
+import { DocumentStore } from "./service/document-store";
 import { logger } from "./util/logger";
 
 export interface BootstrapResult {
-  corpus: Corpus;
-  manifest: CorpusManifest;
+  malmunchi: DocumentCollection;
+  manifest: MalmunchiManifest;
 }
 
-export async function loadCorpusAndManifest(
+export async function loadDocumentsAndManifest(
   dataDir: string,
-  corpusName: string
+  instanceName: string
 ): Promise<BootstrapResult> {
   const manifestPath = path.join(dataDir, "manifest.json");
-  const corpus = await loadCorpus(dataDir);
+  const malmunchi = await loadDocuments(dataDir);
 
   let manifest = await readManifest(manifestPath);
   if (!manifest) {
-    manifest = await buildManifest(corpus, { name: corpusName, dataDir });
+    manifest = await buildManifest(malmunchi, { name: instanceName, dataDir });
     await writeManifest(manifest, manifestPath);
     logger.info("manifest rebuilt", { manifestPath });
   }
 
-  return { corpus, manifest };
+  return { malmunchi, manifest };
 }
 
-export async function buildService(dataDir: string, corpusName: string): Promise<DocumentService> {
-  const { corpus, manifest } = await loadCorpusAndManifest(dataDir, corpusName);
+export async function buildService(
+  dataDir: string,
+  instanceName: string
+): Promise<DocumentService> {
+  const { malmunchi, manifest } = await loadDocumentsAndManifest(dataDir, instanceName);
   const defaultImportDir = path.join(env.dataDir, "imports");
   const authorImportDir =
     env.authorImportDir === defaultImportDir ? path.join(dataDir, "imports") : env.authorImportDir;
@@ -49,18 +52,22 @@ export async function buildService(dataDir: string, corpusName: string): Promise
     embeddingCacheDir: path.join(dataDir, ".cache", "embeddings"),
   };
 
-  const baseCategoryIndex = buildDocumentCategoryIndex(corpus.documents, corpus.categories);
-  const categoryIndex = enrichCategoryIndex(corpus.documents, corpus.categories, baseCategoryIndex);
+  const baseCategoryIndex = buildDocumentCategoryIndex(malmunchi.documents, malmunchi.categories);
+  const categoryIndex = enrichCategoryIndex(
+    malmunchi.documents,
+    malmunchi.categories,
+    baseCategoryIndex
+  );
 
-  const store = new CorpusStore(
-    new Map(corpus.documents.map((e: Corpus["documents"][number]) => [e.slug, e])),
-    new Map(corpus.categories.map((t: Corpus["categories"][number]) => [t.slug, t])),
+  const store = new DocumentStore(
+    new Map(malmunchi.documents.map((document) => [document.slug, document])),
+    new Map(malmunchi.categories.map((category) => [category.slug, category])),
     categoryIndex,
     manifest
   );
 
   const engine = await createSearchEngine(serviceEnv);
-  await engine.build(corpus.documents, categoryIndex.documentToCategories, {
+  await engine.build(malmunchi.documents, categoryIndex.documentToCategories, {
     dataDir,
     manifest,
   });
@@ -70,10 +77,10 @@ export async function buildService(dataDir: string, corpusName: string): Promise
 
 export async function rebuildManifest(
   dataDir: string,
-  corpusName: string
-): Promise<CorpusManifest> {
-  const corpus = await loadCorpus(dataDir);
-  const manifest = await buildManifest(corpus, { name: corpusName, dataDir });
+  instanceName: string
+): Promise<MalmunchiManifest> {
+  const malmunchi = await loadDocuments(dataDir);
+  const manifest = await buildManifest(malmunchi, { name: instanceName, dataDir });
   await writeManifest(manifest, path.join(dataDir, "manifest.json"));
   return manifest;
 }

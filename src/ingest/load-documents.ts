@@ -2,7 +2,7 @@ import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
-import { authorPostsToDocuments } from "../author/corpus/author-to-document";
+import { authorPostsToDocuments } from "../author/document/author-to-document";
 import type { AuthorPost } from "../author/domain/author-post";
 import { loadAllAuthorPosts } from "../author/storage/author-storage";
 import type { Category, DocumentRecord } from "../domain/document";
@@ -90,7 +90,7 @@ function parseCategoryJsonlRecord(record: unknown, raw: string): Category {
   };
 }
 
-export async function loadDocuments(documentsDir: string): Promise<DocumentRecord[]> {
+export async function loadDocumentRecords(documentsDir: string): Promise<DocumentRecord[]> {
   const documents = await loadMarkdownDocuments(documentsDir);
   const jsonlPath = path.join(path.dirname(documentsDir), "documents.jsonl");
   const jsonlEpisodes = await loadJsonlDocuments(jsonlPath);
@@ -205,13 +205,13 @@ function mergeBySlug<T extends { slug: string }>(
   return Array.from(map.values()).sort((a, b) => a.slug.localeCompare(b.slug));
 }
 
-export interface Corpus {
+export interface DocumentCollection {
   documents: DocumentRecord[];
   categories: Category[];
   authorPosts: AuthorPost[];
 }
 
-export async function loadCorpus(dataDir: string): Promise<Corpus> {
+export async function loadDocuments(dataDir: string): Promise<DocumentCollection> {
   const authorPosts = await loadAllAuthorPosts(path.join(dataDir, "authors"));
   return {
     documents: authorPostsToDocuments(authorPosts),

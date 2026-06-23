@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { AnyElysia } from "elysia";
 
-// ponytail: global HTTP lock; use per-data-dir locks only if isolated corpora must run side by side.
+// ponytail: global HTTP lock; use per-data-dir locks only if isolated data directories must run side by side.
 const DEFAULT_HTTP_LOCK_PATH = join(tmpdir(), "malmunchi-http.lock");
 
 export async function startHttpTransport(
@@ -41,7 +41,7 @@ async function acquireHttpLock(lockPath: string): Promise<() => Promise<void>> {
     if (!isNodeError(error) || error.code !== "EEXIST") throw error;
     const pid = await readLockedPid(lockPath);
     if (pid !== undefined && processIsAlive(pid)) {
-      throw new Error(`Corpus HTTP server already running (pid ${pid})`);
+      throw new Error(`Malmunchi HTTP server already running (pid ${pid})`);
     }
     await unlink(lockPath).catch((unlinkError: unknown) => {
       if (!isNodeError(unlinkError) || unlinkError.code !== "ENOENT") throw unlinkError;

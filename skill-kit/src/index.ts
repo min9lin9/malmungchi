@@ -71,13 +71,13 @@ async function main(): Promise<void> {
       throw new Error("Usage: skill-kit author-source <workspace> --author-id <id>");
     await mkdir(dirname(out), { recursive: true });
     const content = await generateAuthorJsonl(workspace, authorId, out);
-    const corpusUrl = arg("--corpus-url");
-    if (corpusUrl && !has("--dry-run")) {
+    const malmunchiUrl = arg("--malmunchi-url");
+    if (malmunchiUrl && !has("--dry-run")) {
       const result = await importAuthorHttp({
         authorId,
         fileContent: content,
-        corpusUrl,
-        allowRemote: has("--allow-remote-corpus"),
+        malmunchiUrl,
+        allowRemote: has("--allow-remote-malmunchi"),
       });
       const evidence = arg("--evidence");
       if (evidence) await writeFile(evidence, `${JSON.stringify(result, null, 2)}\n`);
@@ -100,8 +100,8 @@ async function main(): Promise<void> {
       provider: parseProvider(arg("--provider", "openai")),
       out,
       markdown: arg("--markdown"),
-      corpusUrl: arg("--corpus-url"),
-      allowRemoteCorpus: has("--allow-remote-corpus"),
+      malmunchiUrl: arg("--malmunchi-url"),
+      allowRemoteMalmunchi: has("--allow-remote-malmunchi"),
     });
     console.log(`persona written ${out}`);
     return;

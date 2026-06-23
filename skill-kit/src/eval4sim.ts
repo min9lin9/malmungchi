@@ -45,6 +45,6 @@ export function runtimeDoctor(): string {
     `sentence-transformers==3.4.1 ${eval4simModels.sentenceBert}`,
     `transformers==4.48.3 ${eval4simModels.dialogueNli}`,
     `torch==2.5.1 colbert-ai==0.2.21 ${eval4simModels.colbert}`,
-    `cache=${process.env.CORPUS_SKILL_KIT_MODEL_CACHE ?? defaultModelCache()}`,
+    `cache=${process.env.MALMUNCHI_SKILL_KIT_MODEL_CACHE ?? defaultModelCache()}`,
   ].join("\n");
 }

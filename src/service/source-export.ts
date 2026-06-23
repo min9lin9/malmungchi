@@ -1,7 +1,7 @@
-import type { CorpusSource, ExportedSourceDocument, SourceHistoryResult } from "./source-types";
+import type { ExportedSourceDocument, Source, SourceHistoryResult } from "./source-types";
 
 export function formatSourceMarkdown(
-  source: CorpusSource,
+  source: Source,
   documents: readonly ExportedSourceDocument[],
   history: SourceHistoryResult | undefined,
   manifest?: {

@@ -31,9 +31,9 @@ describe("mcp tools", () => {
       "compare_search_explain",
       "delete_source",
       "export_source",
-      "get_corpus_stats",
       "get_document",
       "get_llm_status",
+      "get_malmunchi_stats",
       "get_source",
       "get_source_history",
       "get_source_status",
@@ -58,7 +58,7 @@ describe("mcp tools", () => {
   it("imports an author source and exposes lifecycle tools", async () => {
     const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), "mcp-author-import-"));
     try {
-      const client = await createTestClient(await buildService(dataDir, "test-corpus"));
+      const client = await createTestClient(await buildService(dataDir, "test-malmunchi"));
       const imported = await client.callTool({
         name: "import_author_source",
         arguments: {

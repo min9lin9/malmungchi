@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { formatCorpusStats, formatDocument, formatSearchResults } from "../src/mcp/formatters";
+import { formatDocument, formatMalmunchiStats, formatSearchResults } from "../src/mcp/formatters";
 
 describe("mcp formatters", () => {
   it("formats search results with total and offset", () => {
@@ -111,8 +111,8 @@ describe("mcp formatters", () => {
     expect(text).toContain("...(truncated)");
   });
 
-  it("formats corpus stats", () => {
-    const text = formatCorpusStats({
+  it("formats malmunchi stats", () => {
+    const text = formatMalmunchiStats({
       name: "test",
       generatedAt: "2024-01-01T00:00:00Z",
       documentCount: 10,
@@ -126,7 +126,7 @@ describe("mcp formatters", () => {
       documentHashes: {},
       categoryHashes: {},
     });
-    expect(text).toContain("Corpus Stats: test");
+    expect(text).toContain("Malmunchi Stats: test");
     expect(text).toContain("1,234");
   });
 });

@@ -6,18 +6,18 @@ import { legacyEnvName } from "../src/config/env-names";
 describe("env validation", () => {
   afterEach(() => {
     const names = [
-      "CORPUS_API_KEY",
-      "CORPUS_CORS_ORIGIN",
-      "CORPUS_DATA_DIR",
-      "CORPUS_HTTP_HOST",
-      "CORPUS_HTTP_PORT",
-      "CORPUS_IMPORT_DIR",
-      "CORPUS_MAX_RESPONSE_CHARS",
-      "CORPUS_MAX_RESULTS",
-      "CORPUS_NAME",
-      "CORPUS_RATE_LIMIT_RPM",
-      "CORPUS_SEARCH_ENGINE",
-      "CORPUS_TRANSPORT",
+      "MALMUNCHI_API_KEY",
+      "MALMUNCHI_CORS_ORIGIN",
+      "MALMUNCHI_DATA_DIR",
+      "MALMUNCHI_HTTP_HOST",
+      "MALMUNCHI_HTTP_PORT",
+      "MALMUNCHI_IMPORT_DIR",
+      "MALMUNCHI_MAX_RESPONSE_CHARS",
+      "MALMUNCHI_MAX_RESULTS",
+      "MALMUNCHI_NAME",
+      "MALMUNCHI_RATE_LIMIT_RPM",
+      "MALMUNCHI_SEARCH_ENGINE",
+      "MALMUNCHI_TRANSPORT",
       ..."HTTP_HOST HTTP_PORT IMPORT_DIR MAX_RESPONSE_CHARS MAX_RESULTS TRANSPORT"
         .split(" ")
         .map(legacyEnvName),
@@ -37,51 +37,51 @@ describe("env validation", () => {
   });
 
   it("accepts valid http port", () => {
-    process.env.CORPUS_HTTP_PORT = "8080";
+    process.env.MALMUNCHI_HTTP_PORT = "8080";
     const env = createEnv();
     expect(env.httpPort).toBe(8080);
   });
 
   it("rejects negative port", () => {
-    process.env.CORPUS_HTTP_PORT = "-1";
-    expect(() => createEnv()).toThrow("CORPUS_HTTP_PORT");
+    process.env.MALMUNCHI_HTTP_PORT = "-1";
+    expect(() => createEnv()).toThrow("MALMUNCHI_HTTP_PORT");
   });
 
   it("rejects port above 65535", () => {
-    process.env.CORPUS_HTTP_PORT = "70000";
-    expect(() => createEnv()).toThrow("CORPUS_HTTP_PORT");
+    process.env.MALMUNCHI_HTTP_PORT = "70000";
+    expect(() => createEnv()).toThrow("MALMUNCHI_HTTP_PORT");
   });
 
   it("rejects non-numeric max results", () => {
-    process.env.CORPUS_MAX_RESULTS = "abc";
-    expect(() => createEnv()).toThrow("CORPUS_MAX_RESULTS");
+    process.env.MALMUNCHI_MAX_RESULTS = "abc";
+    expect(() => createEnv()).toThrow("MALMUNCHI_MAX_RESULTS");
   });
 
   it("rejects zero max results", () => {
-    process.env.CORPUS_MAX_RESULTS = "0";
-    expect(() => createEnv()).toThrow("CORPUS_MAX_RESULTS");
+    process.env.MALMUNCHI_MAX_RESULTS = "0";
+    expect(() => createEnv()).toThrow("MALMUNCHI_MAX_RESULTS");
   });
 
   it("rejects invalid transport", () => {
-    process.env.CORPUS_TRANSPORT = "both";
-    expect(() => createEnv()).toThrow("Invalid CORPUS_TRANSPORT");
+    process.env.MALMUNCHI_TRANSPORT = "both";
+    expect(() => createEnv()).toThrow("Invalid MALMUNCHI_TRANSPORT");
   });
 
   it("uses custom http host", () => {
-    process.env.CORPUS_HTTP_HOST = "0.0.0.0";
+    process.env.MALMUNCHI_HTTP_HOST = "0.0.0.0";
     const env = createEnv();
     expect(env.httpHost).toBe("0.0.0.0");
   });
 
   it("uses custom author import directory", () => {
-    process.env.CORPUS_IMPORT_DIR = "/tmp/corpus-imports";
+    process.env.MALMUNCHI_IMPORT_DIR = "/tmp/malmunchi-imports";
     const env = createEnv();
-    expect(env.authorImportDir).toBe(path.resolve("/tmp/corpus-imports"));
+    expect(env.authorImportDir).toBe(path.resolve("/tmp/malmunchi-imports"));
   });
 
-  it("lets CORPUS variables override legacy variables", () => {
+  it("lets MALMUNCHI variables override legacy variables", () => {
     process.env[legacyEnvName("HTTP_PORT")] = "8080";
-    process.env.CORPUS_HTTP_PORT = "9090";
+    process.env.MALMUNCHI_HTTP_PORT = "9090";
     const env = createEnv();
     expect(env.httpPort).toBe(9090);
   });

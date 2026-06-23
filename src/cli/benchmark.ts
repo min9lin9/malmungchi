@@ -14,8 +14,8 @@ const QUERIES = [
 ];
 
 async function main() {
-  console.error(`Benchmarking corpus in ${env.dataDir}...`);
-  const service = await buildService(env.dataDir, env.corpusName);
+  console.error(`Benchmarking malmunchi in ${env.dataDir}...`);
+  const service = await buildService(env.dataDir, env.instanceName);
 
   console.log("query,elapsed_ms,total,returned");
   for (const query of QUERIES) {

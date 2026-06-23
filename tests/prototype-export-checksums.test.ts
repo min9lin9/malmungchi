@@ -9,12 +9,12 @@ describe("prototype export checksum polish", () => {
   it("exports deterministic checksums and provenance", async () => {
     const dataDir = await makePrototypeDataDir("prototype-export-");
     try {
-      const app = createHttpApp(await buildService(dataDir, "test-corpus"));
+      const app = createHttpApp(await buildService(dataDir, "test-malmunchi"));
       await importPrototypeAuthor(app, "export-author");
 
       const first = await app.handle(
         new Request(
-          "http://localhost/corpus/sources/author:export-author/export?format=json&includeHistory=true"
+          "http://localhost/malmunchi/sources/author:export-author/export?format=json&includeHistory=true"
         )
       );
       expect(first.status).toBe(200);
@@ -51,7 +51,7 @@ describe("prototype export checksum polish", () => {
 
       const second = await app.handle(
         new Request(
-          "http://localhost/corpus/sources/author:export-author/export?format=json&includeHistory=true"
+          "http://localhost/malmunchi/sources/author:export-author/export?format=json&includeHistory=true"
         )
       );
       const secondBody = (await second.json()) as typeof firstBody;
@@ -61,7 +61,7 @@ describe("prototype export checksum polish", () => {
 
       const markdown = await app.handle(
         new Request(
-          "http://localhost/corpus/sources/author:export-author/export?format=markdown&includeHistory=true"
+          "http://localhost/malmunchi/sources/author:export-author/export?format=markdown&includeHistory=true"
         )
       );
       const markdownBody = (await markdown.json()) as { markdown: string };

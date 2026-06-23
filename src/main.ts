@@ -7,7 +7,7 @@ import { startStdioTransport } from "./transports/stdio";
 import { logger } from "./util/logger";
 
 async function main() {
-  const service = await buildService(env.dataDir, env.corpusName);
+  const service = await buildService(env.dataDir, env.instanceName);
   await service.startSubscriptions();
   const shutdownHandlers: Array<() => Promise<void> | void> = [() => service.stopSubscriptions()];
 
@@ -16,14 +16,14 @@ async function main() {
       maxResponseChars: env.maxResponseChars,
     });
     await startStdioTransport(server);
-    logger.info("Corpus MCP server running via stdio");
+    logger.info("Malmunchi MCP server running via stdio");
   }
 
   if (env.transport === "http") {
     const app = createHttpApp(service);
     const stopHttp = await startHttpTransport(app, env.httpPort, env.httpHost);
     shutdownHandlers.push(stopHttp);
-    logger.info(`Corpus HTTP server running at http://${env.httpHost}:${env.httpPort}`);
+    logger.info(`Malmunchi HTTP server running at http://${env.httpHost}:${env.httpPort}`);
   }
 
   const shutdown = async (signal: string) => {

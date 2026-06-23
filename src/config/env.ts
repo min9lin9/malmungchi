@@ -19,7 +19,7 @@ export interface Env {
   searchEngine: SearchEngineType;
   httpHost: string;
   httpPort: number;
-  corpusName: string;
+  instanceName: string;
   apiKey?: string;
   rateLimitRpm: number;
   corsOrigin?: string;
@@ -41,14 +41,14 @@ export interface Env {
 }
 
 function getDataDir(): string {
-  const raw = readEnv("CORPUS_DATA_DIR", legacyEnvName("DATA_DIR")) ?? "./data";
+  const raw = readEnv("MALMUNCHI_DATA_DIR", legacyEnvName("DATA_DIR")) ?? "./data";
   return path.resolve(raw);
 }
 
 function getTransport(): TransportMode {
-  const raw = readEnv("CORPUS_TRANSPORT", legacyEnvName("TRANSPORT")) ?? "stdio";
+  const raw = readEnv("MALMUNCHI_TRANSPORT", legacyEnvName("TRANSPORT")) ?? "stdio";
   if (raw !== "stdio" && raw !== "http") {
-    throw new Error(`Invalid CORPUS_TRANSPORT: ${raw}. Use "stdio" or "http".`);
+    throw new Error(`Invalid MALMUNCHI_TRANSPORT: ${raw}. Use "stdio" or "http".`);
   }
   return raw;
 }
@@ -72,13 +72,13 @@ function getInt(
 }
 
 function getHttpHost(): string {
-  return readEnv("CORPUS_HTTP_HOST", legacyEnvName("HTTP_HOST")) ?? "127.0.0.1";
+  return readEnv("MALMUNCHI_HTTP_HOST", legacyEnvName("HTTP_HOST")) ?? "127.0.0.1";
 }
 
 function getSearchEngine(): SearchEngineType {
-  const raw = readEnv("CORPUS_SEARCH_ENGINE", legacyEnvName("SEARCH_ENGINE")) ?? "flexsearch";
+  const raw = readEnv("MALMUNCHI_SEARCH_ENGINE", legacyEnvName("SEARCH_ENGINE")) ?? "flexsearch";
   if (raw !== "flexsearch" && raw !== "meilisearch") {
-    throw new Error(`Invalid CORPUS_SEARCH_ENGINE: ${raw}. Use "flexsearch" or "meilisearch".`);
+    throw new Error(`Invalid MALMUNCHI_SEARCH_ENGINE: ${raw}. Use "flexsearch" or "meilisearch".`);
   }
   return raw;
 }
@@ -111,36 +111,36 @@ export function createEnv(): Env {
     blogsDir: path.join(getDataDir(), "blogs"),
     authorsDir: path.join(getDataDir(), "authors"),
     authorImportDir: path.resolve(
-      readEnv("CORPUS_IMPORT_DIR", legacyEnvName("IMPORT_DIR")) ??
+      readEnv("MALMUNCHI_IMPORT_DIR", legacyEnvName("IMPORT_DIR")) ??
         path.join(getDataDir(), "imports")
     ),
     manifestPath: path.join(getDataDir(), "manifest.json"),
     transport: getTransport(),
-    maxResults: getInt("CORPUS_MAX_RESULTS", 20, {
+    maxResults: getInt("MALMUNCHI_MAX_RESULTS", 20, {
       min: 1,
       legacyName: legacyEnvName("MAX_RESULTS"),
     }),
-    maxResponseChars: getInt("CORPUS_MAX_RESPONSE_CHARS", 50000, {
+    maxResponseChars: getInt("MALMUNCHI_MAX_RESPONSE_CHARS", 50000, {
       min: 1,
       legacyName: legacyEnvName("MAX_RESPONSE_CHARS"),
     }),
     searchEngine: getSearchEngine(),
     httpHost: getHttpHost(),
-    httpPort: getInt("CORPUS_HTTP_PORT", 3000, {
+    httpPort: getInt("MALMUNCHI_HTTP_PORT", 3000, {
       min: 1,
       max: 65535,
       legacyName: legacyEnvName("HTTP_PORT"),
     }),
-    corpusName: readEnv("CORPUS_NAME", legacyEnvName("CORPUS_NAME")) ?? "corpus",
-    apiKey: readEnv("CORPUS_API_KEY", legacyEnvName("API_KEY")),
-    rateLimitRpm: getInt("CORPUS_RATE_LIMIT_RPM", 60, {
+    instanceName: readEnv("MALMUNCHI_NAME", legacyEnvName("MALMUNCHI_NAME")) ?? "malmunchi",
+    apiKey: readEnv("MALMUNCHI_API_KEY", legacyEnvName("API_KEY")),
+    rateLimitRpm: getInt("MALMUNCHI_RATE_LIMIT_RPM", 60, {
       min: 1,
       legacyName: legacyEnvName("RATE_LIMIT_RPM"),
     }),
-    corsOrigin: readEnv("CORPUS_CORS_ORIGIN", legacyEnvName("CORS_ORIGIN")) ?? "*",
+    corsOrigin: readEnv("MALMUNCHI_CORS_ORIGIN", legacyEnvName("CORS_ORIGIN")) ?? "*",
     meiliHost: process.env.MEILI_HOST ?? "http://localhost:7700",
     meiliApiKey: process.env.MEILI_API_KEY,
-    meiliIndexName: process.env.MEILI_INDEX_NAME ?? "corpus",
+    meiliIndexName: process.env.MEILI_INDEX_NAME ?? "malmunchi",
     insaneSearchRoot: process.env.INSANE_SEARCH_ROOT,
     lightpandaCdpUrl: process.env.LIGHTPANDA_CDP_URL,
     openaiApiKey: process.env.OPENAI_API_KEY,

@@ -26,7 +26,7 @@ async function runSmoke(dataDir: string): Promise<{ readonly stdout: string }> {
     stdout: "pipe",
     stderr: "pipe",
     cwd: process.cwd(),
-    env: { ...process.env, CORPUS_TRANSPORT: "http" },
+    env: { ...process.env, MALMUNCHI_TRANSPORT: "http" },
   });
   const [exitCode, stdout, stderr] = await Promise.all([
     proc.exited,

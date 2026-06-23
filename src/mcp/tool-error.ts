@@ -1,10 +1,10 @@
-import { CorpusError } from "../domain/errors";
+import { MalmunchiError } from "../domain/errors";
 
 export function handleToolError(error: unknown): {
   content: { type: "text"; text: string }[];
   isError: true;
 } {
-  if (error instanceof CorpusError) {
+  if (error instanceof MalmunchiError) {
     return {
       content: [{ type: "text", text: error.message }],
       isError: true,

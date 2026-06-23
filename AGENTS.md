@@ -18,10 +18,11 @@
 ## Data Boundary
 
 - Do not commit runtime source data, generated caches, evidence, provider keys,
-  or private corpora.
+  or private document collections.
 - Public fixtures must be small and synthetic.
 - The public v0 source lifecycle is `author:` source based. Do not add bundled
-  private corpora or crawler-specific import routes without a new plan.
+  private document collections or crawler-specific import routes without a new
+  plan.
 
 ## Verification
 
