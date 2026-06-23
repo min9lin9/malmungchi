@@ -2,10 +2,12 @@
 
 [한국어 README](./README.ko.md)
 
-Malmungchi is a local document memory server and persona workflow kit for Codex.
-It imports user-provided Markdown or JSONL author sources, searches them through
-MCP or HTTP, exports evidence bundles with provenance, and uses those exports to
-generate bounded simulated personas.
+Malmungchi gives Codex a local pile of wild, biased human context, with receipts.
+
+It is a local document memory server and persona workflow kit. It imports
+user-provided Markdown or JSONL author sources, searches them through MCP or
+HTTP, exports evidence bundles with provenance, and uses those exports to
+generate bounded simulated personas. Human mess in, cited workflows out.
 
 ## Quickstart
 

@@ -2,10 +2,9 @@
 
 [English README](./README.md)
 
-Malmungchi는 Codex와 함께 쓰는 로컬 문서 기억 서버이자 페르소나 워크플로 키트입니다.
-내 문서를 어디론가 보내기 전에, 일단 내 컴퓨터 안에서 잘 정리하고 찾아 쓰자는 쪽에 가깝습니다.
+Malmungchi는 당신의 workflow에 야생의 인간적 편향을 접목합니다. 물론 출처는 붙이고요.
 
-Markdown이나 JSONL로 만든 author source를 가져오고, MCP 또는 HTTP로 검색하고, 근거가 붙은 export bundle을 만들고, 그 근거를 바탕으로 선을 넘지 않는 simulated persona를 생성합니다. 기억력은 빌려주되, 허언증은 빌려주지 않는 것이 목표입니다.
+Codex와 함께 쓰는 로컬 문서 기억 서버이자 페르소나 워크플로 키트입니다. Markdown이나 JSONL로 만든 author source를 가져오고, MCP 또는 HTTP로 검색하고, 근거가 붙은 export bundle을 만들고, 그 근거를 바탕으로 선을 넘지 않는 simulated persona를 생성합니다. 인간의 뒤죽박죽을 넣되, 결과물에는 근거를 달아 내보냅니다.
 
 ## 빠른 시작
 
